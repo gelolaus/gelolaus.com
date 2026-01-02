@@ -252,3 +252,19 @@ function openPDF(title, filePath, orientation = 'landscape') {
     }
     bringToFront(win);
 }
+
+/* --- IMAGE VIEWER LOGIC --- */
+function openImage(title, imagePath) {
+    // 1. Set Title & Src
+    document.getElementById('img-title').innerText = title;
+    document.getElementById('img-viewer').src = imagePath;
+    
+    // 2. Open Window
+    const win = document.getElementById('window-image');
+    if (win.classList.contains('hidden')) {
+        toggleWindow('window-image');
+    }
+    
+    // 3. Bring to front
+    bringToFront(win);
+}
