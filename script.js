@@ -201,3 +201,27 @@ function addToTerminal(htmlContent, className = '') {
 }
 
 toggleWindow('window-terminal');
+
+/* --- FILE EXPLORER LOGIC --- */
+function openFolder(folderName, elm) {
+    // 1. Hide all file grids
+    document.querySelectorAll('.file-grid').forEach(grid => {
+        grid.classList.add('hidden');
+    });
+
+    // 2. Show the selected grid
+    document.getElementById(`folder-${folderName}`).classList.remove('hidden');
+
+    // 3. Update Sidebar Visuals (Remove 'bg-white/10' from all, add to clicked)
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('bg-white/10', 'text-gray-100', 'border-hacker-green');
+        item.classList.add('text-gray-400', 'border-transparent');
+    });
+
+    // 4. Highlight the active sidebar item
+    elm.classList.add('bg-white/10', 'text-gray-100', 'border-hacker-green');
+    elm.classList.remove('text-gray-400', 'border-transparent');
+    
+    // 5. Update Breadcrumb path
+    document.getElementById('file-path').innerText = `/ home / gelo / ${folderName}`;
+}
