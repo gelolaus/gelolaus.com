@@ -225,3 +225,30 @@ function openFolder(folderName, elm) {
     // 5. Update Breadcrumb path
     document.getElementById('file-path').innerText = `/ home / gelo / ${folderName}`;
 }
+
+/* --- PDF VIEWER LOGIC --- */
+function openPDF(title, filePath, orientation = 'landscape') {
+    const win = document.getElementById('window-pdf');
+    
+    // 1. Set Title & File
+    document.getElementById('pdf-title').innerText = title;
+    document.getElementById('pdf-frame').src = filePath;
+    
+    // 2. Resize Window based on Orientation (Only on Desktop)
+    if (window.innerWidth > 768) {
+        if (orientation === 'portrait') {
+            win.style.width = '600px';
+            win.style.height = '850px';
+        } else {
+            // Default Landscape
+            win.style.width = '1000px';
+            win.style.height = '750px';
+        }
+    }
+
+    // 3. Open Window
+    if (win.classList.contains('hidden')) {
+        toggleWindow('window-pdf');
+    }
+    bringToFront(win);
+}
