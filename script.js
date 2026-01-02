@@ -8,10 +8,19 @@ updateClock();
 
 // Toggle Window Visibility
 function toggleWindow(windowId) {
+    // 1. Play Sound
+    playClick();
+
     const win = document.getElementById(windowId);
     if (win.classList.contains('hidden')) {
         win.classList.remove('hidden');
         win.classList.add('flex');
+        bringToFront(win);
+        // Focus input if opening terminal
+        if(windowId === 'window-terminal') {
+            const termInput = document.getElementById('terminal-input');
+            if(termInput) termInput.focus();
+        }
     } else {
         win.classList.add('hidden');
         win.classList.remove('flex');
@@ -202,6 +211,7 @@ function addToTerminal(htmlContent, className = '') {
 
 /* --- FILE EXPLORER LOGIC --- */
 function openFolder(folderName, elm) {
+    playClick();
     // 1. Hide all file grids
     document.querySelectorAll('.file-grid').forEach(grid => {
         grid.classList.add('hidden');
@@ -266,6 +276,40 @@ function openImage(title, imagePath) {
     // 3. Bring to front
     bringToFront(win);
 }
+
+/* --- AUDIO SYSTEM --- */
+const clickSound = new Audio('sounds/click.mp3');
+clickSound.volume = 0.4;
+
+// NEW: Keypress Sound
+const keySound = new Audio('sounds/keypress.wav');
+keySound.volume = 0.2; // Keep this subtle
+
+function playClick() {
+    const sound = clickSound.cloneNode();
+    sound.volume = 0.4;
+    sound.play().catch(e => {});
+}
+
+function playKey() {
+    // Clone node allows rapid-fire typing without cutting off the previous sound
+    const sound = keySound.cloneNode();
+    sound.volume = 0.2;
+    // Optional: Slight pitch variation makes it sound more natural
+    // sound.playbackRate = 0.9 + Math.random() * 0.2; 
+    sound.play().catch(e => {});
+}
+
+/* --- GLOBAL KEYBOARD SOUNDS --- */
+document.addEventListener('keydown', function(e) {
+    // 1. Ignore modifier keys (so holding Shift doesn't spam sound)
+    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
+        return;
+    }
+    
+    // 2. Play the sound
+    playKey();
+});
 
 /* --- BOOT SEQUENCE LOGIC --- */
 const bootTexts = [
