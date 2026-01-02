@@ -1,104 +1,82 @@
-// Clock
-function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+/* =========================================
+   1. SYSTEM CONFIGURATION & DATA
+   ========================================= */
+
+/* --- AUDIO SYSTEM --- */
+const clickSound = new Audio('sounds/click.mp3');
+clickSound.volume = 0.4;
+
+const keySound = new Audio('sounds/keypress.wav'); // Ensure this matches your filename
+keySound.volume = 0.2; 
+
+function playClick() {
+    const sound = clickSound.cloneNode();
+    sound.volume = 0.4;
+    sound.play().catch(e => {});
 }
-setInterval(updateClock, 1000);
-updateClock();
 
-// Toggle Window Visibility
-function toggleWindow(windowId) {
-    // 1. Play Sound
-    playClick();
+function playKey() {
+    const sound = keySound.cloneNode();
+    sound.volume = 0.2;
+    sound.play().catch(e => {});
+}
 
-    const win = document.getElementById(windowId);
-    if (win.classList.contains('hidden')) {
-        win.classList.remove('hidden');
-        win.classList.add('flex');
-        bringToFront(win);
-        // Focus input if opening terminal
-        if(windowId === 'window-terminal') {
-            const termInput = document.getElementById('terminal-input');
-            if(termInput) termInput.focus();
-        }
-    } else {
-        win.classList.add('hidden');
-        win.classList.remove('flex');
+/* --- GLOBAL KEYBOARD SOUNDS --- */
+document.addEventListener('keydown', function(e) {
+    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
+        return;
     }
-}
-
-/* --- Z-INDEX MANAGEMENT --- */
-let highestZ = 10;
-
-function bringToFront(element) {
-    highestZ++;
-    element.style.zIndex = highestZ;
-}
-
-// Add event listener to all draggable windows
-document.querySelectorAll('.draggable').forEach(win => {
-    win.addEventListener('mousedown', () => bringToFront(win));
+    playKey();
 });
 
-/* --- DRAGGABLE & RESIZABLE LOGIC (Interact.js) --- */
-interact('.draggable')
-  .draggable({
-    allowFrom: '.window-header', 
-    inertia: true,
-    modifiers: [
-      interact.modifiers.restrictRect({
-        restriction: 'parent',
-        endOnly: true
-      })
-    ],
-    autoScroll: true,
-    
-    // LISTENERS
-    listeners: { 
-      move: function(event) {
-        // DISABLE DRAG ON MOBILE (Screen width < 768px)
-        if (window.innerWidth < 768) {
-             return; 
+/* --- VIRTUAL FILE SYSTEM (DATA) --- */
+const fileSystem = {
+    "root": {
+        "about.txt": { type: "text", content: "I am Gelo, a CS student specializing in Cybersecurity." },
+        "desktop": {
+            type: "dir",
+            children: {
+                "terminal.lnk": { type: "exec", action: () => toggleWindow('window-terminal') },
+                "files.lnk": { type: "exec", action: () => toggleWindow('window-files') }
+            }
+        },
+        "documents": {
+            type: "dir",
+            children: {
+                "cert_c3sa.pdf": { type: "pdf", path: "certs/cert_c3sa.pdf" },
+                "cert_ccep.pdf": { type: "pdf", path: "certs/cert_ccep.pdf" },
+                "cert_cpps.pdf": { type: "pdf", path: "certs/cert_cpps.pdf" },
+                "cert_crtom.pdf": { type: "pdf", path: "certs/cert_crtom.pdf" },
+                "resume.pdf": { type: "pdf", path: "docs/resume.pdf" } 
+            }
+        },
+        "pictures": {
+            type: "dir",
+            children: {
+                "01_PyConAPAC.jpg": { type: "img", path: "pics/01_PyConAPAC.jpg" },
+                "02_HWMUN.jpg": { type: "img", path: "pics/02_HWMUN.jpg" },
+                "03_ArduinoDayPH.jpg": { type: "img", path: "pics/03_ArduinoDayPH.jpg" },
+                "04_YSESIdeathon.jpg": { type: "img", path: "pics/04_YSESIdeathon.jpg" },
+                "05_AWSPartyRockHackathon.jpg": { type: "img", path: "pics/05_AWSPartyRockHackathon.jpg" },
+                "06_BitcoinPizzaDay.jpg": { type: "img", path: "pics/06_BitcoinPizzaDay.jpg" },
+                "07_APCFest2025.jpg": { type: "img", path: "pics/07_APCFest2025.jpg" },
+                "08_GDGMNLBuildWithAI.jpg": { type: "img", path: "pics/08_GDGMNLBuildWithAI.jpg" },
+                "09_Innoverse.jpg": { type: "img", path: "pics/09_Innoverse.jpg" },
+                "10_CyberPHMeetup1.JPG": { type: "img", path: "pics/10_CyberPHMeetup1.JPG" },
+                "11_WhoscallRelaunch.jpg": { type: "img", path: "pics/11_WhoscallRelaunch.jpg" },
+                "12_NotionWorkshop.jpg": { type: "img", path: "pics/12_NotionWorkshop.jpg" },
+                "13_RecognitionDay.jpg": { type: "img", path: "pics/13_RecognitionDay.jpg" },
+                "14_CursorMeetup2.jpeg": { type: "img", path: "pics/14_CursorMeetup2.jpeg" },
+                "15_EngagedtoCharl.jpg": { type: "img", path: "pics/15_EngagedtoCharl.jpg" },
+                "16_HackForGov2025NCR.jpg": { type: "img", path: "pics/16_HackForGov2025NCR.jpg" },
+                "17_GDGMNLDevFest.jpg": { type: "img", path: "pics/17_GDGMNLDevFest.jpg" },
+                "18_HackForGov2025Finals.jpg": { type: "img", path: "pics/18_HackForGov2025Finals.jpg" }
+            }
         }
-        dragMoveListener(event);
-      }
     }
-  })
-  .resizable({
-    // Disable resizing on mobile too
-    edges: { left: true, right: true, bottom: true, top: false },
-    listeners: {
-      move: function (event) {
-        if (window.innerWidth < 768) return; // Stop resize on mobile
+};
 
-        let { x, y } = event.target.dataset;
-        x = (parseFloat(x) || 0) + event.deltaRect.left;
-        y = (parseFloat(y) || 0) + event.deltaRect.top;
-
-        Object.assign(event.target.style, {
-          width: `${event.rect.width}px`,
-          height: `${event.rect.height}px`,
-          transform: `translate(${x}px, ${y}px)`
-        });
-
-        Object.assign(event.target.dataset, { x, y });
-      }
-    }
-  });
-
-function dragMoveListener (event) {
-  var target = event.target;
-  var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-  var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-  target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-  target.setAttribute('data-x', x);
-  target.setAttribute('data-y', y);
-}
-
-/* --- TERMINAL LOGIC --- */
-
-// 1. Commands
+/* --- TERMINAL COMMANDS CONTENT --- */
 const commands = {
     help: `
         <span class="text-hacker-green">Available commands:</span><br>
@@ -107,7 +85,11 @@ const commands = {
         <span class="ml-4">ac</span> - Achievements, Awards, and Recognitions<br>
         <span class="ml-4">xp</span> - Experience<br>
         <span class="ml-4">go</span> - Short-Term and Long-Term Goals<br>
+        <span class="ml-4">ls</span> - List files<br>
+        <span class="ml-4">cd [dir]</span> - Change directory<br>
+        <span class="ml-4">open [file]</span> - Open a file<br>
         <span class="ml-4">clear</span> - Clear terminal<br>
+        <span class="ml-4">exit</span> - Close terminal<br>
     `,
     whoami: `
         <span class="font-bold text-yellow-500">>> ABOUT ME</span><br>
@@ -166,28 +148,378 @@ const commands = {
     `
 };
 
-// 2. Logic
+
+/* =========================================
+   2. CORE UTILITIES
+   ========================================= */
+
+// Clock Logic
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Z-Index Management
+let highestZ = 10;
+
+function bringToFront(element) {
+    highestZ++;
+    element.style.zIndex = highestZ;
+}
+
+// Interact.js (Draggable & Resizable)
+interact('.draggable')
+  .draggable({
+    allowFrom: '.window-header', 
+    inertia: true,
+    modifiers: [
+      interact.modifiers.restrictRect({
+        restriction: 'parent',
+        endOnly: true
+      })
+    ],
+    autoScroll: true,
+    listeners: { 
+      move: function(event) {
+        if (window.innerWidth < 768) return; // Disable on mobile
+        dragMoveListener(event);
+      }
+    }
+  })
+  .resizable({
+    edges: { left: true, right: true, bottom: true, top: false },
+    listeners: {
+      move: function (event) {
+        if (window.innerWidth < 768) return; // Disable on mobile
+
+        let { x, y } = event.target.dataset;
+        x = (parseFloat(x) || 0) + event.deltaRect.left;
+        y = (parseFloat(y) || 0) + event.deltaRect.top;
+
+        Object.assign(event.target.style, {
+          width: `${event.rect.width}px`,
+          height: `${event.rect.height}px`,
+          transform: `translate(${x}px, ${y}px)`
+        });
+
+        Object.assign(event.target.dataset, { x, y });
+      }
+    }
+  });
+
+function dragMoveListener (event) {
+  var target = event.target;
+  var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+  var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+  target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+  target.setAttribute('data-x', x);
+  target.setAttribute('data-y', y);
+}
+
+// Add event listener to all draggable windows for Z-Index
+document.querySelectorAll('.draggable').forEach(win => {
+    win.addEventListener('mousedown', () => bringToFront(win));
+});
+
+
+/* =========================================
+   3. WINDOW MANAGEMENT
+   ========================================= */
+
+// Main Toggle Function
+function toggleWindow(windowId) {
+    playClick();
+
+    const win = document.getElementById(windowId);
+    if (win.classList.contains('hidden')) {
+        win.classList.remove('hidden');
+        win.classList.add('flex');
+        bringToFront(win);
+        // Focus input if opening terminal
+        if(windowId === 'window-terminal') {
+            const termInput = document.getElementById('terminal-input');
+            if(termInput) termInput.focus();
+        }
+    } else {
+        win.classList.add('hidden');
+        win.classList.remove('flex');
+    }
+}
+
+// File Explorer Folder Logic
+function openFolder(folderName, elm) {
+    playClick();
+    
+    // 1. Hide all file grids
+    document.querySelectorAll('.file-grid').forEach(grid => {
+        grid.classList.add('hidden');
+    });
+
+    // 2. Show the selected grid
+    const targetGrid = document.getElementById(`folder-${folderName}`);
+    if(targetGrid) targetGrid.classList.remove('hidden');
+
+    // 3. Update Sidebar Visuals
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('bg-white/10', 'text-gray-100', 'border-hacker-green');
+        item.classList.add('text-gray-400', 'border-transparent');
+    });
+
+    // 4. Highlight the active sidebar item
+    if(elm) {
+        elm.classList.add('bg-white/10', 'text-gray-100', 'border-hacker-green');
+        elm.classList.remove('text-gray-400', 'border-transparent');
+    }
+    
+    // 5. Update Breadcrumb path
+    const pathEl = document.getElementById('file-path');
+    if(pathEl) pathEl.innerText = `/ home / gelo / ${folderName}`;
+}
+
+// PDF Viewer Logic
+function openPDF(title, filePath, orientation = 'landscape') {
+    const win = document.getElementById('window-pdf');
+    
+    document.getElementById('pdf-title').innerText = title;
+    document.getElementById('pdf-frame').src = filePath;
+    
+    if (window.innerWidth > 768) {
+        if (orientation === 'portrait') {
+            win.style.width = '600px';
+            win.style.height = '850px';
+        } else {
+            win.style.width = '1000px';
+            win.style.height = '750px';
+        }
+    }
+
+    if (win.classList.contains('hidden')) {
+        toggleWindow('window-pdf');
+    }
+    bringToFront(win);
+}
+
+// Image Viewer Logic
+function openImage(title, imagePath) {
+    document.getElementById('img-title').innerText = title;
+    document.getElementById('img-viewer').src = imagePath;
+    
+    const win = document.getElementById('window-image');
+    if (win.classList.contains('hidden')) {
+        toggleWindow('window-image');
+    }
+    bringToFront(win);
+}
+
+
+/* =========================================
+   4. ADVANCED TERMINAL LOGIC
+   ========================================= */
+
+// Terminal State
+let currentPath = ["root"]; // Start at root
+let commandHistory = [];
+let historyIndex = -1;
+
 const inputField = document.getElementById('terminal-input');
 const terminalBody = document.getElementById('terminal-body');
+const promptLabel = document.querySelector('.text-hacker-green.mr-2'); 
 
-// Check if elements exist before adding listeners (prevents errors)
+// Helper: Get current directory object
+function getCurrentDir() {
+    let dir = fileSystem;
+    for (let folder of currentPath) {
+        dir = dir[folder] ? dir[folder].children || dir[folder] : dir;
+    }
+    return dir;
+}
+
+// Helper: Update Prompt Display
+function updatePrompt() {
+    if(!promptLabel) return;
+    const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
+    promptLabel.innerText = `root@gelo:${pathString}$`;
+}
+
+// Helper: Print to Terminal
+function addToTerminal(htmlContent, className = '') {
+    const div = document.createElement('div');
+    div.className = `history-line mb-2 ${className}`;
+    div.innerHTML = htmlContent;
+    
+    const inputLine = inputField.parentElement;
+    terminalBody.insertBefore(div, inputLine);
+}
+
+// Command Processor
+function processCommand(cmd, target) {
+    const currentDirObj = getCurrentDir();
+
+    // Check predefined text commands first (whoami, ed, etc.)
+    if (commands[cmd] && !['ls', 'cd', 'open', 'clear', 'exit'].includes(cmd)) {
+        addToTerminal(commands[cmd]);
+        return;
+    }
+
+    switch (cmd) {
+        case 'help':
+            addToTerminal(commands.help);
+            break;
+
+        case 'clear':
+            document.querySelectorAll('.history-line').forEach(el => el.remove());
+            break;
+
+        case 'exit':
+            toggleWindow('window-terminal');
+            break;
+
+        case 'ls':
+            let output = '<div class="grid grid-cols-2 md:grid-cols-4 gap-2">';
+            for (let key in currentDirObj) {
+                const item = currentDirObj[key];
+                const color = item.type === 'dir' ? 'text-blue-400 font-bold' : 
+                              item.type === 'exec' ? 'text-hacker-green' : 'text-gray-300';
+                const icon = item.type === 'dir' ? '/' : '';
+                output += `<span class="${color}">${key}${icon}</span>`;
+            }
+            output += '</div>';
+            addToTerminal(output);
+            break;
+
+        case 'cd':
+            if (!target) {
+                currentPath = ["root"];
+            } else if (target === '..') {
+                if (currentPath.length > 1) currentPath.pop();
+            } else if (currentDirObj[target] && currentDirObj[target].type === 'dir') {
+                currentPath.push(target);
+            } else {
+                addToTerminal(`cd: ${target}: No such directory`, 'text-red-400');
+            }
+            updatePrompt();
+            break;
+
+        case 'open':
+            if (!target) {
+                addToTerminal("usage: open [filename]", 'text-yellow-500');
+            } else if (currentDirObj[target]) {
+                const file = currentDirObj[target];
+                
+                if (file.type === 'pdf') {
+                    openPDF(target, file.path);
+                    addToTerminal(`Opening ${target}...`, 'text-gray-400');
+                } else if (file.type === 'img') {
+                    openImage(target, file.path);
+                    addToTerminal(`Opening ${target}...`, 'text-gray-400');
+                } else if (file.type === 'text') {
+                    addToTerminal(file.content, 'text-white');
+                } else if (file.type === 'exec') {
+                    file.action();
+                    addToTerminal(`Executing ${target}...`, 'text-gray-400');
+                } else {
+                    addToTerminal(`Error: Cannot open file type '${file.type}'`, 'text-red-400');
+                }
+            } else {
+                addToTerminal(`open: ${target}: File not found`, 'text-red-400');
+            }
+            break;
+
+        case '':
+            break;
+
+        default:
+            addToTerminal(`Command not found: ${cmd}. Type 'help'.`, 'text-red-400');
+    }
+}
+
+// Input Listener
 if (inputField && terminalBody) {
     inputField.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            const input = inputField.value.trim().toLowerCase();
+        
+        // 0. TAB COMPLETION
+        if (event.key === 'Tab') {
+            event.preventDefault(); // Stop focus from moving
             
-            // Print user command to history
-            addToTerminal(`root@gelo:~$ ${input}`, 'text-gray-400');
+            const rawInput = inputField.value;
+            const parts = rawInput.split(' ');
+            const currentWord = parts[parts.length - 1];
+            
+            if (currentWord.length === 0) return; // Don't complete empty space
 
-            // Process Command
-            if (input === 'clear') {
-                const history = terminalBody.querySelectorAll('.history-line');
-                history.forEach(el => el.remove());
-            } else if (commands[input]) {
-                addToTerminal(commands[input]);
-            } else if (input !== '') {
-                addToTerminal(`Command not found: ${input}. Type 'help'.`, 'text-red-500');
+            let candidates = [];
+            let match = "";
+
+            // A. If it's the first word, complete from COMMANDS
+            if (parts.length === 1) {
+                // Combine custom commands + logic commands
+                const allCommands = [
+                    ...Object.keys(commands), // whoami, ed, ac...
+                    'ls', 'cd', 'open', 'clear', 'exit', 'help'
+                ];
+                candidates = allCommands.filter(c => c.startsWith(currentWord));
+            } 
+            
+            // B. If it's the second word, complete from FILES/FOLDERS
+            else {
+                const currentDirObj = getCurrentDir();
+                const files = Object.keys(currentDirObj);
+                candidates = files.filter(f => f.startsWith(currentWord));
             }
+
+            // C. Apply Completion
+            if (candidates.length === 1) {
+                // Exact match found - auto fill it
+                parts[parts.length - 1] = candidates[0];
+                inputField.value = parts.join(' ');
+            } else if (candidates.length > 1) {
+                // Optional: If multiple matches (e.g., 'cert_'), 
+                // you could print them to console or terminal, 
+                // but for now we do nothing (standard shell behavior).
+            }
+        }
+
+        // HISTORY NAVIGATION
+        else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            if (historyIndex > 0) {
+                historyIndex--;
+                inputField.value = commandHistory[historyIndex];
+            }
+        } else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                inputField.value = commandHistory[historyIndex];
+            } else {
+                historyIndex = commandHistory.length;
+                inputField.value = "";
+            }
+        }
+        
+        // EXECUTE
+        else if (event.key === 'Enter') {
+            const rawInput = inputField.value.trim();
+            
+            // Add to history
+            if (rawInput) {
+                commandHistory.push(rawInput);
+                historyIndex = commandHistory.length;
+            }
+
+            // Print user line
+            const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
+            addToTerminal(`root@gelo:${pathString}$ ${rawInput}`, 'text-gray-400');
+
+            // Parse Command
+            const args = rawInput.split(' ');
+            const cmd = args[0].toLowerCase();
+            const target = args[1]; 
+
+            processCommand(cmd, target);
 
             // Reset
             inputField.value = '';
@@ -195,123 +527,14 @@ if (inputField && terminalBody) {
         }
     });
 
-    // Auto-focus input when clicking the window body
     terminalBody.addEventListener('click', () => inputField.focus());
 }
 
-function addToTerminal(htmlContent, className = '') {
-    const div = document.createElement('div');
-    div.className = `history-line mb-2 ${className}`;
-    div.innerHTML = htmlContent;
-    
-    // Insert before the input field
-    const inputLine = inputField.parentElement;
-    terminalBody.insertBefore(div, inputLine);
-}
 
-/* --- FILE EXPLORER LOGIC --- */
-function openFolder(folderName, elm) {
-    playClick();
-    // 1. Hide all file grids
-    document.querySelectorAll('.file-grid').forEach(grid => {
-        grid.classList.add('hidden');
-    });
+/* =========================================
+   5. BOOT SEQUENCE
+   ========================================= */
 
-    // 2. Show the selected grid
-    document.getElementById(`folder-${folderName}`).classList.remove('hidden');
-
-    // 3. Update Sidebar Visuals (Remove 'bg-white/10' from all, add to clicked)
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.classList.remove('bg-white/10', 'text-gray-100', 'border-hacker-green');
-        item.classList.add('text-gray-400', 'border-transparent');
-    });
-
-    // 4. Highlight the active sidebar item
-    elm.classList.add('bg-white/10', 'text-gray-100', 'border-hacker-green');
-    elm.classList.remove('text-gray-400', 'border-transparent');
-    
-    // 5. Update Breadcrumb path
-    document.getElementById('file-path').innerText = `/ home / gelo / ${folderName}`;
-}
-
-/* --- PDF VIEWER LOGIC --- */
-function openPDF(title, filePath, orientation = 'landscape') {
-    const win = document.getElementById('window-pdf');
-    
-    // 1. Set Title & File
-    document.getElementById('pdf-title').innerText = title;
-    document.getElementById('pdf-frame').src = filePath;
-    
-    // 2. Resize Window based on Orientation (Only on Desktop)
-    if (window.innerWidth > 768) {
-        if (orientation === 'portrait') {
-            win.style.width = '600px';
-            win.style.height = '850px';
-        } else {
-            // Default Landscape
-            win.style.width = '1000px';
-            win.style.height = '750px';
-        }
-    }
-
-    // 3. Open Window
-    if (win.classList.contains('hidden')) {
-        toggleWindow('window-pdf');
-    }
-    bringToFront(win);
-}
-
-/* --- IMAGE VIEWER LOGIC --- */
-function openImage(title, imagePath) {
-    // 1. Set Title & Src
-    document.getElementById('img-title').innerText = title;
-    document.getElementById('img-viewer').src = imagePath;
-    
-    // 2. Open Window
-    const win = document.getElementById('window-image');
-    if (win.classList.contains('hidden')) {
-        toggleWindow('window-image');
-    }
-    
-    // 3. Bring to front
-    bringToFront(win);
-}
-
-/* --- AUDIO SYSTEM --- */
-const clickSound = new Audio('sounds/click.mp3');
-clickSound.volume = 0.4;
-
-// NEW: Keypress Sound
-const keySound = new Audio('sounds/keypress.wav');
-keySound.volume = 0.2; // Keep this subtle
-
-function playClick() {
-    const sound = clickSound.cloneNode();
-    sound.volume = 0.4;
-    sound.play().catch(e => {});
-}
-
-function playKey() {
-    // Clone node allows rapid-fire typing without cutting off the previous sound
-    const sound = keySound.cloneNode();
-    sound.volume = 0.2;
-    // Optional: Slight pitch variation makes it sound more natural
-    // sound.playbackRate = 0.9 + Math.random() * 0.2; 
-    sound.play().catch(e => {});
-}
-
-/* --- GLOBAL KEYBOARD SOUNDS --- */
-document.addEventListener('keydown', function(e) {
-    // 1. Ignore modifier keys (so holding Shift doesn't spam sound)
-    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
-        return;
-    }
-    
-    // 2. Play the sound
-    playKey();
-});
-
-/* --- BOOT SEQUENCE LOGIC --- */
 const bootTexts = [
     "Initializing GELO-KERNEL v1.0.4...",
     "Loading BIOS settings... [OK]",
@@ -348,23 +571,17 @@ async function runBootSequence() {
     // 1. Print Logs
     for (let text of bootTexts) {
         const p = document.createElement('div');
-        
-        // Highlight [OK] in green
         if (text.includes('[OK]')) {
             p.innerHTML = text.replace('[OK]', '<span class="text-hacker-green font-bold">[OK]</span>');
         } else {
             p.innerText = text;
         }
         
-        // Append to container
         logContainer.appendChild(p);
         
-        // Auto-scroll logic (keep the view at the bottom as new lines are added)
-        // We scroll the CONTAINER, not the window, because the container is fixed.
+        // Auto-scroll logic
         bootScreen.scrollTop = bootScreen.scrollHeight;
         
-        // Random delay for realism (shorter delay for faster boot)
-        // Adjust the '50' and '150' to make it faster or slower
         await new Promise(r => setTimeout(r, Math.random() * 100 + 50));
     }
 
