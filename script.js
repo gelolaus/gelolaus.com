@@ -200,8 +200,6 @@ function addToTerminal(htmlContent, className = '') {
     terminalBody.insertBefore(div, inputLine);
 }
 
-toggleWindow('window-terminal');
-
 /* --- FILE EXPLORER LOGIC --- */
 function openFolder(folderName, elm) {
     // 1. Hide all file grids
@@ -268,3 +266,70 @@ function openImage(title, imagePath) {
     // 3. Bring to front
     bringToFront(win);
 }
+
+/* --- BOOT SEQUENCE LOGIC --- */
+const bootTexts = [
+    "Initializing GELO-KERNEL v1.0.4...",
+    "Loading BIOS settings... [OK]",
+    "Verifying CPU microcode... [OK]",
+    "[OK] CPU: Intel Core i9-14900K detected (24 Cores).",
+    "[OK] Memory: 64GB DDR5 RAM verified.",
+    "Mounting root filesystem (/) read-only...",
+    "Checking integrity of filesystem...",
+    "[OK] /dev/nvme0n1p2: clean, 1204422/6291456 files, 332912/25165824 blocks",
+    "Remounting root filesystem read-write... [OK]",
+    "Loading kernel modules...",
+    "   - crypto_user.ko",
+    "   - security_layer.ko",
+    "   - networking.ko",
+    "   - wifi_driver.ko",
+    "[OK] Interfaces: eth0, wlan0 initialized.",
+    "Starting system message bus...",
+    "Starting OpenBSD Secure Shell server... [OK]",
+    "Starting Network Manager...",
+    "   > Connecting to secure-node-1...",
+    "   > Authenticating via encrypted handshake...",
+    "[OK] Connection established. IP: 192.168.1.104",
+    "Loading Portfolio Assets...",
+    "   - /home/gelo/documents/resume.pdf",
+    "   - /home/gelo/pics/hackathon.jpg",
+    "Starting Graphical User Interface (X11)...",
+    "Welcome, User."
+];
+
+async function runBootSequence() {
+    const logContainer = document.getElementById('boot-log');
+    const bootScreen = document.getElementById('boot-screen');
+    
+    // 1. Print Logs
+    for (let text of bootTexts) {
+        const p = document.createElement('div');
+        
+        // Highlight [OK] in green
+        if (text.includes('[OK]')) {
+            p.innerHTML = text.replace('[OK]', '<span class="text-hacker-green font-bold">[OK]</span>');
+        } else {
+            p.innerText = text;
+        }
+        
+        // Append to container
+        logContainer.appendChild(p);
+        
+        // Auto-scroll logic (keep the view at the bottom as new lines are added)
+        // We scroll the CONTAINER, not the window, because the container is fixed.
+        bootScreen.scrollTop = bootScreen.scrollHeight;
+        
+        // Random delay for realism (shorter delay for faster boot)
+        // Adjust the '50' and '150' to make it faster or slower
+        await new Promise(r => setTimeout(r, Math.random() * 100 + 50));
+    }
+
+    // 2. Short pause after completion
+    await new Promise(r => setTimeout(r, 800));
+
+    // 3. Fade out
+    bootScreen.classList.add('fade-out');
+}
+
+// Start the sequence
+runBootSequence();

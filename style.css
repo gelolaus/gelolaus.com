@@ -35,3 +35,10 @@
         opacity: 0.1;
     }
 }
+
+/* Boot Screen Fade Out */
+.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease-out;
+}
