@@ -23,3 +23,15 @@
 
 /* Utility */
 .window-max-height { max-height: 80vh; }
+
+/* Prevent iOS zoom on inputs */
+@media screen and (max-width: 768px) {
+    input[type="text"], textarea {
+        font-size: 16px !important;
+    }
+    
+    /* Optional: Hide the CRT scanlines on mobile if it makes text hard to read */
+    .scanline {
+        opacity: 0.1;
+    }
+}

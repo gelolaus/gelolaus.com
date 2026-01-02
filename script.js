@@ -34,21 +34,34 @@ document.querySelectorAll('.draggable').forEach(win => {
 /* --- DRAGGABLE & RESIZABLE LOGIC (Interact.js) --- */
 interact('.draggable')
   .draggable({
-    allowFrom: '.window-header', // Only drag via the header bar
+    allowFrom: '.window-header', 
     inertia: true,
     modifiers: [
       interact.modifiers.restrictRect({
-        restriction: 'parent', // Keep inside the desktop
+        restriction: 'parent',
         endOnly: true
       })
     ],
     autoScroll: true,
-    listeners: { move: dragMoveListener }
+    
+    // LISTENERS
+    listeners: { 
+      move: function(event) {
+        // DISABLE DRAG ON MOBILE (Screen width < 768px)
+        if (window.innerWidth < 768) {
+             return; 
+        }
+        dragMoveListener(event);
+      }
+    }
   })
   .resizable({
+    // Disable resizing on mobile too
     edges: { left: true, right: true, bottom: true, top: false },
     listeners: {
       move: function (event) {
+        if (window.innerWidth < 768) return; // Stop resize on mobile
+
         let { x, y } = event.target.dataset;
         x = (parseFloat(x) || 0) + event.deltaRect.left;
         y = (parseFloat(y) || 0) + event.deltaRect.top;
@@ -186,3 +199,5 @@ function addToTerminal(htmlContent, className = '') {
     const inputLine = inputField.parentElement;
     terminalBody.insertBefore(div, inputLine);
 }
+
+toggleWindow('window-terminal');
