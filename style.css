@@ -1,0 +1,25 @@
+/* CRT Scanline Effect Overlay */
+.scanline {
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0,0,0,0.2) 50%,
+        rgba(0,0,0,0.2)
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    opacity: 0.2;
+}
+
+/* Custom Scrollbar for that Cyberpunk feel */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #00ff41; }
+
+/* Utility */
+.window-max-height { max-height: 80vh; }
