@@ -35,6 +35,15 @@
             <i class="fa-solid fa-terminal text-4xl text-gray-400 mb-2"></i>
             <span class="text-xs font-bold">Terminal</span>
         </div>
+        <div id="window-terminal" class="draggable absolute top-10 left-10 w-full md:w-[600px] h-[400px] bg-hacker-black border border-gray-700 shadow-2xl rounded-lg flex flex-col hidden md:flex">
+            <div class="window-header h-8 bg-gray-800 flex items-center justify-between px-2 cursor-move border-b border-gray-700 select-none">
+                <span class="text-xs text-gray-400">root@gelo:~</span>
+                <div class="w-3 h-3 rounded-full bg-red-500 cursor-pointer" onclick="toggleWindow('window-terminal')"></div>
+            </div>
+            <div class="flex-1 p-4 overflow-y-auto" id="terminal-body">
+                <div class="mb-2">Welcome to Gelo's OS...</div>
+                </div>
+        </div>
     </main>
 
     <footer id="taskbar" class="h-12 bg-hacker-gray/90 border-t border-gray-700 flex items-center px-4 justify-between z-50">
