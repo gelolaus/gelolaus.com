@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gelo // Cybersec Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hacker-green': '#00ff41',
+                        'hacker-black': '#0d0d0d',
+                        'hacker-gray': '#1a1a1a',
+                    },
+                    fontFamily: {
+                        'mono': ['"Fira Code"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-hacker-black text-gray-300 font-mono h-screen w-screen flex flex-col relative overflow-hidden">
+
+    <main id="desktop" class="flex-1 relative p-4 grid grid-cols-1 md:grid-cols-auto gap-4 content-start z-0">
+        <div class="desktop-icon flex flex-col items-center w-24 p-2 hover:bg-white/10 rounded cursor-pointer">
+            <i class="fa-solid fa-terminal text-4xl text-gray-400 mb-2"></i>
+            <span class="text-xs font-bold">Terminal</span>
+        </div>
+    </main>
+
+    <footer id="taskbar" class="h-12 bg-hacker-gray/90 border-t border-gray-700 flex items-center px-4 justify-between z-50">
+        <div class="text-sm font-bold text-hacker-green">START</div>
+        <div class="text-xs text-gray-400" id="clock">12:00 PM</div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
