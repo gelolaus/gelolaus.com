@@ -64,6 +64,16 @@
     max-height: 80vh; 
 }
 
+/* Maximize State */
+.maximized {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+    border-radius: 0 !important;
+}
+
 
 /* =========================================
    5. MEDIA QUERIES (MOBILE RESPONSIVENESS)

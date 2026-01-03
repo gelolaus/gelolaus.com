@@ -229,23 +229,90 @@ document.querySelectorAll('.draggable').forEach(win => {
    3. WINDOW MANAGEMENT
    ========================================= */
 
-// Main Toggle Function
+// List of all managed window IDs
+const managedWindows = ['window-terminal', 'window-files', 'window-pdf', 'window-image', 'window-readme'];
+
 function toggleWindow(windowId) {
     playClick();
-
     const win = document.getElementById(windowId);
+
     if (win.classList.contains('hidden')) {
+        // OPEN
         win.classList.remove('hidden');
         win.classList.add('flex');
         bringToFront(win);
-        // Focus input if opening terminal
+        
+        // Focus input if terminal
         if(windowId === 'window-terminal') {
             const termInput = document.getElementById('terminal-input');
             if(termInput) termInput.focus();
         }
     } else {
+        // CLOSE (Hide)
         win.classList.add('hidden');
         win.classList.remove('flex');
+    }
+    
+    // UPDATE TASKBAR
+    renderTaskbar();
+}
+
+/* --- TASKBAR LOGIC --- */
+function renderTaskbar() {
+    const container = document.getElementById('taskbar-apps');
+    container.innerHTML = ''; // Clear current
+
+    managedWindows.forEach(id => {
+        const win = document.getElementById(id);
+        
+        // If window is visible (open), show tab
+        if (!win.classList.contains('hidden')) {
+            
+            // Determine Title & Icon based on ID
+            let title = "App";
+            let iconClass = "fa-window-maximize";
+            
+            if (id === 'window-terminal') { title = "Terminal"; iconClass = "fa-terminal"; }
+            else if (id === 'window-files') { title = "Files"; iconClass = "fa-folder-open"; }
+            else if (id === 'window-pdf') { title = "Viewer"; iconClass = "fa-file-pdf"; }
+            else if (id === 'window-image') { title = "Image"; iconClass = "fa-image"; }
+            else if (id === 'window-readme') { title = "README.md"; iconClass = "fa-markdown"; }
+
+            // Create Tab Element
+            const tab = document.createElement('div');
+            tab.className = "h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded flex items-center gap-2 cursor-pointer border-b-2 border-hacker-green transition-colors min-w-[100px]";
+            tab.onclick = () => {
+                bringToFront(win);
+                // Optional: Toggle minimize logic could go here
+            };
+            
+            tab.innerHTML = `
+                <i class="fa-solid ${iconClass} text-xs text-gray-400"></i>
+                <span class="text-xs text-gray-300 truncate">${title}</span>
+            `;
+            
+            container.appendChild(tab);
+        }
+    });
+}
+
+/* --- MAXIMIZE WINDOW LOGIC --- */
+function toggleMaximize(windowId) {
+    playClick();
+    const win = document.getElementById(windowId);
+    
+    // Toggle class
+    win.classList.toggle('maximized');
+    
+    // Check if we need to reset Interact.js position data
+    if (win.classList.contains('maximized')) {
+        // Disable dragging while maximized (optional, feels cleaner)
+        win.setAttribute('data-original-transform', win.style.transform);
+        win.style.transform = 'none';
+    } else {
+        // Restore
+        const originalTransform = win.getAttribute('data-original-transform');
+        if (originalTransform) win.style.transform = originalTransform;
     }
 }
 
