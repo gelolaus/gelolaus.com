@@ -2,34 +2,40 @@
    1. SYSTEM CONFIGURATION & DATA
    ========================================= */
 
-/* --- AUDIO SYSTEM --- */
+/* --- AUDIO SETTINGS --- */
+// Load sound effects for clicking and typing
 const clickSound = new Audio('sounds/click.mp3');
 clickSound.volume = 0.4;
 
 const keySound = new Audio('sounds/keypress.wav'); 
 keySound.volume = 0.2; 
 
+// Function to play click sound (clones it so we can play rapidly)
 function playClick() {
     const sound = clickSound.cloneNode();
     sound.volume = 0.4;
     sound.play().catch(e => {});
 }
 
+// Function to play typing sound
 function playKey() {
     const sound = keySound.cloneNode();
     sound.volume = 0.2;
     sound.play().catch(e => {});
 }
 
-/* --- GLOBAL KEYBOARD SOUNDS --- */
+// Listen for any key press to play the typing sound
 document.addEventListener('keydown', function(e) {
+    // Don't play sound for modifier keys like Shift or Ctrl
     if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) {
         return;
     }
     playKey();
 });
 
-/* --- VIRTUAL FILE SYSTEM (DATA) --- */
+/* --- VIRTUAL FILE SYSTEM --- */
+// This object mimics a file structure. 
+// Folders have a "children" object, and files have "content" or "path".
 const fileSystem = {
     "root": {
         "about.txt": { type: "text", content: "I am Gelo, a CS student specializing in Cybersecurity." },
@@ -76,7 +82,8 @@ const fileSystem = {
     }
 };
 
-/* --- TERMINAL COMMANDS CONTENT --- */
+/* --- TERMINAL CONTENT --- */
+// Content for specific commands like 'help' or 'whoami'
 const commands = {
     help: `
         <span class="text-hacker-green">Available commands:</span><br>
@@ -153,7 +160,7 @@ const commands = {
    2. CORE UTILITIES
    ========================================= */
 
-// Clock Logic
+// Update the clock every second
 function updateClock() {
     const now = new Date();
     document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -161,7 +168,7 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Z-Index Management
+// Logic to make sure the clicked window is always on top
 let highestZ = 10;
 
 function bringToFront(element) {
@@ -169,7 +176,7 @@ function bringToFront(element) {
     element.style.zIndex = highestZ;
 }
 
-// Interact.js (Draggable & Resizable)
+// Interact.js configuration for dragging and resizing windows
 interact('.draggable')
   .draggable({
     allowFrom: '.window-header', 
@@ -183,7 +190,7 @@ interact('.draggable')
     autoScroll: true,
     listeners: { 
       move: function(event) {
-        if (window.innerWidth < 768) return; // Disable on mobile
+        if (window.innerWidth < 768) return; // Disable drag on mobile phones
         dragMoveListener(event);
       }
     }
@@ -192,7 +199,7 @@ interact('.draggable')
     edges: { left: true, right: true, bottom: true, top: false },
     listeners: {
       move: function (event) {
-        if (window.innerWidth < 768) return; // Disable on mobile
+        if (window.innerWidth < 768) return; // Disable resize on mobile phones
 
         let { x, y } = event.target.dataset;
         x = (parseFloat(x) || 0) + event.deltaRect.left;
@@ -219,7 +226,7 @@ function dragMoveListener (event) {
   target.setAttribute('data-y', y);
 }
 
-// Add event listener to all draggable windows for Z-Index
+// Attach the click event to all windows so they come to front when clicked
 document.querySelectorAll('.draggable').forEach(win => {
     win.addEventListener('mousedown', () => bringToFront(win));
 });
@@ -229,46 +236,47 @@ document.querySelectorAll('.draggable').forEach(win => {
    3. WINDOW MANAGEMENT
    ========================================= */
 
-// List of all managed window IDs
+// Keep track of which windows can be opened
 const managedWindows = ['window-terminal', 'window-files', 'window-pdf', 'window-image', 'window-readme'];
 
+// Open or Close a window by its ID
 function toggleWindow(windowId) {
     playClick();
     const win = document.getElementById(windowId);
 
     if (win.classList.contains('hidden')) {
-        // OPEN
+        // Show the window
         win.classList.remove('hidden');
         win.classList.add('flex');
         bringToFront(win);
         
-        // Focus input if terminal
+        // If it's the terminal, automatically focus the typing area
         if(windowId === 'window-terminal') {
             const termInput = document.getElementById('terminal-input');
             if(termInput) termInput.focus();
         }
     } else {
-        // CLOSE (Hide)
+        // Hide the window
         win.classList.add('hidden');
         win.classList.remove('flex');
     }
     
-    // UPDATE TASKBAR
+    // Refresh the taskbar at the bottom
     renderTaskbar();
 }
 
-/* --- TASKBAR LOGIC --- */
+// Logic to draw the tabs in the taskbar
 function renderTaskbar() {
     const container = document.getElementById('taskbar-apps');
-    container.innerHTML = ''; // Clear current
+    container.innerHTML = ''; // Clear existing tabs
 
     managedWindows.forEach(id => {
         const win = document.getElementById(id);
         
-        // If window is visible (open), show tab
+        // Only create a tab if the window is open
         if (!win.classList.contains('hidden')) {
             
-            // Determine Title & Icon based on ID
+            // Set the correct name and icon for each app
             let title = "App";
             let iconClass = "fa-window-maximize";
             
@@ -278,7 +286,7 @@ function renderTaskbar() {
             else if (id === 'window-image') { title = "Image"; iconClass = "fa-image"; }
             else if (id === 'window-readme') { title = "README.md"; iconClass = "fa-markdown"; }
 
-            // Create Tab Element
+            // Create the tab element
             const tab = document.createElement('div');
             tab.className = "h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded flex items-center gap-2 cursor-pointer border-b-2 border-hacker-green transition-colors min-w-[100px]";
             tab.onclick = () => {
@@ -295,63 +303,63 @@ function renderTaskbar() {
     });
 }
 
-/* --- MAXIMIZE WINDOW LOGIC --- */
+// Maximize (Full Screen) button logic
 function toggleMaximize(windowId) {
     playClick();
     const win = document.getElementById(windowId);
     
-    // Toggle class
+    // Toggle the 'maximized' CSS class
     win.classList.toggle('maximized');
     
-    // Check if we need to reset Interact.js position data
+    // If maximizing, remove drag transform so it fills screen cleanly
     if (win.classList.contains('maximized')) {
-        // Disable dragging while maximized
         win.setAttribute('data-original-transform', win.style.transform);
         win.style.transform = 'none';
     } else {
-        // Restore
+        // If restoring, put it back where it was
         const originalTransform = win.getAttribute('data-original-transform');
         if (originalTransform) win.style.transform = originalTransform;
     }
 }
 
-// File Explorer Folder Logic
+// Logic for clicking folders in the File Explorer sidebar
 function openFolder(folderName, elm) {
     playClick();
     
-    // 1. Hide all file grids
+    // 1. Hide all existing file lists
     document.querySelectorAll('.file-grid').forEach(grid => {
         grid.classList.add('hidden');
     });
 
-    // 2. Show the selected grid
+    // 2. Show the list for the folder we clicked
     const targetGrid = document.getElementById(`folder-${folderName}`);
     if(targetGrid) targetGrid.classList.remove('hidden');
 
-    // 3. Update Sidebar Visuals
+    // 3. Reset the sidebar styling
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.classList.remove('bg-white/10', 'text-gray-100', 'border-hacker-green');
         item.classList.add('text-gray-400', 'border-transparent');
     });
 
-    // 4. Highlight the active sidebar item
+    // 4. Highlight the sidebar item we just clicked
     if(elm) {
         elm.classList.add('bg-white/10', 'text-gray-100', 'border-hacker-green');
         elm.classList.remove('text-gray-400', 'border-transparent');
     }
     
-    // 5. Update Breadcrumb path
+    // 5. Update the breadcrumb text
     const pathEl = document.getElementById('file-path');
     if(pathEl) pathEl.innerText = `/ home / gelo / ${folderName}`;
 }
 
-// PDF Viewer Logic
+// Function to open the PDF Viewer window
 function openPDF(title, filePath, orientation = 'landscape') {
     const win = document.getElementById('window-pdf');
     
     document.getElementById('pdf-title').innerText = title;
     document.getElementById('pdf-frame').src = filePath;
     
+    // Resize window based on document type (only on desktop)
     if (window.innerWidth > 768) {
         if (orientation === 'portrait') {
             win.style.width = '600px';
@@ -368,7 +376,7 @@ function openPDF(title, filePath, orientation = 'landscape') {
     bringToFront(win);
 }
 
-// Image Viewer Logic
+// Function to open the Image Viewer window
 function openImage(title, imagePath) {
     document.getElementById('img-title').innerText = title;
     document.getElementById('img-viewer').src = imagePath;
@@ -382,11 +390,11 @@ function openImage(title, imagePath) {
 
 
 /* =========================================
-   4. ADVANCED TERMINAL LOGIC
+   4. TERMINAL LOGIC
    ========================================= */
 
-// Terminal State
-let currentPath = ["root"]; // Start at root
+// Tracking where we are in the terminal
+let currentPath = ["root"]; // We start at root
 let commandHistory = [];
 let historyIndex = -1;
 
@@ -394,49 +402,46 @@ const inputField = document.getElementById('terminal-input');
 const terminalBody = document.getElementById('terminal-body');
 const promptLabel = document.querySelector('.text-hacker-green.mr-2'); 
 
-// --- UPDATED: PATH RESOLVER ---
-// Allows navigation like "cd documents/projects" or "open ../resume.pdf"
+// This function processes paths like "cd documents/projects" or "open ../resume.pdf"
 function resolvePath(inputPath) {
-    // 1. Determine starting point
-    // If input starts with '/', it's absolute. Otherwise, start at currentPath.
+    // 1. Decide where to start
+    // If path starts with '/', start from root. Otherwise, start from current folder.
     let pathStack = inputPath.startsWith('/') ? [] : [...currentPath];
     
-    // 2. Split input into segments
+    // 2. Break the path string into individual folder names
     const segments = inputPath.split('/').filter(seg => seg !== '' && seg !== '.');
 
-    // 3. Process segments
+    // 3. Process each folder name
     for (let segment of segments) {
         if (segment === '..') {
-            if (pathStack.length > 1) { // Don't pop 'root'
+            // ".." means go up one level
+            if (pathStack.length > 1) { // Don't allow going above root
                 pathStack.pop();
             }
         } else {
+            // Otherwise, go down into the folder
             pathStack.push(segment);
         }
     }
 
-    // 4. Traverse the fileSystem to find the node
+    // 4. Check if this path actually exists in our fileSystem object
     let currentNode = fileSystem;
     
-    // Our fileSystem structure is { "root": { ... } }
-    // pathStack[0] is always "root".
-    
+    // We walk through the JSON object step-by-step
     for (let i = 0; i < pathStack.length; i++) {
         const folderName = pathStack[i];
         
-        // Handle the nested structure:
-        // If we are at the top level, currentNode is fileSystem, key is "root"
+        // Special case for root level
         if (i === 0 && folderName === 'root') {
             currentNode = currentNode['root'];
         } else {
-            // Check children
+            // Check if folder exists inside .children (nested) or directly
             if (currentNode.children && currentNode.children[folderName]) {
                 currentNode = currentNode.children[folderName];
             } else if (currentNode[folderName]) {
-                // Fallback for simple structures
                 currentNode = currentNode[folderName];
             } else {
-                return null; // Invalid path
+                return null; // Path doesn't exist
             }
         }
     }
@@ -447,34 +452,47 @@ function resolvePath(inputPath) {
     };
 }
 
-// Helper: Get current directory object (Legacy support)
+// Helper to get the current folder object based on the currentPath array
 function getCurrentDir() {
-    let result = resolvePath(currentPath.join('/'));
-    return result ? result.node : null;
+    let current = fileSystem['root'];
+    
+    // Loop through the path array to find the correct object
+    for (let i = 1; i < currentPath.length; i++) {
+        const folder = currentPath[i];
+        
+        // Check both .children (standard) and direct keys (legacy support)
+        if (current.children && current.children[folder]) {
+            current = current.children[folder];
+        } else if (current[folder]) {
+            current = current[folder];
+        }
+    }
+    return current;
 }
 
-// Helper: Update Prompt Display
+// Update the "root@gelo:~$" text
 function updatePrompt() {
     if(!promptLabel) return;
     const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
     promptLabel.innerText = `root@gelo:${pathString}$`;
 }
 
-// Helper: Print to Terminal
+// Add a line of text to the terminal history
 function addToTerminal(htmlContent, className = '') {
     const div = document.createElement('div');
     div.className = `history-line mb-2 ${className}`;
     div.innerHTML = htmlContent;
     
+    // Insert the new line before the input field
     const inputLine = inputField.parentElement;
     terminalBody.insertBefore(div, inputLine);
 }
 
-// Command Processor
+// Main logic to handle user commands
 function processCommand(cmd, target) {
     const currentDirObj = getCurrentDir();
 
-    // Check predefined text commands first
+    // Check if the command is one of our text blocks (whoami, ed, xp, etc.)
     if (commands[cmd] && !['ls', 'cd', 'open', 'clear', 'exit'].includes(cmd)) {
         addToTerminal(commands[cmd]);
         return;
@@ -486,6 +504,7 @@ function processCommand(cmd, target) {
             break;
 
         case 'clear':
+            // Remove all previous lines
             document.querySelectorAll('.history-line').forEach(el => el.remove());
             break;
 
@@ -494,11 +513,14 @@ function processCommand(cmd, target) {
             break;
 
         case 'ls':
+            // List all files and folders in the current directory
             let output = '<div class="grid grid-cols-2 md:grid-cols-4 gap-2">';
+            // Handle differences between root object and folder objects
             let items = currentDirObj.children ? currentDirObj.children : currentDirObj;
             
             for (let key in items) {
                 const item = items[key];
+                // Color code: Blue for directories, Green for executables, Gray for files
                 const color = item.type === 'dir' ? 'text-blue-400 font-bold' : 
                               item.type === 'exec' ? 'text-hacker-green' : 'text-gray-300';
                 const icon = item.type === 'dir' ? '/' : '';
@@ -509,17 +531,18 @@ function processCommand(cmd, target) {
             break;
 
         case 'cd':
+            // If no folder specified, go back to root
             if (!target) {
                 currentPath = ["root"];
                 updatePrompt();
                 return;
             } 
             
-            // USE RESOLVE PATH
+            // Use our helper to find the target folder
             const cdResult = resolvePath(target);
             
             if (cdResult && cdResult.node && (cdResult.node.type === 'dir' || cdResult.fullPathArray.length === 1)) {
-                // Success
+                // Update our path variable
                 currentPath = cdResult.fullPathArray;
                 updatePrompt();
             } else if (cdResult && cdResult.node && cdResult.node.type !== 'dir') {
@@ -535,12 +558,13 @@ function processCommand(cmd, target) {
                 return;
             }
             
-            // USE RESOLVE PATH
+            // Use our helper to find the file
             const openResult = resolvePath(target);
             
             if (openResult && openResult.node) {
                 const file = openResult.node;
                 
+                // Open the correct window based on file type
                 if (file.type === 'pdf') {
                     openPDF(target, file.path);
                     addToTerminal(`Opening ${target}...`, 'text-gray-400');
@@ -570,13 +594,13 @@ function processCommand(cmd, target) {
     }
 }
 
-// Input Listener
+// Event Listeners for the Terminal Input
 if (inputField && terminalBody) {
     inputField.addEventListener('keydown', function(event) {
         
-        // 0. TAB COMPLETION
+        // Handle Tab Completion
         if (event.key === 'Tab') {
-            event.preventDefault(); 
+            event.preventDefault(); // Stop the tab from switching focus
             
             const rawInput = inputField.value;
             const parts = rawInput.split(' ');
@@ -586,7 +610,7 @@ if (inputField && terminalBody) {
 
             let candidates = [];
 
-            // A. If it's the first word, complete from COMMANDS
+            // If it's the first word, check against COMMANDS
             if (parts.length === 1) {
                 const allCommands = [
                     ...Object.keys(commands),
@@ -594,21 +618,22 @@ if (inputField && terminalBody) {
                 ];
                 candidates = allCommands.filter(c => c.startsWith(currentWord));
             } 
-            // B. If it's the second word, complete from FILES/FOLDERS
+            // If it's the second word, check against FILES
             else {
                 const currentDirObj = getCurrentDir();
-                const items = currentDirObj.children || currentDirObj; // Handle root vs folders
+                const items = currentDirObj.children || currentDirObj; 
                 const files = Object.keys(items);
                 candidates = files.filter(f => f.startsWith(currentWord));
             }
 
+            // If we found exactly one match, fill it in
             if (candidates.length === 1) {
                 parts[parts.length - 1] = candidates[0];
                 inputField.value = parts.join(' ');
             }
         }
 
-        // HISTORY NAVIGATION
+        // Handle Arrow Keys for History
         else if (event.key === 'ArrowUp') {
             event.preventDefault();
             if (historyIndex > 0) {
@@ -626,29 +651,34 @@ if (inputField && terminalBody) {
             }
         }
         
-        // EXECUTE
+        // Handle Enter Key (Execute)
         else if (event.key === 'Enter') {
             const rawInput = inputField.value.trim();
             
+            // Save to history
             if (rawInput) {
                 commandHistory.push(rawInput);
                 historyIndex = commandHistory.length;
             }
 
+            // Display the command in the terminal
             const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
             addToTerminal(`root@gelo:${pathString}$ ${rawInput}`, 'text-gray-400');
 
+            // Process the command
             const args = rawInput.split(' ');
             const cmd = args[0].toLowerCase();
             const target = args[1]; 
 
             processCommand(cmd, target);
 
+            // Clear input and scroll to bottom
             inputField.value = '';
             terminalBody.scrollTop = terminalBody.scrollHeight;
         }
     });
 
+    // Focus input when clicking anywhere in terminal
     terminalBody.addEventListener('click', () => inputField.focus());
 }
 
@@ -657,6 +687,7 @@ if (inputField && terminalBody) {
    5. BOOT SEQUENCE
    ========================================= */
 
+// Text log to simulate system startup
 const bootTexts = [
     "Initializing GELO-KERNEL v1.0.4...",
     "Loading BIOS settings... [OK]",
@@ -690,7 +721,7 @@ async function runBootSequence() {
     const logContainer = document.getElementById('boot-log');
     const bootScreen = document.getElementById('boot-screen');
     
-    // 1. Print Logs
+    // Print each line one by one
     for (let text of bootTexts) {
         const p = document.createElement('div');
         if (text.includes('[OK]')) {
@@ -701,18 +732,19 @@ async function runBootSequence() {
         
         logContainer.appendChild(p);
         
-        // Auto-scroll logic
+        // Scroll to keep new lines visible
         bootScreen.scrollTop = bootScreen.scrollHeight;
         
+        // Random delay to make it look realistic
         await new Promise(r => setTimeout(r, Math.random() * 100 + 50));
     }
 
-    // 2. Short pause after completion
+    // Wait a moment before showing the desktop
     await new Promise(r => setTimeout(r, 800));
 
-    // 3. Fade out
+    // Hide the boot screen
     bootScreen.classList.add('fade-out');
 }
 
-// Start the sequence
+// Start the boot sequence immediately
 runBootSequence();
