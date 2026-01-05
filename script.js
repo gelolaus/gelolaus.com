@@ -6,7 +6,7 @@
 const clickSound = new Audio('sounds/click.mp3');
 clickSound.volume = 0.4;
 
-const keySound = new Audio('sounds/keypress.wav'); // Ensure this matches your filename
+const keySound = new Audio('sounds/keypress.wav'); 
 keySound.volume = 0.2; 
 
 function playClick() {
@@ -283,7 +283,6 @@ function renderTaskbar() {
             tab.className = "h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded flex items-center gap-2 cursor-pointer border-b-2 border-hacker-green transition-colors min-w-[100px]";
             tab.onclick = () => {
                 bringToFront(win);
-                // Optional: Toggle minimize logic could go here
             };
             
             tab.innerHTML = `
@@ -306,7 +305,7 @@ function toggleMaximize(windowId) {
     
     // Check if we need to reset Interact.js position data
     if (win.classList.contains('maximized')) {
-        // Disable dragging while maximized (optional, feels cleaner)
+        // Disable dragging while maximized
         win.setAttribute('data-original-transform', win.style.transform);
         win.style.transform = 'none';
     } else {
@@ -395,13 +394,63 @@ const inputField = document.getElementById('terminal-input');
 const terminalBody = document.getElementById('terminal-body');
 const promptLabel = document.querySelector('.text-hacker-green.mr-2'); 
 
-// Helper: Get current directory object
-function getCurrentDir() {
-    let dir = fileSystem;
-    for (let folder of currentPath) {
-        dir = dir[folder] ? dir[folder].children || dir[folder] : dir;
+// --- UPDATED: PATH RESOLVER ---
+// Allows navigation like "cd documents/projects" or "open ../resume.pdf"
+function resolvePath(inputPath) {
+    // 1. Determine starting point
+    // If input starts with '/', it's absolute. Otherwise, start at currentPath.
+    let pathStack = inputPath.startsWith('/') ? [] : [...currentPath];
+    
+    // 2. Split input into segments
+    const segments = inputPath.split('/').filter(seg => seg !== '' && seg !== '.');
+
+    // 3. Process segments
+    for (let segment of segments) {
+        if (segment === '..') {
+            if (pathStack.length > 1) { // Don't pop 'root'
+                pathStack.pop();
+            }
+        } else {
+            pathStack.push(segment);
+        }
     }
-    return dir;
+
+    // 4. Traverse the fileSystem to find the node
+    let currentNode = fileSystem;
+    
+    // Our fileSystem structure is { "root": { ... } }
+    // pathStack[0] is always "root".
+    
+    for (let i = 0; i < pathStack.length; i++) {
+        const folderName = pathStack[i];
+        
+        // Handle the nested structure:
+        // If we are at the top level, currentNode is fileSystem, key is "root"
+        if (i === 0 && folderName === 'root') {
+            currentNode = currentNode['root'];
+        } else {
+            // Check children
+            if (currentNode.children && currentNode.children[folderName]) {
+                currentNode = currentNode.children[folderName];
+            } else if (currentNode[folderName]) {
+                // Fallback for simple structures
+                currentNode = currentNode[folderName];
+            } else {
+                return null; // Invalid path
+            }
+        }
+    }
+
+    return {
+        node: currentNode,
+        fullPathArray: pathStack
+    };
+}
+
+// Helper: Get current directory object (Legacy support)
+function getCurrentDir() {
+    let result = resolvePath(currentPath.join('/'));
+    return result ? result.node : null;
 }
 
 // Helper: Update Prompt Display
@@ -425,7 +474,7 @@ function addToTerminal(htmlContent, className = '') {
 function processCommand(cmd, target) {
     const currentDirObj = getCurrentDir();
 
-    // Check predefined text commands first (whoami, ed, etc.)
+    // Check predefined text commands first
     if (commands[cmd] && !['ls', 'cd', 'open', 'clear', 'exit'].includes(cmd)) {
         addToTerminal(commands[cmd]);
         return;
@@ -446,8 +495,10 @@ function processCommand(cmd, target) {
 
         case 'ls':
             let output = '<div class="grid grid-cols-2 md:grid-cols-4 gap-2">';
-            for (let key in currentDirObj) {
-                const item = currentDirObj[key];
+            let items = currentDirObj.children ? currentDirObj.children : currentDirObj;
+            
+            for (let key in items) {
+                const item = items[key];
                 const color = item.type === 'dir' ? 'text-blue-400 font-bold' : 
                               item.type === 'exec' ? 'text-hacker-green' : 'text-gray-300';
                 const icon = item.type === 'dir' ? '/' : '';
@@ -460,21 +511,35 @@ function processCommand(cmd, target) {
         case 'cd':
             if (!target) {
                 currentPath = ["root"];
-            } else if (target === '..') {
-                if (currentPath.length > 1) currentPath.pop();
-            } else if (currentDirObj[target] && currentDirObj[target].type === 'dir') {
-                currentPath.push(target);
+                updatePrompt();
+                return;
+            } 
+            
+            // USE RESOLVE PATH
+            const cdResult = resolvePath(target);
+            
+            if (cdResult && cdResult.node && (cdResult.node.type === 'dir' || cdResult.fullPathArray.length === 1)) {
+                // Success
+                currentPath = cdResult.fullPathArray;
+                updatePrompt();
+            } else if (cdResult && cdResult.node && cdResult.node.type !== 'dir') {
+                 addToTerminal(`cd: ${target}: Not a directory`, 'text-red-400');
             } else {
-                addToTerminal(`cd: ${target}: No such directory`, 'text-red-400');
+                 addToTerminal(`cd: ${target}: No such directory`, 'text-red-400');
             }
-            updatePrompt();
             break;
 
         case 'open':
             if (!target) {
                 addToTerminal("usage: open [filename]", 'text-yellow-500');
-            } else if (currentDirObj[target]) {
-                const file = currentDirObj[target];
+                return;
+            }
+            
+            // USE RESOLVE PATH
+            const openResult = resolvePath(target);
+            
+            if (openResult && openResult.node) {
+                const file = openResult.node;
                 
                 if (file.type === 'pdf') {
                     openPDF(target, file.path);
@@ -487,6 +552,8 @@ function processCommand(cmd, target) {
                 } else if (file.type === 'exec') {
                     file.action();
                     addToTerminal(`Executing ${target}...`, 'text-gray-400');
+                } else if (file.type === 'dir') {
+                    addToTerminal(`open: ${target}: Is a directory`, 'text-red-400');
                 } else {
                     addToTerminal(`Error: Cannot open file type '${file.type}'`, 'text-red-400');
                 }
@@ -509,43 +576,35 @@ if (inputField && terminalBody) {
         
         // 0. TAB COMPLETION
         if (event.key === 'Tab') {
-            event.preventDefault(); // Stop focus from moving
+            event.preventDefault(); 
             
             const rawInput = inputField.value;
             const parts = rawInput.split(' ');
             const currentWord = parts[parts.length - 1];
             
-            if (currentWord.length === 0) return; // Don't complete empty space
+            if (currentWord.length === 0) return;
 
             let candidates = [];
-            let match = "";
 
             // A. If it's the first word, complete from COMMANDS
             if (parts.length === 1) {
-                // Combine custom commands + logic commands
                 const allCommands = [
-                    ...Object.keys(commands), // whoami, ed, ac...
+                    ...Object.keys(commands),
                     'ls', 'cd', 'open', 'clear', 'exit', 'help'
                 ];
                 candidates = allCommands.filter(c => c.startsWith(currentWord));
             } 
-            
             // B. If it's the second word, complete from FILES/FOLDERS
             else {
                 const currentDirObj = getCurrentDir();
-                const files = Object.keys(currentDirObj);
+                const items = currentDirObj.children || currentDirObj; // Handle root vs folders
+                const files = Object.keys(items);
                 candidates = files.filter(f => f.startsWith(currentWord));
             }
 
-            // C. Apply Completion
             if (candidates.length === 1) {
-                // Exact match found - auto fill it
                 parts[parts.length - 1] = candidates[0];
                 inputField.value = parts.join(' ');
-            } else if (candidates.length > 1) {
-                // Optional: If multiple matches (e.g., 'cert_'), 
-                // you could print them to console or terminal, 
-                // but for now we do nothing (standard shell behavior).
             }
         }
 
@@ -571,24 +630,20 @@ if (inputField && terminalBody) {
         else if (event.key === 'Enter') {
             const rawInput = inputField.value.trim();
             
-            // Add to history
             if (rawInput) {
                 commandHistory.push(rawInput);
                 historyIndex = commandHistory.length;
             }
 
-            // Print user line
             const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
             addToTerminal(`root@gelo:${pathString}$ ${rawInput}`, 'text-gray-400');
 
-            // Parse Command
             const args = rawInput.split(' ');
             const cmd = args[0].toLowerCase();
             const target = args[1]; 
 
             processCommand(cmd, target);
 
-            // Reset
             inputField.value = '';
             terminalBody.scrollTop = terminalBody.scrollHeight;
         }
