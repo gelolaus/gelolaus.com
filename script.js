@@ -598,7 +598,7 @@ function processCommand(cmd, target) {
 if (inputField && terminalBody) {
     inputField.addEventListener('keydown', function(event) {
         
-        // Handle Tab Completion
+        // 0. TAB COMPLETION (Upgraded for Nested Paths)
         if (event.key === 'Tab') {
             event.preventDefault(); // Stop the tab from switching focus
             
@@ -609,8 +609,9 @@ if (inputField && terminalBody) {
             if (currentWord.length === 0) return;
 
             let candidates = [];
+            let prefix = ""; // To store "pictures/" if we are typing a path
 
-            // If it's the first word, check against COMMANDS
+            // A. If it's the first word, complete from COMMANDS
             if (parts.length === 1) {
                 const allCommands = [
                     ...Object.keys(commands),
@@ -618,29 +619,54 @@ if (inputField && terminalBody) {
                 ];
                 candidates = allCommands.filter(c => c.startsWith(currentWord));
             } 
-            // If it's the second word, check against FILES
+            
+            // B. If it's the second word, complete from FILES
             else {
-                const currentDirObj = getCurrentDir();
-                const items = currentDirObj.children || currentDirObj; 
-                const files = Object.keys(items);
-                candidates = files.filter(f => f.startsWith(currentWord));
+                // Check if the user is typing a nested path (e.g. "pictures/01")
+                const lastSlashIndex = currentWord.lastIndexOf('/');
+                
+                if (lastSlashIndex !== -1) {
+                    // Case B1: Nested Path found
+                    // Separate "pictures/" from "01"
+                    prefix = currentWord.substring(0, lastSlashIndex + 1); // "pictures/"
+                    const search = currentWord.substring(lastSlashIndex + 1); // "01"
+                    
+                    // Use resolvePath to find the folder they are pointing to
+                    const parentDir = resolvePath(prefix);
+                    
+                    if (parentDir && parentDir.node) {
+                        const items = parentDir.node.children || parentDir.node;
+                        const files = Object.keys(items);
+                        // Find files starting with "01" inside that folder
+                        candidates = files.filter(f => f.startsWith(search));
+                    }
+                } else {
+                    // Case B2: Normal file in current directory
+                    const currentDirObj = getCurrentDir();
+                    const items = currentDirObj.children || currentDirObj; 
+                    const files = Object.keys(items);
+                    candidates = files.filter(f => f.startsWith(currentWord));
+                }
             }
 
             // If we found exactly one match, fill it in
             if (candidates.length === 1) {
-                parts[parts.length - 1] = candidates[0];
+                // If we had a prefix (like "pictures/"), add it back to the match
+                parts[parts.length - 1] = prefix + candidates[0];
                 inputField.value = parts.join(' ');
             }
         }
 
-        // Handle Arrow Keys for History
+        // HISTORY NAVIGATION (ArrowUp)
         else if (event.key === 'ArrowUp') {
             event.preventDefault();
             if (historyIndex > 0) {
                 historyIndex--;
                 inputField.value = commandHistory[historyIndex];
             }
-        } else if (event.key === 'ArrowDown') {
+        } 
+        // HISTORY NAVIGATION (ArrowDown)
+        else if (event.key === 'ArrowDown') {
             event.preventDefault();
             if (historyIndex < commandHistory.length - 1) {
                 historyIndex++;
@@ -651,28 +677,24 @@ if (inputField && terminalBody) {
             }
         }
         
-        // Handle Enter Key (Execute)
+        // EXECUTE (Enter)
         else if (event.key === 'Enter') {
             const rawInput = inputField.value.trim();
             
-            // Save to history
             if (rawInput) {
                 commandHistory.push(rawInput);
                 historyIndex = commandHistory.length;
             }
 
-            // Display the command in the terminal
             const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
             addToTerminal(`root@gelo:${pathString}$ ${rawInput}`, 'text-gray-400');
 
-            // Process the command
             const args = rawInput.split(' ');
             const cmd = args[0].toLowerCase();
             const target = args[1]; 
 
             processCommand(cmd, target);
 
-            // Clear input and scroll to bottom
             inputField.value = '';
             terminalBody.scrollTop = terminalBody.scrollHeight;
         }
