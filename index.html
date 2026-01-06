@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gelo // Cybersec Portfolio</title>
     
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -26,9 +28,11 @@
         }
     </script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-hacker-black text-gray-300 font-mono h-screen w-screen flex flex-col relative overflow-hidden">
+
+    <canvas id="matrix-canvas" class="fixed inset-0 z-[5] opacity-0 transition-opacity duration-1000 pointer-events-none"></canvas>
 
     <div id="boot-screen" class="fixed inset-0 bg-black z-[60] flex flex-col justify-start p-4 md:p-10 font-mono text-xs md:text-sm cursor-none overflow-hidden">
         <div id="boot-log" class="text-gray-400 flex flex-col gap-1">
@@ -38,8 +42,7 @@
 
     <div class="scanline"></div>
 
-
-    <main id="desktop" class="flex-1 relative p-4 grid grid-cols-1 md:grid-cols-auto gap-4 content-start z-0">
+    <main id="desktop" class="flex-1 relative p-4 grid grid-cols-1 md:grid-cols-auto gap-4 content-start z-10">
         
         <div class="desktop-icon flex flex-col items-center w-24 p-2 hover:bg-white/10 rounded cursor-pointer" onclick="toggleWindow('window-terminal')">
             <i class="fa-solid fa-terminal text-4xl text-gray-400 mb-2"></i>
@@ -125,97 +128,120 @@
                     </div>
         
                     <div id="folder-documents" class="file-grid grid grid-cols-3 md:grid-cols-6 gap-4 hidden animate-fade-in">
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified C3SA', 'certs/cert_c3sa.pdf')">
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified C3SA', 'assets/certs/cert_c3sa.pdf')">
                             <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300">cert_c3sa.pdf</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified CCEP', 'certs/cert_ccep.pdf')">
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified CCEP', 'assets/certs/cert_ccep.pdf')">
                             <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300">cert_ccep.pdf</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified CPPS', 'certs/cert_cpps.pdf')">
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified CPPS', 'assets/certs/cert_cpps.pdf')">
                             <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300">cert_cpps.pdf</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified CRTOM', 'certs/cert_crtom.pdf')">
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Certified CRTOM', 'assets/certs/cert_crtom.pdf')">
                             <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300">cert_crtom.pdf</span>
                         </div>
+<!--                      <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openPDF('Resume', 'assets/docs/resume.pdf')">
+                            <i class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-xs text-center text-gray-300">resume.pdf</span>
+                        </div> -->
                     </div>
         
                     <div id="folder-pictures" class="file-grid grid grid-cols-3 md:grid-cols-6 gap-4 hidden animate-fade-in">
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('PyCon APAC', 'pics/01_PyConAPAC.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('PyCon APAC', 'assets/pics/01_PyConAPAC.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">01_PyConAPAC.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('HWMUN', 'pics/02_HWMUN.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('HWMUN', 'assets/pics/02_HWMUN.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">02_HWMUN.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Arduino Day PH', 'pics/03_ArduinoDayPH.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Arduino Day PH', 'assets/pics/03_ArduinoDayPH.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">03_ArduinoDayPH.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('YSES Ideathon', 'pics/04_YSESIdeathon.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('YSES Ideathon', 'assets/pics/04_YSESIdeathon.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">04_YSESIdeathon.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('AWS PartyRock', 'pics/05_AWSPartyRockHackathon.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('AWS PartyRock', 'assets/pics/05_AWSPartyRockHackathon.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">05_AWSPartyRockHackathon.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Bitcoin Pizza Day', 'pics/06_BitcoinPizzaDay.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Bitcoin Pizza Day', 'assets/pics/06_BitcoinPizzaDay.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">06_BitcoinPizzaDay.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('APC Fest 2025', 'pics/07_APCFest2025.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('APC Fest 2025', 'assets/pics/07_APCFest2025.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">07_APCFest2025.</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('GDG BuildWithAI', 'pics/08_GDGMNLBuildWithAI.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('GDG BuildWithAI', 'assets/pics/08_GDGMNLBuildWithAI.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">08_GDGMNLBuildWithAI.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Innoverse', 'pics/09_Innoverse.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Innoverse', 'assets/pics/09_Innoverse.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">09_Innoverse.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('CyberPH Meetup', 'pics/10_CyberPHMeetup1.JPG')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('CyberPH Meetup', 'assets/pics/10_CyberPHMeetup1.JPG')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">10_CyberPHMeetup1.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Whoscall Relaunch', 'pics/11_WhoscallRelaunch.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Whoscall Relaunch', 'assets/pics/11_WhoscallRelaunch.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">11_WhoscallRelaunch.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Notion Workshop', 'pics/12_NotionWorkshop.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Notion Workshop', 'assets/pics/12_NotionWorkshop.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">12_NotionWorkshop.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Recognition Day', 'pics/13_RecognitionDay.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Recognition Day', 'assets/pics/13_RecognitionDay.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">13_RecognitionDay.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Cursor Meetup', 'pics/14_CursorMeetup2.jpeg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Cursor Meetup', 'assets/pics/14_CursorMeetup2.jpeg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">14_CursorMeetup2.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Engaged to Charl', 'pics/15_EngagedtoCharl.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('Engaged to Charl', 'assets/pics/15_EngagedtoCharl.jpg')">
                             <i class="fa-solid fa-heart text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">15_EngagedtoCharl.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('HackForGov NCR', 'pics/16_HackForGov2025NCR.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('HackForGov NCR', 'assets/pics/16_HackForGov2025NCR.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">16_HackForGov2025NCR.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('GDG DevFest', 'pics/17_GDGMNLDevFest.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('GDG DevFest', 'assets/pics/17_GDGMNLDevFest.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">17_GDGMNLDevFest.jpg</span>
                         </div>
-                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('HackForGov Finals', 'pics/18_HackForGov2025Finals.jpg')">
+                        
+                        <div class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openImage('HackForGov Finals', 'assets/pics/18_HackForGov2025Finals.jpg')">
                             <i class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
                             <span class="text-xs text-center text-gray-300 break-all">18_HackForGov2025Finals.jpg</span>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -307,6 +333,6 @@
 
     
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>

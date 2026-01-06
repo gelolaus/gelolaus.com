@@ -3,11 +3,11 @@
    ========================================= */
 
 /* --- AUDIO SETTINGS --- */
-// Load sound effects for clicking and typing
-const clickSound = new Audio('sounds/click.mp3');
+// Load sound effects from the assets folder
+const clickSound = new Audio('assets/sounds/click.mp3');
 clickSound.volume = 0.4;
 
-const keySound = new Audio('sounds/keypress.wav'); 
+const keySound = new Audio('assets/sounds/keypress.wav'); 
 keySound.volume = 0.2; 
 
 // Function to play click sound (clones it so we can play rapidly)
@@ -35,10 +35,10 @@ document.addEventListener('keydown', function(e) {
 
 /* --- VIRTUAL FILE SYSTEM --- */
 // This object mimics a file structure. 
-// Folders have a "children" object, and files have "content" or "path".
+// We updated the paths to point to the new 'assets' folder.
 const fileSystem = {
     "root": {
-        "about.txt": { type: "text", content: "I am Gelo, a CS student specializing in Cybersecurity." },
+        // "about.txt": { type: "text", content: "I am Gelo, a CS student specializing in Cybersecurity." },
         "desktop": {
             type: "dir",
             children: {
@@ -49,41 +49,40 @@ const fileSystem = {
         "documents": {
             type: "dir",
             children: {
-                "cert_c3sa.pdf": { type: "pdf", path: "certs/cert_c3sa.pdf" },
-                "cert_ccep.pdf": { type: "pdf", path: "certs/cert_ccep.pdf" },
-                "cert_cpps.pdf": { type: "pdf", path: "certs/cert_cpps.pdf" },
-                "cert_crtom.pdf": { type: "pdf", path: "certs/cert_crtom.pdf" },
-                "resume.pdf": { type: "pdf", path: "docs/resume.pdf" } 
+                "cert_c3sa.pdf": { type: "pdf", path: "assets/certs/cert_c3sa.pdf" },
+                "cert_ccep.pdf": { type: "pdf", path: "assets/certs/cert_ccep.pdf" },
+                "cert_cpps.pdf": { type: "pdf", path: "assets/certs/cert_cpps.pdf" },
+                "cert_crtom.pdf": { type: "pdf", path: "assets/certs/cert_crtom.pdf" }
+                // "resume.pdf": { type: "pdf", path: "assets/docs/resume.pdf" } 
             }
         },
         "pictures": {
             type: "dir",
             children: {
-                "01_PyConAPAC.jpg": { type: "img", path: "pics/01_PyConAPAC.jpg" },
-                "02_HWMUN.jpg": { type: "img", path: "pics/02_HWMUN.jpg" },
-                "03_ArduinoDayPH.jpg": { type: "img", path: "pics/03_ArduinoDayPH.jpg" },
-                "04_YSESIdeathon.jpg": { type: "img", path: "pics/04_YSESIdeathon.jpg" },
-                "05_AWSPartyRockHackathon.jpg": { type: "img", path: "pics/05_AWSPartyRockHackathon.jpg" },
-                "06_BitcoinPizzaDay.jpg": { type: "img", path: "pics/06_BitcoinPizzaDay.jpg" },
-                "07_APCFest2025.jpg": { type: "img", path: "pics/07_APCFest2025.jpg" },
-                "08_GDGMNLBuildWithAI.jpg": { type: "img", path: "pics/08_GDGMNLBuildWithAI.jpg" },
-                "09_Innoverse.jpg": { type: "img", path: "pics/09_Innoverse.jpg" },
-                "10_CyberPHMeetup1.JPG": { type: "img", path: "pics/10_CyberPHMeetup1.JPG" },
-                "11_WhoscallRelaunch.jpg": { type: "img", path: "pics/11_WhoscallRelaunch.jpg" },
-                "12_NotionWorkshop.jpg": { type: "img", path: "pics/12_NotionWorkshop.jpg" },
-                "13_RecognitionDay.jpg": { type: "img", path: "pics/13_RecognitionDay.jpg" },
-                "14_CursorMeetup2.jpeg": { type: "img", path: "pics/14_CursorMeetup2.jpeg" },
-                "15_EngagedtoCharl.jpg": { type: "img", path: "pics/15_EngagedtoCharl.jpg" },
-                "16_HackForGov2025NCR.jpg": { type: "img", path: "pics/16_HackForGov2025NCR.jpg" },
-                "17_GDGMNLDevFest.jpg": { type: "img", path: "pics/17_GDGMNLDevFest.jpg" },
-                "18_HackForGov2025Finals.jpg": { type: "img", path: "pics/18_HackForGov2025Finals.jpg" }
+                "01_PyConAPAC.jpg": { type: "img", path: "assets/pics/01_PyConAPAC.jpg" },
+                "02_HWMUN.jpg": { type: "img", path: "assets/pics/02_HWMUN.jpg" },
+                "03_ArduinoDayPH.jpg": { type: "img", path: "assets/pics/03_ArduinoDayPH.jpg" },
+                "04_YSESIdeathon.jpg": { type: "img", path: "assets/pics/04_YSESIdeathon.jpg" },
+                "05_AWSPartyRockHackathon.jpg": { type: "img", path: "assets/pics/05_AWSPartyRockHackathon.jpg" },
+                "06_BitcoinPizzaDay.jpg": { type: "img", path: "assets/pics/06_BitcoinPizzaDay.jpg" },
+                "07_APCFest2025.jpg": { type: "img", path: "assets/pics/07_APCFest2025.jpg" },
+                "08_GDGMNLBuildWithAI.jpg": { type: "img", path: "assets/pics/08_GDGMNLBuildWithAI.jpg" },
+                "09_Innoverse.jpg": { type: "img", path: "assets/pics/09_Innoverse.jpg" },
+                "10_CyberPHMeetup1.JPG": { type: "img", path: "assets/pics/10_CyberPHMeetup1.JPG" },
+                "11_WhoscallRelaunch.jpg": { type: "img", path: "assets/pics/11_WhoscallRelaunch.jpg" },
+                "12_NotionWorkshop.jpg": { type: "img", path: "assets/pics/12_NotionWorkshop.jpg" },
+                "13_RecognitionDay.jpg": { type: "img", path: "assets/pics/13_RecognitionDay.jpg" },
+                "14_CursorMeetup2.jpeg": { type: "img", path: "assets/pics/14_CursorMeetup2.jpeg" },
+                "15_EngagedtoCharl.jpg": { type: "img", path: "assets/pics/15_EngagedtoCharl.jpg" },
+                "16_HackForGov2025NCR.jpg": { type: "img", path: "assets/pics/16_HackForGov2025NCR.jpg" },
+                "17_GDGMNLDevFest.jpg": { type: "img", path: "assets/pics/17_GDGMNLDevFest.jpg" },
+                "18_HackForGov2025Finals.jpg": { type: "img", path: "assets/pics/18_HackForGov2025Finals.jpg" }
             }
         }
     }
 };
 
 /* --- TERMINAL CONTENT --- */
-// Content for specific commands like 'help' or 'whoami'
 const commands = {
     help: `
         <span class="text-hacker-green">Available commands:</span><br>
@@ -176,7 +175,7 @@ function bringToFront(element) {
     element.style.zIndex = highestZ;
 }
 
-// Interact.js configuration for dragging and resizing windows
+// Interact.js configuration
 interact('.draggable')
   .draggable({
     allowFrom: '.window-header', 
@@ -190,7 +189,7 @@ interact('.draggable')
     autoScroll: true,
     listeners: { 
       move: function(event) {
-        if (window.innerWidth < 768) return; // Disable drag on mobile phones
+        if (window.innerWidth < 768) return; 
         dragMoveListener(event);
       }
     }
@@ -199,7 +198,7 @@ interact('.draggable')
     edges: { left: true, right: true, bottom: true, top: false },
     listeners: {
       move: function (event) {
-        if (window.innerWidth < 768) return; // Disable resize on mobile phones
+        if (window.innerWidth < 768) return; 
 
         let { x, y } = event.target.dataset;
         x = (parseFloat(x) || 0) + event.deltaRect.left;
@@ -226,7 +225,6 @@ function dragMoveListener (event) {
   target.setAttribute('data-y', y);
 }
 
-// Attach the click event to all windows so they come to front when clicked
 document.querySelectorAll('.draggable').forEach(win => {
     win.addEventListener('mousedown', () => bringToFront(win));
 });
@@ -236,47 +234,37 @@ document.querySelectorAll('.draggable').forEach(win => {
    3. WINDOW MANAGEMENT
    ========================================= */
 
-// Keep track of which windows can be opened
 const managedWindows = ['window-terminal', 'window-files', 'window-pdf', 'window-image', 'window-readme'];
 
-// Open or Close a window by its ID
 function toggleWindow(windowId) {
     playClick();
     const win = document.getElementById(windowId);
 
     if (win.classList.contains('hidden')) {
-        // Show the window
         win.classList.remove('hidden');
         win.classList.add('flex');
         bringToFront(win);
         
-        // If it's the terminal, automatically focus the typing area
         if(windowId === 'window-terminal') {
             const termInput = document.getElementById('terminal-input');
             if(termInput) termInput.focus();
         }
     } else {
-        // Hide the window
         win.classList.add('hidden');
         win.classList.remove('flex');
     }
     
-    // Refresh the taskbar at the bottom
     renderTaskbar();
 }
 
-// Logic to draw the tabs in the taskbar
 function renderTaskbar() {
     const container = document.getElementById('taskbar-apps');
-    container.innerHTML = ''; // Clear existing tabs
+    container.innerHTML = ''; 
 
     managedWindows.forEach(id => {
         const win = document.getElementById(id);
         
-        // Only create a tab if the window is open
         if (!win.classList.contains('hidden')) {
-            
-            // Set the correct name and icon for each app
             let title = "App";
             let iconClass = "fa-window-maximize";
             
@@ -286,7 +274,6 @@ function renderTaskbar() {
             else if (id === 'window-image') { title = "Image"; iconClass = "fa-image"; }
             else if (id === 'window-readme') { title = "README.md"; iconClass = "fa-markdown"; }
 
-            // Create the tab element
             const tab = document.createElement('div');
             tab.className = "h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded flex items-center gap-2 cursor-pointer border-b-2 border-hacker-green transition-colors min-w-[100px]";
             tab.onclick = () => {
@@ -303,63 +290,51 @@ function renderTaskbar() {
     });
 }
 
-// Maximize (Full Screen) button logic
 function toggleMaximize(windowId) {
     playClick();
     const win = document.getElementById(windowId);
     
-    // Toggle the 'maximized' CSS class
     win.classList.toggle('maximized');
     
-    // If maximizing, remove drag transform so it fills screen cleanly
     if (win.classList.contains('maximized')) {
         win.setAttribute('data-original-transform', win.style.transform);
         win.style.transform = 'none';
     } else {
-        // If restoring, put it back where it was
         const originalTransform = win.getAttribute('data-original-transform');
         if (originalTransform) win.style.transform = originalTransform;
     }
 }
 
-// Logic for clicking folders in the File Explorer sidebar
 function openFolder(folderName, elm) {
     playClick();
     
-    // 1. Hide all existing file lists
     document.querySelectorAll('.file-grid').forEach(grid => {
         grid.classList.add('hidden');
     });
 
-    // 2. Show the list for the folder we clicked
     const targetGrid = document.getElementById(`folder-${folderName}`);
     if(targetGrid) targetGrid.classList.remove('hidden');
 
-    // 3. Reset the sidebar styling
     document.querySelectorAll('.sidebar-item').forEach(item => {
         item.classList.remove('bg-white/10', 'text-gray-100', 'border-hacker-green');
         item.classList.add('text-gray-400', 'border-transparent');
     });
 
-    // 4. Highlight the sidebar item we just clicked
     if(elm) {
         elm.classList.add('bg-white/10', 'text-gray-100', 'border-hacker-green');
         elm.classList.remove('text-gray-400', 'border-transparent');
     }
     
-    // 5. Update the breadcrumb text
     const pathEl = document.getElementById('file-path');
     if(pathEl) pathEl.innerText = `/ home / gelo / ${folderName}`;
 }
 
-// Function to open the PDF Viewer window
 function openPDF(title, filePath, orientation = 'landscape') {
     const win = document.getElementById('window-pdf');
     
     document.getElementById('pdf-title').innerText = title;
     document.getElementById('pdf-frame').src = filePath;
     
-    // Resize window based on document type (only on desktop)
     if (window.innerWidth > 768) {
         if (orientation === 'portrait') {
             win.style.width = '600px';
@@ -376,7 +351,6 @@ function openPDF(title, filePath, orientation = 'landscape') {
     bringToFront(win);
 }
 
-// Function to open the Image Viewer window
 function openImage(title, imagePath) {
     document.getElementById('img-title').innerText = title;
     document.getElementById('img-viewer').src = imagePath;
@@ -393,8 +367,7 @@ function openImage(title, imagePath) {
    4. TERMINAL LOGIC
    ========================================= */
 
-// Tracking where we are in the terminal
-let currentPath = ["root"]; // We start at root
+let currentPath = ["root"]; 
 let commandHistory = [];
 let historyIndex = -1;
 
@@ -402,46 +375,35 @@ const inputField = document.getElementById('terminal-input');
 const terminalBody = document.getElementById('terminal-body');
 const promptLabel = document.querySelector('.text-hacker-green.mr-2'); 
 
-// This function processes paths like "cd documents/projects" or "open ../resume.pdf"
+// Resolver function to handle paths like "cd documents/projects"
 function resolvePath(inputPath) {
-    // 1. Decide where to start
-    // If path starts with '/', start from root. Otherwise, start from current folder.
     let pathStack = inputPath.startsWith('/') ? [] : [...currentPath];
-    
-    // 2. Break the path string into individual folder names
     const segments = inputPath.split('/').filter(seg => seg !== '' && seg !== '.');
 
-    // 3. Process each folder name
     for (let segment of segments) {
         if (segment === '..') {
-            // ".." means go up one level
-            if (pathStack.length > 1) { // Don't allow going above root
+            if (pathStack.length > 1) { 
                 pathStack.pop();
             }
         } else {
-            // Otherwise, go down into the folder
             pathStack.push(segment);
         }
     }
 
-    // 4. Check if this path actually exists in our fileSystem object
     let currentNode = fileSystem;
     
-    // We walk through the JSON object step-by-step
     for (let i = 0; i < pathStack.length; i++) {
         const folderName = pathStack[i];
         
-        // Special case for root level
         if (i === 0 && folderName === 'root') {
             currentNode = currentNode['root'];
         } else {
-            // Check if folder exists inside .children (nested) or directly
             if (currentNode.children && currentNode.children[folderName]) {
                 currentNode = currentNode.children[folderName];
             } else if (currentNode[folderName]) {
                 currentNode = currentNode[folderName];
             } else {
-                return null; // Path doesn't exist
+                return null; 
             }
         }
     }
@@ -452,15 +414,13 @@ function resolvePath(inputPath) {
     };
 }
 
-// Helper to get the current folder object based on the currentPath array
+// Helper to get current directory object
 function getCurrentDir() {
     let current = fileSystem['root'];
     
-    // Loop through the path array to find the correct object
     for (let i = 1; i < currentPath.length; i++) {
         const folder = currentPath[i];
         
-        // Check both .children (standard) and direct keys (legacy support)
         if (current.children && current.children[folder]) {
             current = current.children[folder];
         } else if (current[folder]) {
@@ -470,30 +430,25 @@ function getCurrentDir() {
     return current;
 }
 
-// Update the "root@gelo:~$" text
 function updatePrompt() {
     if(!promptLabel) return;
     const pathString = currentPath.length === 1 ? "~" : "~/" + currentPath.slice(1).join("/");
     promptLabel.innerText = `root@gelo:${pathString}$`;
 }
 
-// Add a line of text to the terminal history
 function addToTerminal(htmlContent, className = '') {
     const div = document.createElement('div');
     div.className = `history-line mb-2 ${className}`;
     div.innerHTML = htmlContent;
     
-    // Insert the new line before the input field
     const inputLine = inputField.parentElement;
     terminalBody.insertBefore(div, inputLine);
 }
 
-// Main logic to handle user commands
 function processCommand(cmd, target) {
     const currentDirObj = getCurrentDir();
 
-    // Check if the command is one of our text blocks (whoami, ed, xp, etc.)
-    if (commands[cmd] && !['ls', 'cd', 'open', 'clear', 'exit'].includes(cmd)) {
+    if (commands[cmd] && !['ls', 'cd', 'open', 'clear', 'exit', 'matrix'].includes(cmd)) {
         addToTerminal(commands[cmd]);
         return;
     }
@@ -504,7 +459,6 @@ function processCommand(cmd, target) {
             break;
 
         case 'clear':
-            // Remove all previous lines
             document.querySelectorAll('.history-line').forEach(el => el.remove());
             break;
 
@@ -513,14 +467,11 @@ function processCommand(cmd, target) {
             break;
 
         case 'ls':
-            // List all files and folders in the current directory
             let output = '<div class="grid grid-cols-2 md:grid-cols-4 gap-2">';
-            // Handle differences between root object and folder objects
             let items = currentDirObj.children ? currentDirObj.children : currentDirObj;
             
             for (let key in items) {
                 const item = items[key];
-                // Color code: Blue for directories, Green for executables, Gray for files
                 const color = item.type === 'dir' ? 'text-blue-400 font-bold' : 
                               item.type === 'exec' ? 'text-hacker-green' : 'text-gray-300';
                 const icon = item.type === 'dir' ? '/' : '';
@@ -531,18 +482,15 @@ function processCommand(cmd, target) {
             break;
 
         case 'cd':
-            // If no folder specified, go back to root
             if (!target) {
                 currentPath = ["root"];
                 updatePrompt();
                 return;
             } 
             
-            // Use our helper to find the target folder
             const cdResult = resolvePath(target);
             
             if (cdResult && cdResult.node && (cdResult.node.type === 'dir' || cdResult.fullPathArray.length === 1)) {
-                // Update our path variable
                 currentPath = cdResult.fullPathArray;
                 updatePrompt();
             } else if (cdResult && cdResult.node && cdResult.node.type !== 'dir') {
@@ -558,13 +506,11 @@ function processCommand(cmd, target) {
                 return;
             }
             
-            // Use our helper to find the file
             const openResult = resolvePath(target);
             
             if (openResult && openResult.node) {
                 const file = openResult.node;
                 
-                // Open the correct window based on file type
                 if (file.type === 'pdf') {
                     openPDF(target, file.path);
                     addToTerminal(`Opening ${target}...`, 'text-gray-400');
@@ -585,6 +531,11 @@ function processCommand(cmd, target) {
                 addToTerminal(`open: ${target}: File not found`, 'text-red-400');
             }
             break;
+        
+        case 'matrix':
+            addToTerminal("Wake up, Neo...", "text-hacker-green font-bold");
+            startMatrix();
+            break;
 
         case '':
             break;
@@ -594,13 +545,11 @@ function processCommand(cmd, target) {
     }
 }
 
-// Event Listeners for the Terminal Input
 if (inputField && terminalBody) {
     inputField.addEventListener('keydown', function(event) {
         
-        // 0. TAB COMPLETION (Upgraded for Nested Paths)
         if (event.key === 'Tab') {
-            event.preventDefault(); // Stop the tab from switching focus
+            event.preventDefault(); 
             
             const rawInput = inputField.value;
             const parts = rawInput.split(' ');
@@ -609,9 +558,8 @@ if (inputField && terminalBody) {
             if (currentWord.length === 0) return;
 
             let candidates = [];
-            let prefix = ""; // To store "pictures/" if we are typing a path
+            let prefix = ""; 
 
-            // A. If it's the first word, complete from COMMANDS
             if (parts.length === 1) {
                 const allCommands = [
                     ...Object.keys(commands),
@@ -619,29 +567,21 @@ if (inputField && terminalBody) {
                 ];
                 candidates = allCommands.filter(c => c.startsWith(currentWord));
             } 
-            
-            // B. If it's the second word, complete from FILES
             else {
-                // Check if the user is typing a nested path (e.g. "pictures/01")
                 const lastSlashIndex = currentWord.lastIndexOf('/');
                 
                 if (lastSlashIndex !== -1) {
-                    // Case B1: Nested Path found
-                    // Separate "pictures/" from "01"
-                    prefix = currentWord.substring(0, lastSlashIndex + 1); // "pictures/"
-                    const search = currentWord.substring(lastSlashIndex + 1); // "01"
+                    prefix = currentWord.substring(0, lastSlashIndex + 1); 
+                    const search = currentWord.substring(lastSlashIndex + 1); 
                     
-                    // Use resolvePath to find the folder they are pointing to
                     const parentDir = resolvePath(prefix);
                     
                     if (parentDir && parentDir.node) {
                         const items = parentDir.node.children || parentDir.node;
                         const files = Object.keys(items);
-                        // Find files starting with "01" inside that folder
                         candidates = files.filter(f => f.startsWith(search));
                     }
                 } else {
-                    // Case B2: Normal file in current directory
                     const currentDirObj = getCurrentDir();
                     const items = currentDirObj.children || currentDirObj; 
                     const files = Object.keys(items);
@@ -649,24 +589,19 @@ if (inputField && terminalBody) {
                 }
             }
 
-            // If we found exactly one match, fill it in
             if (candidates.length === 1) {
-                // If we had a prefix (like "pictures/"), add it back to the match
                 parts[parts.length - 1] = prefix + candidates[0];
                 inputField.value = parts.join(' ');
             }
         }
 
-        // HISTORY NAVIGATION (ArrowUp)
         else if (event.key === 'ArrowUp') {
             event.preventDefault();
             if (historyIndex > 0) {
                 historyIndex--;
                 inputField.value = commandHistory[historyIndex];
             }
-        } 
-        // HISTORY NAVIGATION (ArrowDown)
-        else if (event.key === 'ArrowDown') {
+        } else if (event.key === 'ArrowDown') {
             event.preventDefault();
             if (historyIndex < commandHistory.length - 1) {
                 historyIndex++;
@@ -677,7 +612,6 @@ if (inputField && terminalBody) {
             }
         }
         
-        // EXECUTE (Enter)
         else if (event.key === 'Enter') {
             const rawInput = inputField.value.trim();
             
@@ -700,16 +634,65 @@ if (inputField && terminalBody) {
         }
     });
 
-    // Focus input when clicking anywhere in terminal
     terminalBody.addEventListener('click', () => inputField.focus());
 }
 
 
 /* =========================================
-   5. BOOT SEQUENCE
+   5. MATRIX EASTER EGG
    ========================================= */
 
-// Text log to simulate system startup
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+
+let matrixInterval;
+
+function startMatrix() {
+    canvas.classList.remove('opacity-0');
+    canvas.classList.add('opacity-50'); 
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    
+    const drops = [];
+    for(let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "#0F0"; 
+        ctx.font = fontSize + "px arial";
+
+        for(let i = 0; i < drops.length; i++) {
+            const text = letters.charAt(Math.floor(Math.random() * letters.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    if (matrixInterval) clearInterval(matrixInterval);
+    matrixInterval = setInterval(draw, 33);
+    
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+}
+
+
+/* =========================================
+   6. BOOT SEQUENCE
+   ========================================= */
+
 const bootTexts = [
     "Initializing GELO-KERNEL v1.0.4...",
     "Loading BIOS settings... [OK]",
@@ -743,7 +726,6 @@ async function runBootSequence() {
     const logContainer = document.getElementById('boot-log');
     const bootScreen = document.getElementById('boot-screen');
     
-    // Print each line one by one
     for (let text of bootTexts) {
         const p = document.createElement('div');
         if (text.includes('[OK]')) {
@@ -754,19 +736,14 @@ async function runBootSequence() {
         
         logContainer.appendChild(p);
         
-        // Scroll to keep new lines visible
         bootScreen.scrollTop = bootScreen.scrollHeight;
         
-        // Random delay to make it look realistic
         await new Promise(r => setTimeout(r, Math.random() * 100 + 50));
     }
 
-    // Wait a moment before showing the desktop
     await new Promise(r => setTimeout(r, 800));
 
-    // Hide the boot screen
     bootScreen.classList.add('fade-out');
 }
 
-// Start the boot sequence immediately
 runBootSequence();
