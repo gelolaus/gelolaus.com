@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gelo // Cybersec Portfolio</title>
+    <title>GelOS</title>
     
     <link rel="icon" type="image/png" href="assets/favicon.png">
 
@@ -323,27 +323,11 @@
                     <div class="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:bg-red-600" onclick="toggleWindow('window-readme')"></div>
                 </div>
             </div>
+            
             <div class="flex-1 bg-hacker-black/90 p-6 overflow-y-auto text-gray-300 font-sans leading-relaxed">
-                <h1 class="text-2xl font-bold text-hacker-green mb-4 border-b border-gray-700 pb-2">Welcome to Gelo-OS v1.0</h1>
-                <p class="mb-4">This is an interactive portfolio designed to mimic a Linux-based operating system. Use the desktop icons or the terminal to navigate.</p>
-                
-                <h2 class="text-xl font-bold text-blue-400 mb-2">🚀 Getting Started</h2>
-                <ul class="list-disc pl-5 mb-4 space-y-1">
-                    <li><strong>Double-click</strong> icons to open applications.</li>
-                    <li><strong>Drag</strong> windows by their header bar.</li>
-                    <li><strong>Type</strong> commands in the Terminal.</li>
-                </ul>
-        
-                <h2 class="text-xl font-bold text-yellow-500 mb-2">💻 Terminal Commands</h2>
-                <div class="bg-black/50 p-4 rounded mb-4 font-mono text-sm border border-gray-700">
-                    <span class="text-hacker-green">whoami</span>  - View profile & bio<br>
-                    <span class="text-hacker-green">ls</span>      - List files in directory<br>
-                    <span class="text-hacker-green">cd</span>      - Change directory (e.g. 'cd pictures')<br>
-                    <span class="text-hacker-green">open</span>    - Open a file (e.g. 'open resume.pdf')<br>
-                    <span class="text-hacker-green">exit</span>    - Close the terminal
+                <div id="readme-content" class="markdown-body text-sm">
+                    <p class="animate-pulse">Loading README.md...</p>
                 </div>
-        
-                <p class="text-xs text-gray-500 mt-8 italic">Built with HTML, TailwindCSS, and Vanilla JS.</p>
             </div>
         </div>
 
@@ -364,6 +348,7 @@
         <div class="px-4 text-xs text-gray-400 font-mono" id="clock">12:00 PM</div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/core.js"></script>
