@@ -54,6 +54,11 @@
             <span class="text-xs font-bold text-shadow">Files</span>
         </div>
 
+        <div class="desktop-icon flex flex-col items-center w-24 p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="openBrowser('https://gelolaus.com')">
+            <i class="fa-solid fa-globe text-4xl text-blue-400 mb-2"></i>
+            <span class="text-xs font-bold text-shadow">Browser</span>
+        </div>
+
         <div class="desktop-icon flex flex-col items-center w-24 p-2 hover:bg-white/10 rounded cursor-pointer transition-colors" onclick="toggleWindow('window-readme')">
             <i class="fa-brands fa-markdown text-4xl text-blue-400 mb-2"></i>
             <span class="text-xs font-bold text-shadow">README.md</span>
@@ -279,6 +284,34 @@
             </div>
         </div>
 
+        <div id="window-browser" class="draggable fixed md:absolute inset-0 m-auto w-full h-full md:w-[1000px] md:h-[700px] bg-hacker-gray border-0 md:border border-gray-600 shadow-none md:shadow-2xl rounded-none md:rounded-lg flex flex-col z-40 hidden">
+    
+            <div class="window-header h-10 bg-gray-800 flex items-center justify-between px-2 cursor-move border-b border-gray-600 select-none gap-4">
+                
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-globe text-blue-400 text-sm"></i>
+                    <span class="text-xs text-gray-400 hidden md:block">Browser</span>
+                </div>
+        
+                <div class="flex-1 flex items-center">
+                    <input type="text" id="browser-address-bar" class="w-full h-6 bg-black/50 border border-gray-600 rounded px-2 text-xs text-hacker-green font-mono focus:outline-none focus:border-hacker-green" placeholder="https://..." value="https://en.wikipedia.org/wiki/Hacker">
+                    <button onclick="navigateBrowser()" class="ml-2 px-2 h-6 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition-colors">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+        
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-green-500 cursor-pointer hover:bg-green-600" onclick="toggleMaximize('window-browser')"></div>
+                    <div class="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:bg-red-600" onclick="toggleWindow('window-browser')"></div>
+                </div>
+            </div>
+        
+            <div class="flex-1 bg-white relative">
+                <div id="browser-loader" class="absolute inset-0 flex items-center justify-center bg-gray-100 text-gray-500 text-xs hidden">Loading...</div>
+                <iframe id="browser-frame" src="" class="w-full h-full border-none"></iframe>
+            </div>
+        </div>
+
         <div id="window-readme" class="draggable fixed md:absolute inset-0 m-auto w-full h-full md:w-[600px] md:h-[700px] bg-hacker-gray border-0 md:border border-gray-600 shadow-none md:shadow-2xl rounded-none md:rounded-lg flex flex-col z-40 hidden">
             <div class="window-header h-8 bg-gray-800 flex items-center justify-between px-2 cursor-move border-b border-gray-600 select-none">
                 <div class="flex items-center gap-2">
@@ -335,6 +368,7 @@
     <script src="js/data.js"></script>
     <script src="js/core.js"></script>
     <script src="js/window-manager.js"></script>
+    <script src="js/browser.js"></script>
     <script src="js/terminal.js"></script>
     <script src="js/boot.js"></script>
 

@@ -10,7 +10,8 @@ const fileSystem = {
             type: "dir",
             children: {
                 "terminal.lnk": { type: "exec", action: () => toggleWindow('window-terminal') },
-                "files.lnk": { type: "exec", action: () => toggleWindow('window-files') }
+                "files.lnk": { type: "exec", action: () => toggleWindow('window-files') },
+                "browser.lnk": { type: "exec", action: () => openBrowser('https://gelolaus.com') }
             }
         },
         "documents": {

@@ -2,7 +2,7 @@
    Contains the GUI and applications for the OS.
    ========================================= */
 
-   const managedWindows = ['window-terminal', 'window-files', 'window-pdf', 'window-image', 'window-readme'];
+   const managedWindows = ['window-terminal', 'window-files', 'window-pdf', 'window-image', 'window-readme', 'window-browser'];
 
    function toggleWindow(windowId) {
        playClick();
@@ -43,6 +43,7 @@
                else if (id === 'window-pdf') { title = "Viewer"; iconClass = "fa-file-pdf"; }
                else if (id === 'window-image') { title = "Image"; iconClass = "fa-image"; }
                else if (id === 'window-readme') { title = "README.md"; iconClass = "fa-markdown"; }
+               else if (id === 'window-browser') { title = "Browser"; iconClass = "fa-globe"; }
    
                const tab = document.createElement('div');
                tab.className = "h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded flex items-center gap-2 cursor-pointer border-b-2 border-hacker-green transition-colors min-w-[100px]";
