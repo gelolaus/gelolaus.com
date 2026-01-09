@@ -105,6 +105,10 @@ async function runBootSequence() {
     await new Promise(r => setTimeout(r, 800));
 
     bootScreen.classList.add('fade-out');
+
+    setTimeout(() => {
+        toggleWindow('window-readme');
+    }, 500);
 }
 
 runBootSequence();
