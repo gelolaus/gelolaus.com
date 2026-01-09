@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useWindowStore = defineStore('windows', () => {
-  // 1. STATE: The list of all possible windows and their status
   const windows = ref({
     terminal: { 
       id: 'terminal', 
@@ -22,11 +21,30 @@ export const useWindowStore = defineStore('windows', () => {
     },
     browser: { 
       id: 'browser', 
-      title: 'GeloNet', 
+      title: 'Browser', 
       icon: 'fa-globe', 
       isOpen: false, 
       isMaximized: false, 
-      zIndex: 10 
+      zIndex: 10,
+      url: 'https://gelolaus.com' // Default URL
+    },
+    pdf: { 
+      id: 'pdf', 
+      title: 'PDF Viewer', 
+      icon: 'fa-file-pdf', 
+      isOpen: false, 
+      isMaximized: false, 
+      zIndex: 10,
+      filePath: '' // Holds the path to the PDF
+    },
+    image: { 
+        id: 'image', 
+        title: 'Image Viewer', 
+        icon: 'fa-image', 
+        isOpen: false, 
+        isMaximized: false, 
+        zIndex: 10,
+        filePath: '' // Holds the path to the Image
     },
     readme: { 
       id: 'readme', 
@@ -35,22 +53,20 @@ export const useWindowStore = defineStore('windows', () => {
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10 
-    },
-    features: { 
-        id: 'features', 
-        title: 'Sys Specs', 
-        icon: 'fa-microchip', 
-        isOpen: false, 
-        isMaximized: false, 
-        zIndex: 10 
     }
   })
 
   const activeZIndex = ref(100)
 
-  // 2. ACTIONS: Functions to open/close windows
-  function openWindow(id) {
+  // Open a window (and optionally set its content)
+  function openWindow(id, payload = {}) {
     if (!windows.value[id]) return
+
+    // Update title or content if provided
+    if (payload.title) windows.value[id].title = payload.title
+    if (payload.filePath) windows.value[id].filePath = payload.filePath
+    if (payload.url) windows.value[id].url = payload.url
+
     windows.value[id].isOpen = true
     bringToFront(id)
   }

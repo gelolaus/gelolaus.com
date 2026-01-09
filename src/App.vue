@@ -2,6 +2,8 @@
   import { useWindowStore } from '@/stores/windowManager'
   import WindowFrame from '@/components/os/WindowFrame.vue'
   import Terminal from '@/components/apps/Terminal.vue'
+  import PDFViewer from '@/components/apps/PDFViewer.vue'
+  import ImageViewer from '@/components/apps/ImageViewer.vue'
   
   const store = useWindowStore()
   </script>
@@ -29,6 +31,15 @@
   
       <WindowFrame windowId="files" title="File Explorer" icon="fa-folder-open">
           <div class="p-10 text-center">Files Coming Soon...</div>
+      </WindowFrame>
+
+      <WindowFrame 
+        windowId="pdf" :title="store.windows.pdf.title" icon="fa-file-pdf">
+          <PDFViewer :filePath="store.windows.pdf.filePath" />
+      </WindowFrame>
+
+      <WindowFrame windowId="image" :title="store.windows.image.title" icon="fa-image">
+          <ImageViewer :filePath="store.windows.image.filePath" />
       </WindowFrame>
       
     </div>

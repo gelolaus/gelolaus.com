@@ -8,7 +8,7 @@
     
     // --- CONFIG ---
     const welcomeLines = [
-        { text: "Welcome to GelOS v2.0. Type 'help'." }
+        { text: "Welcome to GelOS v2.0. Type 'help'.", color: "text-gray-400" }
     ]
     
     // --- STATE ---
@@ -68,6 +68,8 @@
                     let icon = ''
                     if (item.type === 'directory') { color = 'text-blue-400 font-bold'; icon = '/' }
                     else if (item.type === 'shortcut') { color = 'text-hacker-green'; icon = '*' }
+                    else if (item.type === 'pdf') { color = 'text-red-400'; icon = '' }
+                    else if (item.type === 'img') { color = 'text-purple-400'; icon = '' }
                     
                     output += `<span class="${color}">${name}${icon}</span>`
                 }
@@ -98,12 +100,28 @@
                     history.value.push({ text: result.error, color: 'text-red-500' })
                 } else {
                     const file = result.node
+                    
+                    // --- STEP 4.4 POLISH APPLIED HERE ---
                     if (file.type === 'shortcut') {
                         history.value.push({ text: `Launching ${target}...`, color: 'text-gray-400' })
                         store.openWindow(file.windowId)
                     } 
                     else if (file.type === 'directory') {
                         history.value.push({ text: `open: ${target}: Is a directory`, color: 'text-red-500' })
+                    }
+                    else if (file.type === 'pdf') {
+                        history.value.push({ text: `Opening PDF: ${target}...`, color: 'text-gray-400' })
+                        store.openWindow('pdf', { 
+                            title: target, 
+                            filePath: file.path 
+                        })
+                    }
+                    else if (file.type === 'img') {
+                        history.value.push({ text: `Opening Image: ${target}...`, color: 'text-gray-400' })
+                        store.openWindow('image', { 
+                            title: target, 
+                            filePath: file.path 
+                        })
                     }
                     else {
                         history.value.push({ text: `Cannot open file type: ${file.type}`, color: 'text-red-500' })
@@ -141,30 +159,30 @@
     onMounted(() => {
         inputRef.value?.focus()
     })
-    </script>
+</script>
     
-    <template>
-        <div id="terminal-container" class="h-full bg-hacker-black p-4 font-mono text-sm overflow-y-auto" @click="inputRef?.focus()">
-            
-            <div v-for="(line, i) in history" :key="i" :class="['mb-1', line.color]">
-                <span v-if="line.isHtml" v-html="line.text"></span>
-                <span v-else>{{ line.text }}</span>
-            </div>
-    
-            <div class="flex items-center mt-2">
-                <span class="text-hacker-green mr-2">
-                    root@gelo:{{ currentPath.length === 1 ? '~' : '~/' + currentPath.slice(1).join('/') }}$
-                </span>
-                <input 
-                    ref="inputRef"
-                    v-model="input"
-                    @keydown.enter="handleEnter"
-                    @keydown.up="handleKey"
-                    @keydown.down="handleKey"
-                    type="text" 
-                    class="bg-transparent border-none outline-none text-white flex-1 font-mono"
-                    autocomplete="off"
-                />
-            </div>
+<template>
+    <div id="terminal-container" class="h-full bg-hacker-black p-4 font-mono text-sm overflow-y-auto" @click="inputRef?.focus()">
+        
+        <div v-for="(line, i) in history" :key="i" :class="['mb-1', line.color]">
+            <span v-if="line.isHtml" v-html="line.text"></span>
+            <span v-else>{{ line.text }}</span>
         </div>
-    </template>
+
+        <div class="flex items-center mt-2">
+            <span class="text-hacker-green mr-2">
+                root@gelo:{{ currentPath.length === 1 ? '~' : '~/' + currentPath.slice(1).join('/') }}$
+            </span>
+            <input 
+                ref="inputRef"
+                v-model="input"
+                @keydown.enter="handleEnter"
+                @keydown.up="handleKey"
+                @keydown.down="handleKey"
+                type="text" 
+                class="bg-transparent border-none outline-none text-white flex-1 font-mono"
+                autocomplete="off"
+            />
+        </div>
+    </div>
+</template>
