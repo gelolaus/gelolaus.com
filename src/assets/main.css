@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global OS Styles */
+body {
+    background-color: #0d0d0d;
+    color: #e5e7eb;
+    font-family: 'Courier New', monospace; /* Fallback until we load Fira Code */
+    overflow: hidden; /* No scrollbars on the desktop */
+}
