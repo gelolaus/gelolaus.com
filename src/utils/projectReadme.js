@@ -1,3 +1,4 @@
+export const readmeContent = `
 # Welcome to GelOS
 ![Version](https://img.shields.io/badge/version-2.0.0-green?style=flat-square)
 ![Status](https://img.shields.io/badge/status-stable-blue?style=flat-square)
@@ -56,3 +57,4 @@ The OS features a simulated recursive file system. You can navigate paths just l
 ---
 
 *© 2026 Angelo Laus. Bachelor of Science in Computer Science specialized in Cybersecurity & Forensics at Asia Pacific College, Philippines.*
+`;

@@ -1,5 +1,6 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
+  import { marked } from 'marked'
   import { useWindowStore } from '@/stores/windowManager'
   import WindowFrame from '@/components/os/WindowFrame.vue'
   import Terminal from '@/components/apps/Terminal.vue'
@@ -7,9 +8,12 @@
   import ImageViewer from '@/components/apps/ImageViewer.vue'
   import MatrixRain from '@/components/effects/MatrixRain.vue'
   import BootScreen from '@/components/effects/BootScreen.vue'
+  import { readmeContent } from '@/utils/projectReadme'
   
   const store = useWindowStore()
   const isBooting = ref(true)
+
+  const readmeHtml = computed(() => marked.parse(readmeContent))
 
   const finishBoot = () => {
     isBooting.value = false
@@ -60,15 +64,7 @@
       </WindowFrame>
   
       <WindowFrame windowId="readme" title="README.md" icon="fa-markdown">
-          <div class="p-6 prose prose-invert max-w-none">
-               <h1>Welcome to GelOS v2.0</h1>
-               <p>This is my interactive portfolio built with Vue.js.</p>
-               <ul>
-                  <li>Use the <strong>Terminal</strong> to explore using commands.</li>
-                  <li>Click <strong>Icons</strong> to open apps.</li>
-                  <li>Try typing <code>matrix</code> in the terminal!</li>
-               </ul>
-          </div>
+        <div class="h-full overflow-y-auto p-6 prose prose-invert max-w-none prose-a:text-blue-400 hover:prose-a:text-blue-300"v-html="readmeHtml"></div>
       </WindowFrame>
       
     </div>
