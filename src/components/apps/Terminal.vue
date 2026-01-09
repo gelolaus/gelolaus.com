@@ -58,6 +58,14 @@
             // RESET to the welcome message instead of emptying array
             history.value = [...welcomeLines]
         }
+        else if (cmd === 'matrix') {
+            store.toggleMatrix()
+            const status = store.isMatrixActive ? "active... Wake up, Neo!" : "disabled... Hello, Gelo!"
+            history.value.push({ 
+                text: `Matrix ${status}`, 
+                color: "text-green-500 font-bold" 
+            })
+        }
         else if (cmd === 'ls') {
             const { node } = resolvePath(currentPath.value, '.')
             

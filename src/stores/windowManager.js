@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useWindowStore = defineStore('windows', () => {
+  // --- STATE ---
+  const isMatrixActive = ref(false)
+
   const windows = ref({
     terminal: { 
       id: 'terminal', 
@@ -26,7 +29,7 @@ export const useWindowStore = defineStore('windows', () => {
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10,
-      url: 'https://gelolaus.com' // Default URL
+      url: 'https://gelolaus.com' 
     },
     pdf: { 
       id: 'pdf', 
@@ -35,7 +38,7 @@ export const useWindowStore = defineStore('windows', () => {
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10,
-      filePath: '' // Holds the path to the PDF
+      filePath: '' 
     },
     image: { 
         id: 'image', 
@@ -44,7 +47,7 @@ export const useWindowStore = defineStore('windows', () => {
         isOpen: false, 
         isMaximized: false, 
         zIndex: 10,
-        filePath: '' // Holds the path to the Image
+        filePath: '' 
     },
     readme: { 
       id: 'readme', 
@@ -58,11 +61,15 @@ export const useWindowStore = defineStore('windows', () => {
 
   const activeZIndex = ref(100)
 
-  // Open a window (and optionally set its content)
+  // --- ACTIONS ---
+  
+  function toggleMatrix() {
+    isMatrixActive.value = !isMatrixActive.value
+  }
+
   function openWindow(id, payload = {}) {
     if (!windows.value[id]) return
 
-    // Update title or content if provided
     if (payload.title) windows.value[id].title = payload.title
     if (payload.filePath) windows.value[id].filePath = payload.filePath
     if (payload.url) windows.value[id].url = payload.url
@@ -87,5 +94,5 @@ export const useWindowStore = defineStore('windows', () => {
     windows.value[id].zIndex = activeZIndex.value
   }
 
-  return { windows, openWindow, closeWindow, toggleMaximize, bringToFront }
+  return { windows, isMatrixActive, toggleMatrix, openWindow, closeWindow, toggleMaximize, bringToFront }
 })
