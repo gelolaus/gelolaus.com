@@ -28,6 +28,17 @@
       store.openWindow('readme') 
     }
 
+    const browserInput = ref('https://gelolaus.com') 
+
+    const navigateBrowser = () => {
+        let target = browserInput.value.trim()
+        if (!target.startsWith('http') && !target.startsWith('file')) {
+            target = 'https://' + target
+        }
+        browserInput.value = target
+        store.windows.browser.url = target
+    }
+
     const handleGlobalClick = () => {
         playClick()
     }
@@ -71,7 +82,7 @@
                 @click="store.openWindow(item.windowId)" 
             >
                 <i :class="[item.icon, 'text-4xl mb-2 group-hover:scale-110 transition-transform duration-200', 
-                    name.includes('readme') ? 'text-gray-200' : 
+                    name.includes('readme') ? 'text-blue-400' : 
                     name.includes('files') ? 'text-yellow-500' : 
                     name.includes('browser') ? 'text-blue-400' : 
                     'text-gray-400']">
@@ -100,11 +111,52 @@
         </WindowFrame>
     
         <WindowFrame windowId="readme" :title="store.windows.readme.title" :icon="store.windows.readme.icon">
-          <div class="h-full overflow-y-auto p-6 prose prose-invert max-w-none prose-a:text-blue-400 hover:prose-a:text-blue-300" v-html="readmeHtml"></div>
+            <div 
+                class="h-full overflow-y-auto p-6 prose prose-invert max-w-none 
+                       bg-hacker-black/90 font-sans text-sm leading-relaxed
+
+                       prose-h1:text-hacker-green prose-h1:font-bold prose-h1:text-3xl 
+                       prose-h1:mb-2 prose-h1:pb-2 prose-h1:border-b prose-h1:border-gray-700
+                       
+                       prose-h2:text-blue-400 prose-h2:font-bold prose-h2:text-xl 
+                       prose-h2:mt-6 prose-h2:mb-3
+
+                       prose-h3:text-yellow-500 prose-h3:font-bold prose-h3:text-lg 
+                       prose-h3:mt-4 prose-h3:mb-2
+                        
+                       prose-p:text-gray-300 prose-p:my-3
+                       prose-li:text-gray-300 prose-li:my-0.5
+                       prose-ul:my-2
+                       prose-strong:text-white
+                       
+                       prose-hr:border-gray-700 prose-hr:my-6
+                       prose-img:inline-block prose-img:mr-2 prose-img:my-0
+                       
+                       prose-a:text-blue-400 hover:prose-a:text-blue-300"
+                v-html="readmeHtml"
+            ></div>
         </WindowFrame>
 
         <WindowFrame windowId="browser" :title="store.windows.browser.title" :icon="store.windows.browser.icon">
-          <Browser />
+            <template #header-middle>
+                <div class="flex-1 flex items-center max-w-[600px]">
+                    <input 
+                        v-model="browserInput"
+                        @keydown.enter="navigateBrowser"
+                        type="text" 
+                        class="w-full h-6 bg-black/50 border border-gray-600 rounded px-2 text-xs text-hacker-green font-mono focus:outline-none focus:border-hacker-green placeholder-gray-600"
+                        placeholder="https://..."
+                    >
+                    <button 
+                        @click="navigateBrowser" 
+                        class="ml-2 px-2 h-6 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition-colors"
+                    >
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </template>
+            
+            <Browser />
         </WindowFrame>
 
         <Taskbar />

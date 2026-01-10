@@ -12,7 +12,7 @@
     ]
     
     // --- STATE ---
-    const history = ref([...welcomeLines]) // Start with welcome message
+    const history = ref([...welcomeLines]) 
     const currentPath = ref(['root']) 
     const input = ref('')
     const inputRef = ref(null)
@@ -51,19 +51,18 @@
     
         // 4. Execute Logic
         if (commands[cmd]) {
-            // If it's a simple text command (whoami, help, etc.)
+            // Simple text commands (help, whoami, etc.)
             history.value.push({ text: commands[cmd], isHtml: true })
         } 
         else if (cmd === 'clear') {
-            // RESET to the welcome message instead of emptying array
             history.value = [...welcomeLines]
         }
         else if (cmd === 'matrix') {
             store.toggleMatrix()
-            const status = store.isMatrixActive ? "active... Wake up, Neo!" : "disabled... Hello, Gelo!"
+            const status = store.isMatrixActive ? "Enabled... Wake up, Neo!" : "Disabled... Hello, Gelo!"
             history.value.push({ 
-                text: `Matrix ${status}`, 
-                color: "text-green-500 font-bold" 
+                text: `Matrix Protocol ${status}`, 
+                color: "text-hacker-green font-bold" 
             })
         }
         else if (cmd === 'ls') {
@@ -74,6 +73,7 @@
                 for (const [name, item] of Object.entries(node.children)) {
                     let color = 'text-gray-300'
                     let icon = ''
+                    // Styling based on file type
                     if (item.type === 'directory') { color = 'text-blue-400 font-bold'; icon = '/' }
                     else if (item.type === 'shortcut') { color = 'text-hacker-green'; icon = '*' }
                     else if (item.type === 'pdf') { color = 'text-red-400'; icon = '' }
@@ -109,7 +109,6 @@
                 } else {
                     const file = result.node
                     
-                    // --- STEP 4.4 POLISH APPLIED HERE ---
                     if (file.type === 'shortcut') {
                         history.value.push({ text: `Launching ${target}...`, color: 'text-gray-400' })
                         store.openWindow(file.windowId)
@@ -167,30 +166,30 @@
     onMounted(() => {
         inputRef.value?.focus()
     })
-</script>
+    </script>
     
-<template>
-    <div id="terminal-container" class="h-full bg-hacker-black p-4 font-mono text-sm overflow-y-auto" @click="inputRef?.focus()">
-        
-        <div v-for="(line, i) in history" :key="i" :class="['mb-1', line.color]">
-            <span v-if="line.isHtml" v-html="line.text"></span>
-            <span v-else>{{ line.text }}</span>
+    <template>
+        <div id="terminal-container" class="h-full bg-hacker-black p-4 font-mono text-sm overflow-y-auto" @click="inputRef?.focus()">
+            
+            <div v-for="(line, i) in history" :key="i" :class="['mb-1', line.color]">
+                <span v-if="line.isHtml" v-html="line.text"></span>
+                <span v-else>{{ line.text }}</span>
+            </div>
+    
+            <div class="flex items-center">
+                <span class="text-hacker-green mr-2">
+                    root@gelo:{{ currentPath.length === 1 ? '~' : '~/' + currentPath.slice(1).join('/') }}$
+                </span>
+                <input 
+                    ref="inputRef"
+                    v-model="input"
+                    @keydown.enter="handleEnter"
+                    @keydown.up="handleKey"
+                    @keydown.down="handleKey"
+                    type="text" 
+                    class="bg-transparent border-none outline-none text-white flex-1 font-mono"
+                    autocomplete="off"
+                />
+            </div>
         </div>
-
-        <div class="flex items-center mt-2">
-            <span class="text-hacker-green mr-2">
-                root@gelo:{{ currentPath.length === 1 ? '~' : '~/' + currentPath.slice(1).join('/') }}$
-            </span>
-            <input 
-                ref="inputRef"
-                v-model="input"
-                @keydown.enter="handleEnter"
-                @keydown.up="handleKey"
-                @keydown.down="handleKey"
-                type="text" 
-                class="bg-transparent border-none outline-none text-white flex-1 font-mono"
-                autocomplete="off"
-            />
-        </div>
-    </div>
-</template>
+    </template>
