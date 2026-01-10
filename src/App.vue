@@ -12,7 +12,7 @@
     import { readmeContent } from '@/utils/projectReadme'
     
     const store = useWindowStore()
-    const isBooting = ref(true)
+    const isBooting = ref(false)
   
     const readmeHtml = computed(() => marked.parse(readmeContent))
     
