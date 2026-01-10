@@ -13,9 +13,10 @@
     import { readmeContent } from '@/utils/projectReadme'
     import Browser from '@/components/apps/Browser.vue'
     import Taskbar from '@/components/os/Taskbar.vue'
+    import FileExplorer from '@/components/apps/FileExplorer.vue' 
     
     const store = useWindowStore()
-    const isBooting = ref(false) // Set to true for production!
+    const isBooting = ref(true) // Set to true for production!
   
     const readmeHtml = computed(() => marked.parse(readmeContent))
     
@@ -74,6 +75,8 @@
              :class="store.isMatrixActive ? 'opacity-0' : 'opacity-20'">
         </div>
         
+        <div class="scanline"></div>
+
         <div class="absolute top-4 left-4 grid gap-4 z-10">
             <div 
                 v-for="(item, name) in desktopIcons" 
@@ -99,7 +102,7 @@
         </WindowFrame>
     
         <WindowFrame windowId="files" :title="store.windows.files.title" :icon="store.windows.files.icon">
-            <div class="p-10 text-center">Files Coming Soon...</div>
+            <FileExplorer />
         </WindowFrame>
         
         <WindowFrame windowId="pdf" :title="store.windows.pdf.title" :icon="store.windows.pdf.icon">
