@@ -1,8 +1,9 @@
 <script setup>
-    import { ref, computed } from 'vue'
+    import { ref, computed, onMounted, onUnmounted } from 'vue'
     import { marked } from 'marked'
     import { useWindowStore } from '@/stores/windowManager'
     import { fileSystem } from '@/utils/fileSystem'
+    import { playKey, playClick } from '@/utils/sound' 
     import WindowFrame from '@/components/os/WindowFrame.vue'
     import Terminal from '@/components/apps/Terminal.vue'
     import PDFViewer from '@/components/apps/PDFViewer.vue'
@@ -11,13 +12,13 @@
     import BootScreen from '@/components/effects/BootScreen.vue'
     import { readmeContent } from '@/utils/projectReadme'
     import Browser from '@/components/apps/Browser.vue'
+    import Taskbar from '@/components/os/Taskbar.vue'
     
     const store = useWindowStore()
-    const isBooting = ref(false)
+    const isBooting = ref(false) // Set to true for production!
   
     const readmeHtml = computed(() => marked.parse(readmeContent))
     
-    // Helper to get desktop icons dynamically
     const desktopIcons = computed(() => {
         return fileSystem.root.children.desktop.children
     })
@@ -26,9 +27,29 @@
       isBooting.value = false
       store.openWindow('readme') 
     }
-  </script>
+
+    const handleGlobalClick = () => {
+        playClick()
+    }
+
+    const handleGlobalKey = (e) => {
+        if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return
+        playKey()
+    }
+
+    onMounted(() => {
+        // 'true' enables Capture Mode: Hear clicks even if event.stopPropagation() is used
+        window.addEventListener('click', handleGlobalClick, true)
+        window.addEventListener('keydown', handleGlobalKey)
+    })
+
+    onUnmounted(() => {
+        window.removeEventListener('click', handleGlobalClick, true)
+        window.removeEventListener('keydown', handleGlobalKey)
+    })
+</script>
     
-  <template>
+<template>
       <BootScreen v-if="isBooting" @complete="finishBoot" />
     
       <div v-show="!isBooting" class="bg-hacker-black h-screen w-screen overflow-hidden font-mono text-gray-300 relative select-none">
@@ -47,7 +68,7 @@
                 v-for="(item, name) in desktopIcons" 
                 :key="name"
                 class="w-24 p-2 hover:bg-white/10 rounded cursor-pointer flex flex-col items-center transition-colors group"
-                @click="store.openWindow(item.windowId)"
+                @click="store.openWindow(item.windowId)" 
             >
                 <i :class="[item.icon, 'text-4xl mb-2 group-hover:scale-110 transition-transform duration-200', 
                     name.includes('readme') ? 'text-gray-200' : 
@@ -85,6 +106,8 @@
         <WindowFrame windowId="browser" :title="store.windows.browser.title" :icon="store.windows.browser.icon">
           <Browser />
         </WindowFrame>
+
+        <Taskbar />
         
       </div>
-  </template>
+</template>
