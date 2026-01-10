@@ -5,10 +5,10 @@ export const fileSystem = {
             "desktop": {
                 type: "directory",
                 children: {
-                    "terminal.lnk": { type: "shortcut", windowId: "terminal", icon: "fa-terminal" },
-                    "files.lnk": { type: "shortcut", windowId: "files", icon: "fa-folder-open" },
-                    "browser.lnk": { type: "shortcut", windowId: "browser", icon: "fa-globe" },
-                    "readme.lnk": { type: "shortcut", windowId: "readme", icon: "fa-markdown" }
+                    "terminal.lnk": { type: "shortcut", windowId: "terminal", icon: "fa-solid fa-terminal" },
+                    "files.lnk": { type: "shortcut", windowId: "files", icon: "fa-solid fa-folder-open" },
+                    "browser.lnk": { type: "shortcut", windowId: "browser", icon: "fa-solid fa-globe" },
+                    "README.md.lnk": { type: "shortcut", windowId: "readme", icon: "fa-brands fa-markdown" }
                 }
             },
             "documents": {

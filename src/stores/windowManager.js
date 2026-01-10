@@ -9,7 +9,7 @@ export const useWindowStore = defineStore('windows', () => {
     terminal: { 
       id: 'terminal', 
       title: 'Terminal', 
-      icon: 'fa-terminal', 
+      icon: 'fa-solid fa-terminal',
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10 
@@ -17,7 +17,7 @@ export const useWindowStore = defineStore('windows', () => {
     files: { 
       id: 'files', 
       title: 'File Explorer', 
-      icon: 'fa-folder-open', 
+      icon: 'fa-solid fa-folder-open',
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10 
@@ -25,7 +25,7 @@ export const useWindowStore = defineStore('windows', () => {
     browser: { 
       id: 'browser', 
       title: 'Browser', 
-      icon: 'fa-globe', 
+      icon: 'fa-solid fa-globe',
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10,
@@ -34,7 +34,7 @@ export const useWindowStore = defineStore('windows', () => {
     pdf: { 
       id: 'pdf', 
       title: 'PDF Viewer', 
-      icon: 'fa-file-pdf', 
+      icon: 'fa-solid fa-file-pdf',
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10,
@@ -43,7 +43,7 @@ export const useWindowStore = defineStore('windows', () => {
     image: { 
         id: 'image', 
         title: 'Image Viewer', 
-        icon: 'fa-image', 
+        icon: 'fa-solid fa-image',
         isOpen: false, 
         isMaximized: false, 
         zIndex: 10,
@@ -52,7 +52,7 @@ export const useWindowStore = defineStore('windows', () => {
     readme: { 
       id: 'readme', 
       title: 'README.md', 
-      icon: 'fa-markdown', 
+      icon: 'fa-brands fa-markdown',
       isOpen: false, 
       isMaximized: false, 
       zIndex: 10 

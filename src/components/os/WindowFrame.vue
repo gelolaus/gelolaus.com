@@ -81,7 +81,7 @@
   >
     <div class="window-header h-8 bg-gray-800 flex items-center justify-between px-2 border-b border-gray-600 select-none cursor-grab active:cursor-grabbing">
       <div class="flex items-center gap-2">
-        <i :class="['fa-solid', props.icon, 'text-gray-400']"></i>
+        <i :class="[props.icon, 'text-gray-400']"></i>
         <span class="text-xs text-gray-300 font-mono">{{ props.title }}</span>
       </div>
       <div class="flex items-center gap-2">
