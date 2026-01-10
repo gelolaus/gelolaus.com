@@ -10,6 +10,7 @@
     import MatrixRain from '@/components/effects/MatrixRain.vue'
     import BootScreen from '@/components/effects/BootScreen.vue'
     import { readmeContent } from '@/utils/projectReadme'
+    import Browser from '@/components/apps/Browser.vue'
     
     const store = useWindowStore()
     const isBooting = ref(false)
@@ -79,6 +80,10 @@
     
         <WindowFrame windowId="readme" :title="store.windows.readme.title" :icon="store.windows.readme.icon">
           <div class="h-full overflow-y-auto p-6 prose prose-invert max-w-none prose-a:text-blue-400 hover:prose-a:text-blue-300" v-html="readmeHtml"></div>
+        </WindowFrame>
+
+        <WindowFrame windowId="browser" :title="store.windows.browser.title" :icon="store.windows.browser.icon">
+          <Browser />
         </WindowFrame>
         
       </div>
