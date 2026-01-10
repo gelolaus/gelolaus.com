@@ -52,6 +52,7 @@ The OS features a simulated recursive file system. You can navigate paths just l
 * **[FontAwesome](https://fontawesome.com/):** Scalable vector icons for the UI.
 * **[Marked.js](https://marked.js.org/):** Markdown parsing to render this README dynamically.
 * **[Fira Code](https://github.com/tonsky/FiraCode):** Monospace font for the coding aesthetic.
+* **[Google Gemini](https://gemini.google.com/share/4c25460691ad):** Check link for AI use.
 
 ---
 
