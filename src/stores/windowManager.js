@@ -84,7 +84,6 @@ export const useWindowStore = defineStore('windows', () => {
     windows.value[id].isMinimized = true
   }
 
-  // NEW: Centralized Logic for Taskbar
   function handleTaskbarClick(id) {
     const win = windows.value[id]
     if (!win.isOpen) return
@@ -132,7 +131,7 @@ export const useWindowStore = defineStore('windows', () => {
     openWindow, 
     closeWindow, 
     minimizeWindow,
-    handleTaskbarClick, // Exported
+    handleTaskbarClick,
     toggleMaximize, 
     bringToFront, 
     updatePosition, 
