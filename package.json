@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "gsap": "^3.14.2",
     "interactjs": "^1.10.27",
     "marked": "^17.0.1",
     "pinia": "^3.0.4",
