@@ -16,8 +16,16 @@
         clock.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
     
-    const handleTaskClick = (windowId) => {
-        store.bringToFront(windowId)
+    const handleTaskClick = (win) => {
+        if (win.isMinimized) {
+            store.openWindow(win.id) 
+        } else {
+            if (win.zIndex >= store.activeZIndex) {
+                store.minimizeWindow(win.id)
+            } else {
+                store.bringToFront(win.id)
+            }
+        }
     }
     
     onMounted(() => {
@@ -46,11 +54,11 @@
                 <div 
                     v-for="win in openWindows" 
                     :key="win.id"
-                    @click="handleTaskClick(win.id)"
+                    @click="handleTaskClick(win)"
                     class="px-3 py-1 rounded flex items-center gap-2 cursor-pointer transition-all border-b-2 min-w-[120px] max-w-[200px] select-none"
-                    :class="win.zIndex >= 100 
+                    :class="(win.zIndex >= 100 && !win.isMinimized)
                         ? 'bg-white/10 border-hacker-green text-gray-100 shadow-[0_0_10px_rgba(0,255,65,0.1)]' 
-                        : 'bg-white/5 hover:bg-white/10 border-transparent text-gray-400'" 
+                        : 'bg-white/5 hover:bg-white/10 border-transparent text-gray-400 opacity-80'" 
                 >
                     <i :class="[win.icon, 'text-xs', 
                         win.id === 'files' ? 'text-yellow-500' : 
@@ -61,7 +69,9 @@
                         'text-gray-400']">
                     </i>
                     
-                    <span class="text-xs truncate font-mono pt-0.5">{{ win.title }}</span>
+                    <span class="text-xs truncate font-mono pt-0.5" :class="{'opacity-50': win.isMinimized}">
+                        {{ win.title }}
+                    </span>
                 </div>
             </div>
         

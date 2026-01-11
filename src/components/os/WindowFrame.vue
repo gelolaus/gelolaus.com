@@ -69,6 +69,9 @@
   }
   
   const windowStyle = computed(() => {
+      // FIX: Hide window if minimized
+      if (winState.value.isMinimized) return { display: 'none' }
+
       if (isMobile.value) {
           return {
               top: '0px', left: '0px', width: '100%', height: 'calc(100% - 3rem)',
@@ -147,6 +150,7 @@
         </div>
         <div class="flex items-center gap-2">
           <div v-if="!isMobile" class="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer" @click.stop="store.toggleMaximize(props.windowId)"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer" @click.stop="store.minimizeWindow(props.windowId)"></div>
           <div class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer" @click.stop="store.closeWindow(props.windowId)"></div>
         </div>
       </div>

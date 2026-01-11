@@ -61,18 +61,19 @@ export const useWindowStore = defineStore('windows', () => {
     }
 
     win.isOpen = true
-    win.isMinimized = false
+    win.isMinimized = false // Make sure to un-minimize if opening again
     bringToFront(id)
   }
 
   function closeWindow(id) {
     if (!windows.value[id]) return
     windows.value[id].isOpen = false
+    windows.value[id].isMinimized = false // Reset minimized state
   }
 
   function minimizeWindow(id) {
     if (!windows.value[id]) return
-    windows.value[id].isOpen = false
+    // FIX: Do NOT set isOpen = false. Keep it open, just flag as minimized.
     windows.value[id].isMinimized = true
   }
 
