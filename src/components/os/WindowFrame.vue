@@ -68,18 +68,33 @@
     checkMobile()
     window.addEventListener('resize', checkMobile)
   
+    // Initialize drag/drop when window opens
     watch(
       () => winState.value.isOpen,
       async (isOpen) => {
         if (isOpen) {
           await nextTick()
           const el = windowRef.value
-          if (el) {
-            initInteract(el)
-          }
+          if (el) initInteract(el)
         }
       },
       { immediate: true }
+    )
+  
+    watch(
+      () => winState.value.isMaximized,
+      (maximized) => {
+          const el = windowRef.value
+          if (!el) return
+  
+          if (maximized) {
+              el.style.transform = 'none'
+          } else {
+              const x = el.getAttribute('data-x') || 0
+              const y = el.getAttribute('data-y') || 0
+              el.style.transform = `translate(${x}px, ${y}px)`
+          }
+      }
     )
   })
   
@@ -96,7 +111,7 @@
       :class="{ 
           'inset-0 w-full h-full rounded-none': winState.isMaximized, 
           'rounded-lg': !isMobile && !winState.isMaximized,
-          // Mobile Override classes:
+          // Mobile Override:
           'top-0 left-0 w-full !h-[calc(100%-3rem)] rounded-none': isMobile
       }"
       :style="!isMobile && !winState.isMaximized ? { 
