@@ -14,8 +14,8 @@ export const useWindowStore = defineStore('windows', () => {
     isMinimized: false,
     zIndex: 10,
     hasOpened: false,
-    position: { x: 100, y: 50 },
-    size: { width: 800, height: 600 },
+    position: { x: 0, y: 0 },
+    size: { width: 0, height: 0 },
     url,
     filePath
   })
@@ -28,7 +28,6 @@ export const useWindowStore = defineStore('windows', () => {
     image: defaultState('image', 'Image Viewer', 'fa-solid fa-image'),
     readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown')
   })
-
   
   function toggleMatrix() {
     isMatrixActive.value = !isMatrixActive.value
@@ -44,36 +43,44 @@ export const useWindowStore = defineStore('windows', () => {
     if (payload.url) win.url = payload.url
 
     if (!win.hasOpened) {
-        if (window.innerWidth > 768) {
-            const centerX = (window.innerWidth - 800) / 2
-            const centerY = (window.innerHeight - 600) / 2
+        const viewportW = window.innerWidth
+        const viewportH = window.innerHeight
+        
+        const targetWidth = viewportW < 768 ? viewportW * 0.9 : 800
+        const targetHeight = viewportW < 768 ? viewportH * 0.8 : 600
 
-            const range = 300 
-            const offsetX = (Math.random() * range * 2) - range
-            const offsetY = (Math.random() * range * 2) - range
-
-            win.position = { 
-                x: Math.max(0, centerX + offsetX), 
-                y: Math.max(0, centerY + offsetY) 
-            }
+        win.size = { 
+            width: targetWidth, 
+            height: targetHeight 
         }
+
+        win.position = { 
+            x: (viewportW - targetWidth) / 2, 
+            y: Math.max(20, (viewportH - targetHeight) / 2)
+        }
+
+        if (viewportW > 768) {
+            const range = 50
+            win.position.x += (Math.random() * range * 2) - range
+            win.position.y += (Math.random() * range * 2) - range
+        }
+
         win.hasOpened = true
     }
 
     win.isOpen = true
-    win.isMinimized = false // Make sure to un-minimize if opening again
+    win.isMinimized = false 
     bringToFront(id)
   }
 
   function closeWindow(id) {
     if (!windows.value[id]) return
     windows.value[id].isOpen = false
-    windows.value[id].isMinimized = false // Reset minimized state
+    windows.value[id].isMinimized = false
   }
 
   function minimizeWindow(id) {
     if (!windows.value[id]) return
-    // FIX: Do NOT set isOpen = false. Keep it open, just flag as minimized.
     windows.value[id].isMinimized = true
   }
 

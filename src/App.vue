@@ -4,6 +4,7 @@
     import { useWindowStore } from '@/stores/windowManager'
     import { fileSystem } from '@/utils/fileSystem'
     import { playKey, playClick } from '@/utils/sound' 
+    import { useBreakpoints } from '@/composables/useBreakpoints'
     import WindowFrame from '@/components/os/WindowFrame.vue'
     import Terminal from '@/components/apps/Terminal.vue'
     import PDFViewer from '@/components/apps/PDFViewer.vue'
@@ -16,7 +17,8 @@
     import FileExplorer from '@/components/apps/FileExplorer.vue' 
     
     const store = useWindowStore()
-    const isBooting = ref(true) // Set to true for production!
+    const { isMobile } = useBreakpoints()
+    const isBooting = ref(true)
     const selectedIcon = ref(null)
   
     const readmeHtml = computed(() => marked.parse(readmeContent))
@@ -55,7 +57,7 @@
     }
 
     const handleIconClick = (name, windowId) => {
-        if (window.innerWidth < 768) {
+        if (isMobile.value) {
             store.openWindow(windowId)
             selectedIcon.value = null
         } else {
