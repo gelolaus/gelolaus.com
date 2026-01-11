@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted, computed, nextTick, watch } from 'vue'
   import interact from 'interactjs'
+  import gsap from 'gsap'
   import { useWindowStore } from '@/stores/windowManager'
   import { useBreakpoints } from '@/composables/useBreakpoints'
   
@@ -10,6 +11,24 @@
   const windowRef = ref(null)
   
   const winState = computed(() => store.windows[props.windowId])
+  
+  const onEnter = (el, done) => {
+    const { x, y } = winState.value.position
+    
+    gsap.fromTo(el, 
+      { x: x, y: y + 20, scale: 0.8, opacity: 0 },
+      { x: x, y: y, scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)", onComplete: done }
+    )
+  }
+  
+  const onLeave = (el, done) => {
+    const { x, y } = winState.value.position
+    
+    gsap.fromTo(el,
+      { x: x, y: y, scale: 1, opacity: 1 }, 
+      { x: x, y: y + 20, scale: 0.9, opacity: 0, duration: 0.2, ease: "power2.in", onComplete: done }
+    )
+  }
   
   const initInteract = (el) => {
     el.setAttribute('data-x', winState.value.position.x)
@@ -118,10 +137,14 @@
       }
     )
   })
-</script>
+  </script>
   
-<template>
-    <Transition name="scale-fade">
+  <template>
+    <Transition 
+      @enter="onEnter" 
+      @leave="onLeave" 
+      :css="false"
+    >
         <div 
         v-if="winState.isOpen"
         v-show="!winState.isMinimized"
@@ -149,17 +172,4 @@
         </div>
         </div>
     </Transition>
-</template>
-
-<style scoped>
-.scale-fade-enter-active,
-.scale-fade-leave-active {
-  transition: all 0.2s ease-out;
-}
-
-.scale-fade-enter-from,
-.scale-fade-leave-to {
-  opacity: 0;
-  transform: scale(0.95);
-}
-</style>
+  </template>
