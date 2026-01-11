@@ -1,21 +1,22 @@
 <script setup>
-    import { ref, computed, onMounted, onUnmounted } from 'vue'
+    import { ref, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
     import { marked } from 'marked'
     import { useWindowStore } from '@/stores/windowManager'
     import { fileSystem } from '@/utils/fileSystem'
     import { playKey, playClick } from '@/utils/sound' 
     import { useBreakpoints } from '@/composables/useBreakpoints'
     import WindowFrame from '@/components/os/WindowFrame.vue'
-    import Terminal from '@/components/apps/Terminal.vue'
-    import PDFViewer from '@/components/apps/PDFViewer.vue'
-    import ImageViewer from '@/components/apps/ImageViewer.vue'
-    import MatrixRain from '@/components/effects/MatrixRain.vue'
-    import BootScreen from '@/components/effects/BootScreen.vue'
-    import { readmeContent } from '@/utils/projectReadme'
-    import Browser from '@/components/apps/Browser.vue'
     import Taskbar from '@/components/os/Taskbar.vue'
-    import FileExplorer from '@/components/apps/FileExplorer.vue' 
+    import BootScreen from '@/components/effects/BootScreen.vue'
+    import MatrixRain from '@/components/effects/MatrixRain.vue'
+    import { readmeContent } from '@/utils/projectReadme'
     
+    const Terminal = defineAsyncComponent(() => import('@/components/apps/Terminal.vue'))
+    const PDFViewer = defineAsyncComponent(() => import('@/components/apps/PDFViewer.vue'))
+    const ImageViewer = defineAsyncComponent(() => import('@/components/apps/ImageViewer.vue'))
+    const Browser = defineAsyncComponent(() => import('@/components/apps/Browser.vue'))
+    const FileExplorer = defineAsyncComponent(() => import('@/components/apps/FileExplorer.vue'))
+
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
     const isBooting = ref(true)

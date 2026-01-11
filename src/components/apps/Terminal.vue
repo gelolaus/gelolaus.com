@@ -1,5 +1,6 @@
 <script setup>
     import { ref, onMounted, nextTick } from 'vue'
+    import DOMPurify from 'dompurify'
     import { useShell } from '@/composables/useShell'
     
     const { history, currentPath, commandHistory, execute, formatPath } = useShell()
@@ -38,6 +39,10 @@
             }
         }
     }
+
+    const sanitize = (html) => {
+        return DOMPurify.sanitize(html)
+    }
     
     onMounted(() => {
         inputRef.value?.focus()
@@ -48,7 +53,7 @@
     <div id="terminal-container" class="h-full bg-hacker-black p-4 font-mono text-sm overflow-y-auto" @click="inputRef?.focus()">
         
         <div v-for="(line, i) in history" :key="i" :class="['mb-1', line.color]">
-            <span v-if="line.isHtml" v-html="line.text"></span>
+            <span v-if="line.isHtml" v-html="sanitize(line.text)"></span>
             <span v-else>{{ line.text }}</span>
         </div>
 
