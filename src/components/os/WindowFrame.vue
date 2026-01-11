@@ -6,18 +6,18 @@
   const props = defineProps(['windowId', 'title', 'icon'])
   const store = useWindowStore()
   const windowRef = ref(null)
-  const isMobile = ref(false) // Track mobile state
+  const isMobile = ref(false)
   
-  // Access the state for this specific window
   const winState = computed(() => store.windows[props.windowId])
   
-  // Check if we are on a mobile device
   const checkMobile = () => {
       isMobile.value = window.innerWidth < 768
   }
   
-  // Function to initialize Drag & Drop
   const initInteract = (el) => {
+    el.setAttribute('data-x', winState.value.position.x)
+    el.setAttribute('data-y', winState.value.position.y)
+  
     interact(el).draggable({
       allowFrom: '.window-header', 
       modifiers: [
@@ -25,7 +25,6 @@
       ],
       listeners: {
         move(event) {
-          // Disable dragging on mobile or if maximized
           if (isMobile.value || winState.value.isMaximized) return; 
           
           const target = event.target
@@ -33,8 +32,11 @@
           const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
   
           target.style.transform = `translate(${x}px, ${y}px)`
+          
           target.setAttribute('data-x', x)
           target.setAttribute('data-y', y)
+  
+          store.updatePosition(props.windowId, { x, y })
         }
       }
     }).resizable({
@@ -46,7 +48,6 @@
       ],
       listeners: {
           move(event) {
-              // Disable resizing on mobile or if maximized
               if (isMobile.value || winState.value.isMaximized) return;
   
               let { x, y } = event.target.dataset
@@ -59,16 +60,42 @@
                   transform: `translate(${x}px, ${y}px)`
               })
               Object.assign(event.target.dataset, { x, y })
+  
+              store.updateSize(props.windowId, { width: event.rect.width, height: event.rect.height })
+              store.updatePosition(props.windowId, { x, y })
           }
       }
     })
   }
   
+  const windowStyle = computed(() => {
+      if (isMobile.value) {
+          return {
+              top: '0px', left: '0px', width: '100%', height: 'calc(100% - 3rem)',
+              zIndex: winState.value.zIndex, position: 'absolute', borderRadius: '0'
+          }
+      }
+  
+      if (winState.value.isMaximized) {
+          return {
+              top: '0px', left: '0px', width: '100%', height: '100%',
+              zIndex: winState.value.zIndex, position: 'absolute', borderRadius: '0'
+          }
+      }
+  
+      return {
+          width: `${winState.value.size.width}px`,
+          height: `${winState.value.size.height}px`,
+          transform: `translate(${winState.value.position.x}px, ${winState.value.position.y}px)`,
+          zIndex: winState.value.zIndex,
+          position: 'absolute'
+      }
+  })
+  
   onMounted(() => {
     checkMobile()
     window.addEventListener('resize', checkMobile)
   
-    // Initialize drag/drop when window opens
     watch(
       () => winState.value.isOpen,
       async (isOpen) => {
@@ -88,10 +115,10 @@
           if (!el) return
   
           if (maximized) {
-              el.style.transform = 'none'
+              el.style.transform = 'none' 
           } else {
-              const x = el.getAttribute('data-x') || 0
-              const y = el.getAttribute('data-y') || 0
+              const x = el.getAttribute('data-x') || winState.value.position.x
+              const y = el.getAttribute('data-y') || winState.value.position.y
               el.style.transform = `translate(${x}px, ${y}px)`
           }
       }
@@ -107,20 +134,9 @@
     <div 
       v-if="winState.isOpen"
       ref="windowRef"
-      class="absolute bg-hacker-gray border border-gray-600 shadow-2xl flex flex-col overflow-hidden"
-      :class="{ 
-          'inset-0 w-full h-full rounded-none': winState.isMaximized, 
-          'rounded-lg': !isMobile && !winState.isMaximized,
-          // Mobile Override:
-          'top-0 left-0 w-full !h-[calc(100%-3rem)] rounded-none': isMobile
-      }"
-      :style="!isMobile && !winState.isMaximized ? { 
-          width: '800px', 
-          height: '600px', 
-          top: '5rem', 
-          left: '5rem', 
-          zIndex: winState.zIndex 
-      } : { zIndex: winState.zIndex }"
+      class="bg-hacker-gray border border-gray-600 shadow-2xl flex flex-col overflow-hidden"
+      :class="{ 'rounded-lg': !isMobile && !winState.isMaximized }"
+      :style="windowStyle"
       @mousedown="store.bringToFront(props.windowId)"
     >
       <div class="window-header h-8 bg-gray-800 flex items-center justify-between px-2 border-b border-gray-600 select-none"
