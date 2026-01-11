@@ -3,11 +3,26 @@
 @tailwind utilities;
 
 /* Global OS Styles */
-body {
+html, body {
+    margin: 0;
+    padding: 0;
     background-color: #0d0d0d;
     color: #e5e7eb;
-    font-family: 'Courier New', monospace; /* Fallback until we load Fira Code */
-    overflow: hidden; /* No scrollbars on the desktop */
+    font-family: 'Courier New', monospace; 
+    
+    /* CRITICAL FIX: Use svh (Small Viewport Height) 
+       This forces the app to fit within the visible screen *excluding* the mobile URL bar. */
+    height: 100svh; 
+    width: 100vw;
+    
+    overflow: hidden; 
+    position: fixed; /* Locks the body to prevent scrolling */
+    inset: 0;
+}
+
+#app {
+    height: 100%;
+    width: 100%;
 }
 
 .scanline {
@@ -37,7 +52,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #0d0d0d; /* hacker-black */
+    background: #0d0d0d; 
 }
 
 ::-webkit-scrollbar-thumb {
@@ -50,6 +65,6 @@ body {
 }
 
 ::selection {
-    background: #00ff41; /* hacker-green */
+    background: #00ff41; 
     color: #000;
 }

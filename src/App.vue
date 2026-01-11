@@ -50,7 +50,6 @@
     }
 
     onMounted(() => {
-        // 'true' enables Capture Mode: Hear clicks even if event.stopPropagation() is used
         window.addEventListener('click', handleGlobalClick, true)
         window.addEventListener('keydown', handleGlobalKey)
     })
@@ -64,7 +63,7 @@
 <template>
       <BootScreen v-if="isBooting" @complete="finishBoot" />
     
-      <div v-show="!isBooting" class="bg-hacker-black h-screen w-screen overflow-hidden font-mono text-gray-300 relative select-none">
+      <div v-show="!isBooting" class="bg-hacker-black h-full w-full overflow-hidden font-mono text-gray-300 relative select-none touch-none">
         
         <div class="absolute inset-0 z-0 transition-opacity duration-700"
              :class="store.isMatrixActive ? 'opacity-100' : 'opacity-0'">
@@ -81,17 +80,17 @@
             <div 
                 v-for="(item, name) in desktopIcons" 
                 :key="name"
-                class="w-24 p-2 hover:bg-white/10 rounded cursor-pointer flex flex-col items-center transition-colors group"
+                class="w-20 md:w-24 p-2 hover:bg-white/10 rounded cursor-pointer flex flex-col items-center transition-colors group"
                 @click="store.openWindow(item.windowId)" 
             >
-                <i :class="[item.icon, 'text-4xl mb-2 group-hover:scale-110 transition-transform duration-200', 
+                <i :class="[item.icon, 'text-3xl md:text-4xl mb-2 group-hover:scale-110 transition-transform duration-200', 
                     name.includes('readme') ? 'text-blue-400' : 
                     name.includes('files') ? 'text-yellow-500' : 
                     name.includes('browser') ? 'text-blue-400' : 
                     'text-gray-400']">
                 </i>
                 
-                <span class="text-xs font-bold text-shadow text-center">
+                <span class="text-xs font-bold text-shadow text-center leading-tight">
                     {{ name.replace('.lnk', '').charAt(0).toUpperCase() + name.replace('.lnk', '').slice(1) }}
                 </span>
             </div>
