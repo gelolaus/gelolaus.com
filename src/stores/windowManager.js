@@ -84,9 +84,27 @@ export const useWindowStore = defineStore('windows', () => {
     windows.value[id].isMinimized = true
   }
 
+  // NEW: Centralized Logic for Taskbar
+  function handleTaskbarClick(id) {
+    const win = windows.value[id]
+    if (!win.isOpen) return
+
+    if (win.isMinimized) {
+        win.isMinimized = false
+        bringToFront(id)
+    } else {
+        if (win.zIndex === activeZIndex.value) {
+            minimizeWindow(id)
+        } else {
+            bringToFront(id)
+        }
+    }
+  }
+
   function toggleMaximize(id) {
     if (!windows.value[id]) return
     windows.value[id].isMaximized = !windows.value[id].isMaximized
+    bringToFront(id)
   }
 
   function bringToFront(id) {
@@ -113,7 +131,8 @@ export const useWindowStore = defineStore('windows', () => {
     toggleMatrix, 
     openWindow, 
     closeWindow, 
-    minimizeWindow, 
+    minimizeWindow,
+    handleTaskbarClick, // Exported
     toggleMaximize, 
     bringToFront, 
     updatePosition, 

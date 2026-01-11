@@ -1,18 +1,15 @@
 <script setup>
-  import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+  import { ref, onMounted, computed, nextTick, watch } from 'vue'
   import interact from 'interactjs'
   import { useWindowStore } from '@/stores/windowManager'
+  import { useBreakpoints } from '@/composables/useBreakpoints'
   
   const props = defineProps(['windowId', 'title', 'icon'])
   const store = useWindowStore()
+  const { isMobile } = useBreakpoints()
   const windowRef = ref(null)
-  const isMobile = ref(false)
   
   const winState = computed(() => store.windows[props.windowId])
-  
-  const checkMobile = () => {
-      isMobile.value = window.innerWidth < 768
-  }
   
   const initInteract = (el) => {
     el.setAttribute('data-x', winState.value.position.x)
@@ -69,9 +66,6 @@
   }
   
   const windowStyle = computed(() => {
-      // FIX: Hide window if minimized
-      if (winState.value.isMinimized) return { display: 'none' }
-
       if (isMobile.value) {
           return {
               top: '0px', left: '0px', width: '100%', height: 'calc(100% - 3rem)',
@@ -96,9 +90,6 @@
   })
   
   onMounted(() => {
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-  
     watch(
       () => winState.value.isOpen,
       async (isOpen) => {
@@ -127,36 +118,48 @@
       }
     )
   })
+</script>
   
-  onUnmounted(() => {
-      window.removeEventListener('resize', checkMobile)
-  })
-  </script>
-  
-  <template>
-    <div 
-      v-if="winState.isOpen"
-      ref="windowRef"
-      class="bg-hacker-gray border border-gray-600 shadow-2xl flex flex-col overflow-hidden"
-      :class="{ 'rounded-lg': !isMobile && !winState.isMaximized }"
-      :style="windowStyle"
-      @mousedown="store.bringToFront(props.windowId)"
-    >
-      <div class="window-header h-8 bg-gray-800 flex items-center justify-between px-2 border-b border-gray-600 select-none"
-           :class="isMobile ? '' : 'cursor-grab active:cursor-grabbing'">
-        <div class="flex items-center gap-2">
-          <i :class="[props.icon, 'text-gray-400']"></i>
-          <span class="text-xs text-gray-300 font-mono">{{ props.title }}</span>
+<template>
+    <Transition name="scale-fade">
+        <div 
+        v-if="winState.isOpen"
+        v-show="!winState.isMinimized"
+        ref="windowRef"
+        class="bg-hacker-gray border border-gray-600 shadow-2xl flex flex-col overflow-hidden"
+        :class="{ 'rounded-lg': !isMobile && !winState.isMaximized }"
+        :style="windowStyle"
+        @mousedown="store.bringToFront(props.windowId)"
+        >
+        <div class="window-header h-8 bg-gray-800 flex items-center justify-between px-2 border-b border-gray-600 select-none"
+            :class="isMobile ? '' : 'cursor-grab active:cursor-grabbing'">
+            <div class="flex items-center gap-2">
+            <i :class="[props.icon, 'text-gray-400']"></i>
+            <span class="text-xs text-gray-300 font-mono">{{ props.title }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+            <div v-if="!isMobile" class="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer" @click.stop="store.toggleMaximize(props.windowId)"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer" @click.stop="store.minimizeWindow(props.windowId)"></div>
+            <div class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer" @click.stop="store.closeWindow(props.windowId)"></div>
+            </div>
         </div>
-        <div class="flex items-center gap-2">
-          <div v-if="!isMobile" class="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer" @click.stop="store.toggleMaximize(props.windowId)"></div>
-          <div class="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer" @click.stop="store.minimizeWindow(props.windowId)"></div>
-          <div class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer" @click.stop="store.closeWindow(props.windowId)"></div>
+    
+        <div class="flex-1 overflow-hidden bg-hacker-black relative">
+            <slot></slot>
         </div>
-      </div>
-  
-      <div class="flex-1 overflow-hidden bg-hacker-black relative">
-        <slot></slot>
-      </div>
-    </div>
-  </template>
+        </div>
+    </Transition>
+</template>
+
+<style scoped>
+.scale-fade-enter-active,
+.scale-fade-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.scale-fade-enter-from,
+.scale-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+</style>
