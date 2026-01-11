@@ -1,6 +1,6 @@
 # Welcome to GelOS
-![Version](https://img.shields.io/badge/version-2.0.0-green?style=flat-square)
-![Status](https://img.shields.io/badge/status-stable-blue?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.0.0-green?style=flat-square)
+![Status](https://img.shields.io/badge/status-experimental-orange?style=flat-square)
 
 Gelo + OS = GelOS. A fully interactive web-based operating system simulation designed to showcase my skills, certifications, and projects in Computer Science, Cyber Security, and Forensics.
 
