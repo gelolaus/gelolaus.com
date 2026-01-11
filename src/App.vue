@@ -17,6 +17,7 @@
     
     const store = useWindowStore()
     const isBooting = ref(true) // Set to true for production!
+    const selectedIcon = ref(null)
   
     const readmeHtml = computed(() => marked.parse(readmeContent))
     
@@ -48,6 +49,24 @@
         if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return
         playKey()
     }
+    
+    const handleBackgroundClick = () => {
+        selectedIcon.value = null
+    }
+
+    const handleIconClick = (name, windowId) => {
+        if (window.innerWidth < 768) {
+            store.openWindow(windowId)
+            selectedIcon.value = null
+        } else {
+            selectedIcon.value = name
+        }
+    }
+
+    const handleIconDblClick = (windowId) => {
+        store.openWindow(windowId)
+        selectedIcon.value = null
+    }
 
     onMounted(() => {
         window.addEventListener('click', handleGlobalClick, true)
@@ -63,7 +82,11 @@
 <template>
       <BootScreen v-if="isBooting" @complete="finishBoot" />
     
-      <div v-show="!isBooting" class="bg-hacker-black h-full w-full overflow-hidden font-mono text-gray-300 relative select-none touch-none">
+      <div 
+        v-show="!isBooting" 
+        @click="handleBackgroundClick"
+        class="bg-hacker-black h-full w-full overflow-hidden font-mono text-gray-300 relative select-none touch-none"
+      >
         
         <div class="absolute inset-0 z-0 transition-opacity duration-700"
              :class="store.isMatrixActive ? 'opacity-100' : 'opacity-0'">
@@ -80,17 +103,23 @@
             <div 
                 v-for="(item, name) in desktopIcons" 
                 :key="name"
-                class="w-20 md:w-24 p-2 hover:bg-white/10 rounded cursor-pointer flex flex-col items-center transition-colors group"
-                @click="store.openWindow(item.windowId)" 
+                @click.stop="handleIconClick(name, item.windowId)"
+                @dblclick="handleIconDblClick(item.windowId)"
+                class="w-20 md:w-24 p-2 rounded cursor-pointer flex flex-col items-center transition-colors group border border-transparent"
+                :class="selectedIcon === name ? 'bg-white/20 border-white/30' : 'hover:bg-white/10'"
             >
-                <i :class="[item.icon, 'text-3xl md:text-4xl mb-2 group-hover:scale-110 transition-transform duration-200', 
+                <i :class="[item.icon, 'text-3xl md:text-4xl mb-2 transition-transform duration-200', 
                     name.includes('readme') ? 'text-blue-400' : 
                     name.includes('files') ? 'text-yellow-500' : 
                     name.includes('browser') ? 'text-blue-400' : 
-                    'text-gray-400']">
+                    'text-gray-400',
+                    selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
                 
-                <span class="text-xs font-bold text-shadow text-center leading-tight">
+                <span 
+                    class="text-xs font-bold text-shadow text-center leading-tight px-1 rounded"
+                    :class="selectedIcon === name ? 'bg-blue-600/80 text-white' : ''"
+                >
                     {{ name.replace('.lnk', '').charAt(0).toUpperCase() + name.replace('.lnk', '').slice(1) }}
                 </span>
             </div>
