@@ -6,40 +6,51 @@
     
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
+    
+    // Current time displayed in the taskbar
     const clock = ref('')
+    
+    // Is the Start menu open?
     const isStartOpen = ref(false)
     let clockInterval = null
     
+    // Get list of currently open windows
     const openWindows = computed(() => {
         return Object.values(store.windows).filter(w => w.isOpen)
     })
     
+    // Update the clock display
     const updateClock = () => {
         const now = new Date()
         clock.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
     
+    // Handle clicking a window button in the taskbar
     const handleTaskClick = (win) => {
-        isStartOpen.value = false
+        isStartOpen.value = false // Close Start menu
         store.handleTaskbarClick(win.id)
     }
 
+    // Toggle Start menu open/closed
     const toggleStart = () => {
         isStartOpen.value = !isStartOpen.value
     }
     
     onMounted(() => {
+        // Start the clock
         updateClock()
         clockInterval = setInterval(updateClock, 1000)
         
+        // Close Start menu if user clicks outside of it
         window.addEventListener('click', (e) => {
             const taskbar = document.querySelector('footer')
-            const startMenu = document.getElementById('start-menu-root') 
+            const startMenu = document.getElementById('start-menu-root')
             
             if (isStartOpen.value) {
                 const clickedTaskbar = taskbar && taskbar.contains(e.target)
                 const clickedMenu = startMenu && startMenu.contains(e.target)
                 
+                // Close if clicked outside both taskbar and menu
                 if (!clickedTaskbar && !clickedMenu) {
                     isStartOpen.value = false
                 }
@@ -47,6 +58,7 @@
         })
     })
     
+    // Clean up when component is destroyed
     onUnmounted(() => {
         if (clockInterval) clearInterval(clockInterval)
     })

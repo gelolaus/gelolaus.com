@@ -3,17 +3,21 @@
     import { useWindowStore } from '@/stores/windowManager'
     import { useBreakpoints } from '@/composables/useBreakpoints'
     
+    // Tell parent to close the menu
     const emit = defineEmits(['close'])
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
     
+    // Get list of all available apps
     const apps = computed(() => Object.values(store.windows))
     
+    // Open an app from the menu
     const openApp = (id) => {
         store.openWindow(id)
-        emit('close')
+        emit('close') // Close menu after opening app
     }
     
+    // "Shut down" by reloading the page
     const shutDown = () => {
         window.location.reload()
     }

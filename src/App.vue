@@ -11,6 +11,7 @@
     import MatrixRain from '@/components/effects/MatrixRain.vue'
     import { readmeContent } from '@/utils/projectReadme'
     
+    // Load app components lazily (only when needed) to speed up initial load
     const Terminal = defineAsyncComponent(() => import('@/components/apps/Terminal.vue'))
     const PDFViewer = defineAsyncComponent(() => import('@/components/apps/PDFViewer.vue'))
     const ImageViewer = defineAsyncComponent(() => import('@/components/apps/ImageViewer.vue'))
@@ -19,24 +20,34 @@
 
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
+    
+    // Show boot screen initially
     const isBooting = ref(true)
+    
+    // Track which desktop icon is selected
     const selectedIcon = ref(null)
   
+    // Convert README markdown to HTML
     const readmeHtml = computed(() => marked.parse(readmeContent))
     
+    // Get desktop icon list from file system
     const desktopIcons = computed(() => {
         return fileSystem.root.children.desktop.children
     })
   
+    // Called when boot sequence finishes
     const finishBoot = () => {
       isBooting.value = false
-      store.openWindow('readme') 
+      store.openWindow('readme') // Open README by default
     }
 
+    // Track browser URL (for the custom address bar in header)
     const browserInput = ref('https://gelolaus.com') 
 
+    // Navigate browser to a URL
     const navigateBrowser = () => {
         let target = browserInput.value.trim()
+        // Add https:// if missing
         if (!target.startsWith('http') && !target.startsWith('file')) {
             target = 'https://' + target
         }
@@ -44,38 +55,47 @@
         store.windows.browser.url = target
     }
 
+    // Play click sound on any click
     const handleGlobalClick = () => {
         playClick()
     }
 
+    // Play keyboard sound on any keypress (except modifier keys)
     const handleGlobalKey = (e) => {
         if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(e.key)) return
         playKey()
     }
     
+    // Deselect icon when clicking background
     const handleBackgroundClick = () => {
         selectedIcon.value = null
     }
 
+    // Handle clicking a desktop icon
     const handleIconClick = (name, windowId) => {
         if (isMobile.value) {
+            // On mobile, single click opens the app
             store.openWindow(windowId)
             selectedIcon.value = null
         } else {
+            // On desktop, single click selects it
             selectedIcon.value = name
         }
     }
 
+    // Handle double-clicking a desktop icon (opens the app)
     const handleIconDblClick = (windowId) => {
         store.openWindow(windowId)
         selectedIcon.value = null
     }
 
+    // Set up global event listeners
     onMounted(() => {
         window.addEventListener('click', handleGlobalClick, true)
         window.addEventListener('keydown', handleGlobalKey)
     })
 
+    // Clean up event listeners
     onUnmounted(() => {
         window.removeEventListener('click', handleGlobalClick, true)
         window.removeEventListener('keydown', handleGlobalKey)

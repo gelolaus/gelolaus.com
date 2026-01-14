@@ -3,18 +3,26 @@
     import DOMPurify from 'dompurify'
     import { useShell } from '@/composables/useShell'
     
+    // Get all the terminal logic from the useShell composable
     const { history, currentPath, commandHistory, execute, formatPath } = useShell()
     
+    // Track what user is typing
     const input = ref('')
+    
+    // Reference to the input field so we can focus it
     const inputRef = ref(null)
+    
+    // Track position in command history (for up/down arrows)
     const historyIndex = ref(-1)
 
+    // Auto-scroll to bottom when new output appears
     const scrollToBottom = async () => {
         await nextTick()
         const container = document.getElementById('terminal-container')
         if(container) container.scrollTop = container.scrollHeight
     }
 
+    // When user presses Enter, run the command
     const handleEnter = () => {
         const cmd = input.value
         execute(cmd)
@@ -23,13 +31,16 @@
         scrollToBottom()
     }
 
+    // Handle up/down arrows to cycle through command history
     const handleKey = (e) => {
         if (e.key === 'ArrowUp') {
+            // Go to previous command
             if (historyIndex.value > 0) {
                 historyIndex.value--
                 input.value = commandHistory.value[historyIndex.value]
             }
         } else if (e.key === 'ArrowDown') {
+            // Go to next command
             if (historyIndex.value < commandHistory.value.length - 1) {
                 historyIndex.value++
                 input.value = commandHistory.value[historyIndex.value]
@@ -40,10 +51,12 @@
         }
     }
 
+    // Clean HTML to prevent security issues
     const sanitize = (html) => {
         return DOMPurify.sanitize(html)
     }
     
+    // Focus the input when terminal opens
     onMounted(() => {
         inputRef.value?.focus()
     })

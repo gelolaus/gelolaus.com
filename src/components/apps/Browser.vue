@@ -4,26 +4,36 @@
     
     const store = useWindowStore()
     
+    // Track what URL the user wants to visit
     const urlInput = ref(store.windows.browser.url) 
+    
+    // The actual URL loaded in the iframe
     const iframeSrc = ref('')
+    
+    // Show a loading indicator while page loads
     const isLoading = ref(false)
     
+    // Navigate to a URL
     const navigate = () => {
         let target = urlInput.value.trim()
         
+        // Add https:// if user didn't type it
         if (!target.startsWith('http') && !target.startsWith('file')) {
             target = 'https://' + target
         }
         
+        // Update the address bar and load the page
         urlInput.value = target
         isLoading.value = true
         iframeSrc.value = target
         
+        // Hide loading indicator after a delay
         setTimeout(() => {
             isLoading.value = false
         }, 1500)
     }
     
+    // Load the default URL when component mounts
     onMounted(() => {
         navigate()
     })

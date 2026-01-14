@@ -1,4 +1,6 @@
+// Terminal command outputs (what each command shows when you type it)
 export const commands = {
+    // The 'help' command - shows all available commands
     help: `
         <span class="text-hacker-green">Available commands:</span><br>
         <span class="ml-4">whoami</span> - About Me<br>
@@ -12,11 +14,15 @@ export const commands = {
         <span class="ml-4">clear</span> - Clear terminal<br>
         <span class="ml-4">exit</span> - Close terminal<br>
     `,
+    
+    // About me info
     whoami: `
         <span class="font-bold text-yellow-500">>> ABOUT ME</span><br>
-        I am Angelo Laus, but you can call me “Gelo”. I graduated from the Science, Technology, Engineering, and Mathematics with a Specialization in Information Technology (STEM-IT) strand at Asia Pacific College, Makati City.<br><br>
-        I am a Notion Campus Leader (one out of eight Cohort 4 Campus Leaders in the Philippines) and the Director of External Relations at JPCS-APC, a role I’ve been doing inside and outside college for different organizations for the past four years.<br>
+        I am Angelo Laus, but you can call me "Gelo". I graduated from the Science, Technology, Engineering, and Mathematics with a Specialization in Information Technology (STEM-IT) strand at Asia Pacific College, Makati City.<br><br>
+        I am a Notion Campus Leader (one out of eight Cohort 4 Campus Leaders in the Philippines) and the Director of External Relations at JPCS-APC, a role I've been doing inside and outside college for different organizations for the past four years.<br>
     `,
+    
+    // Education background
     ed: `
         <span class="font-bold text-blue-400">>> EDUCATION</span><br>
         <span class="font-bold text-green-400"> Senior High School</span><br>
@@ -28,6 +34,8 @@ export const commands = {
         55% Scholarship<br>
         Asia Pacific College, Makati City<br>
     `,
+    
+    // Achievements and awards
     ac: `
         <span class="font-bold text-blue-400">>> ACHIEVEMENTS</span><br>
         <span class="font-bold text-green-400">Certifications</span><br>
@@ -41,6 +49,8 @@ export const commands = {
         - HackForGov 2025 Capture the Flag NCR Champion (Team Akira: Requiem)<br>
         - HackForGov 2024 Capture the Flag NCR 2nd Runner-Up (Team Akira)<br>
     `,
+    
+    // Experience
     xp: `
         <span class="font-bold text-blue-400">>> LEADERSHIP EXPERIENCE</span><br>
         <span class="font-bold text-green-400">Notion Campus Leader</span><br>
@@ -58,6 +68,8 @@ export const commands = {
         - Rangya E-Commerce System (Web Application)<br>
         - Doon Ride-Hailing Comparison System (Web Application)<br>
     `,
+    
+    // Goals
     go: `
         <span class="font-bold text-blue-400">>> SHORT-TERM AND LONG-TERM GOALS</span><br>
         <span class="font-bold text-green-400">Short-Term Goals</span><br>

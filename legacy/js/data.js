@@ -1,5 +1,11 @@
+// =========================================
+// VIRTUAL FILE SYSTEM
+// =========================================
+
+// This is like a fake file system - it mimics a real computer's folders
 const fileSystem = {
     "root": {
+        // Desktop folder - has shortcuts to open apps
         "desktop": {
             type: "dir",
             children: {
@@ -8,6 +14,7 @@ const fileSystem = {
                 "browser.lnk": { type: "exec", action: () => openBrowser('https://gelolaus.com') }
             }
         },
+        // Documents folder - has PDF files
         "documents": {
             type: "dir",
             children: {
@@ -17,6 +24,7 @@ const fileSystem = {
                 "cert_crtom.pdf": { type: "pdf", path: "assets/certs/cert_crtom.pdf" }
             }
         },
+        // Pictures folder - has image files
         "pictures": {
             type: "dir",
             children: {
@@ -43,7 +51,13 @@ const fileSystem = {
     }
 };
 
+// =========================================
+// TERMINAL COMMANDS
+// =========================================
+
+// What each command shows when you type it in the terminal
 const commands = {
+    // The 'help' command shows all available commands
     help: `
         <span class="text-hacker-green">Available commands:</span><br>
         <span class="ml-4">whoami</span> - About Me<br>
@@ -57,11 +71,13 @@ const commands = {
         <span class="ml-4">clear</span> - Clear terminal<br>
         <span class="ml-4">exit</span> - Close terminal<br>
     `,
+    // About me section
     whoami: `
         <span class="font-bold text-yellow-500">>> ABOUT ME</span><br>
-        I am Angelo Laus, but you can call me “Gelo”. I graduated from the Science, Technology, Engineering, and Mathematics with a Specialization in Information Technology (STEM-IT) strand at Asia Pacific College, Makati City.<br><br>
-        I am a Notion Campus Leader (one out of eight Cohort 4 Campus Leaders in the Philippines) and the Director of External Relations at JPCS-APC, a role I’ve been doing inside and outside college for different organizations for the past four years.<br>
+        I am Angelo Laus, but you can call me "Gelo". I graduated from the Science, Technology, Engineering, and Mathematics with a Specialization in Information Technology (STEM-IT) strand at Asia Pacific College, Makati City.<br><br>
+        I am a Notion Campus Leader (one out of eight Cohort 4 Campus Leaders in the Philippines) and the Director of External Relations at JPCS-APC, a role I've been doing inside and outside college for different organizations for the past four years.<br>
     `,
+    // Education background
     ed: `
         <span class="font-bold text-blue-400">>> EDUCATION</span><br>
         <span class="font-bold text-green-400"> Senior High School</span><br>
@@ -73,6 +89,7 @@ const commands = {
         55% Scholarship<br>
         Asia Pacific College, Makati City<br>
     `,
+    // Achievements and awards
     ac: `
         <span class="font-bold text-blue-400">>> ACHIEVEMENTS</span><br>
         <span class="font-bold text-green-400">Certifications</span><br>
@@ -86,6 +103,7 @@ const commands = {
         - HackForGov 2025 Capture the Flag NCR Champion (Team Akira: Requiem)<br>
         - HackForGov 2024 Capture the Flag NCR 2nd Runner-Up (Team Akira)<br>
     `,
+    // Work and leadership experience
     xp: `
         <span class="font-bold text-blue-400">>> LEADERSHIP EXPERIENCE</span><br>
         <span class="font-bold text-green-400">Notion Campus Leader</span><br>
@@ -103,6 +121,7 @@ const commands = {
         - Rangya E-Commerce System (Web Application)<br>
         - Doon Ride-Hailing Comparison System (Web Application)<br>
     `,
+    // Future goals
     go: `
         <span class="font-bold text-blue-400">>> SHORT-TERM AND LONG-TERM GOALS</span><br>
         <span class="font-bold text-green-400">Short-Term Goals</span><br>

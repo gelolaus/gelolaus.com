@@ -1,3 +1,5 @@
+// README content in markdown format
+// This gets converted to HTML and displayed in the README window
 export const readmeContent = `
 # Welcome to GelOS
 ![Version](https://img.shields.io/badge/version-2.0.0-green?style=flat-square)

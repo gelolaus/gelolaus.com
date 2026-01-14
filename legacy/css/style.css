@@ -1,20 +1,33 @@
+/* ===================================
+   CUSTOM SCROLLBARS
+   =================================== */
+
+/* Make the scrollbar thin and stylish */
 ::-webkit-scrollbar { 
     width: 8px; 
 }
 
+/* Dark background for the scrollbar track */
 ::-webkit-scrollbar-track { 
     background: #0d0d0d; 
 }
 
+/* The draggable part of the scrollbar */
 ::-webkit-scrollbar-thumb { 
     background: #333; 
     border-radius: 4px; 
 }
 
+/* Scrollbar turns green when you hover over it */
 ::-webkit-scrollbar-thumb:hover { 
     background: #00ff41; 
 }
 
+/* ===================================
+   VISUAL EFFECTS
+   =================================== */
+
+/* Creates the old TV screen scanline effect */
 .scanline {
     background: linear-gradient(
         to bottom,
@@ -31,16 +44,23 @@
     opacity: 0.2;
 }
 
+/* Makes things fade out smoothly */
 .fade-out {
     opacity: 0;
     pointer-events: none;
     transition: opacity 1s ease-out;
 }
 
+/* ===================================
+   WINDOW STYLES
+   =================================== */
+
+/* Prevents windows from getting too tall */
 .window-max-height { 
     max-height: 80vh; 
 }
 
+/* When a window is maximized, make it fullscreen */
 .maximized {
     top: 0 !important;
     left: 0 !important;
@@ -50,17 +70,28 @@
     border-radius: 0 !important;
 }
 
+/* ===================================
+   MOBILE ADJUSTMENTS
+   =================================== */
+
 @media screen and (max-width: 768px) {
     
+    /* Prevent iPhone from zooming in on text inputs */
     input[type="text"], textarea {
         font-size: 16px !important;
     }
     
+    /* Make scanlines less intense on mobile */
     .scanline {
         opacity: 0.1;
     }
 }
 
+/* ===================================
+   MARKDOWN STYLING
+   =================================== */
+
+/* Style the main headings */
 .markdown-body h1 { 
     font-size: 1.5rem; 
     font-weight: bold; 
@@ -70,6 +101,7 @@
     padding-bottom: 0.25rem; 
 }
 
+/* Style the subheadings */
 .markdown-body h2 { 
     font-size: 1.25rem; 
     font-weight: bold; 
@@ -78,6 +110,7 @@
     margin-bottom: 0.5rem; 
 }
 
+/* Style the smaller headings */
 .markdown-body h3 { 
     font-size: 1.1rem; 
     font-weight: bold; 
@@ -86,26 +119,31 @@
     margin-bottom: 0.25rem; 
 }
 
+/* Regular paragraph text */
 .markdown-body p { 
     margin-bottom: 0.75rem; 
     line-height: 1.6; 
 }
 
+/* Bullet point lists */
 .markdown-body ul { 
     list-style-type: disc; 
     padding-left: 1.5rem; 
     margin-bottom: 0.75rem; 
 }
 
+/* Each list item */
 .markdown-body li { 
     margin-bottom: 0.25rem; 
 }
 
+/* Bold text */
 .markdown-body strong { 
     color: #fff; 
     font-weight: 600; 
 }
 
+/* Inline code blocks */
 .markdown-body code { 
     background: #1a1a1a; 
     padding: 2px 4px; 
@@ -115,6 +153,7 @@
     font-size: 0.9em; 
 }
 
+/* Links */
 .markdown-body a { 
     color: #60a5fa; 
     text-decoration: underline; 

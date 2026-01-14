@@ -7,10 +7,13 @@
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
     
+    // Keep track of what folder we're currently viewing
     const currentPath = ref(['root', 'desktop'])
     
+    // Get the folder object we're currently in
     const currentFolderNode = computed(() => {
         let node = fileSystem.root
+        // Walk through the path to find the current folder
         for (let i = 1; i < currentPath.value.length; i++) {
             if (node.children && node.children[currentPath.value[i]]) {
                 node = node.children[currentPath.value[i]]
@@ -21,17 +24,21 @@
         return node
     })
     
+    // Get list of files to show (with some filtering)
     const currentFiles = computed(() => {
         const rawFiles = currentFolderNode.value.children || {}
         const processedFiles = {}
         
+        // On desktop, hide some shortcuts that are already on the main desktop
         const isDesktop = currentPath.value.length === 2 && currentPath.value[1] === 'desktop'
     
         for (const [key, value] of Object.entries(rawFiles)) {
             if (isDesktop) {
+                // Skip these shortcuts on desktop view
                 if (['terminal.lnk', 'files.lnk', 'browser.lnk'].includes(key)) {
                     continue
                 }
+                // Remove .lnk extension from shortcut names
                 const newKey = key.replace('.lnk', '')
                 processedFiles[newKey] = value
             } else {
@@ -42,32 +49,40 @@
         return processedFiles
     })
     
+    // Format path for display (like "~/documents")
     const pathDisplay = computed(() => {
         if (currentPath.value.length === 1) return '/'
         return '~/' + currentPath.value.slice(1).join('/')
     })
     
+    // Jump directly to a folder (from sidebar)
     const navigateTo = (location) => {
         currentPath.value = ['root', location]
     }
     
+    // Go up one folder
     const goUp = () => {
         if (currentPath.value.length > 1) {
             currentPath.value.pop()
         }
     }
     
+    // Open a file or folder when user clicks it
     const openItem = (name, item) => {
         if (item.type === 'directory') {
+            // Go into the folder
             currentPath.value.push(name)
         } 
         else if (item.type === 'shortcut') {
+            // Launch the app
             store.openWindow(item.windowId)
         } 
         else if (item.type === 'pdf') {
+            // Open PDF viewer
             store.openWindow('pdf', { title: name, filePath: item.path })
         }
         else if (item.type === 'img') {
+            // Open image viewer
             store.openWindow('image', { title: name, filePath: item.path })
         }
     }

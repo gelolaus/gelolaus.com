@@ -2,16 +2,23 @@
     import { ref, onMounted } from 'vue'
     import { fileSystem } from '@/utils/fileSystem' 
     
+    // Tell parent when boot is complete
     const emit = defineEmits(['complete'])
+    
+    // Boot log messages to display
     const logs = ref([])
+    
+    // Reference to the container for auto-scrolling
     const containerRef = ref(null)
     
+    // Get file names to show during "loading" phase
     const getAssetLogs = () => {
         const assets = []
         try {
             const docs = fileSystem?.root?.children?.documents?.children || {}
             const pics = fileSystem?.root?.children?.pictures?.children || {}
     
+            // Add each file to the boot log
             for (const name of Object.keys(docs)) assets.push(`   - /root/documents/${name}`)
             for (const name of Object.keys(pics)) assets.push(`   - /root/pictures/${name}`)
         } catch (e) {
@@ -20,7 +27,9 @@
         return assets
     }
     
+    // Run the fake boot sequence
     const runBootSequence = async () => {
+        // All the boot messages to show
         const initialLogs = [
             "Initializing GELOS-KERNEL v2.0...",
             "Loading BIOS settings... [OK]",
@@ -41,36 +50,44 @@
             "Loading Portfolio Assets..."
         ]
     
+        // Show initial boot messages
         for (let text of initialLogs) {
             logs.value.push(text)
             await autoScrollAndDelay()
         }
     
+        // Show file loading messages (faster)
         const assetLogs = getAssetLogs()
         for (let text of assetLogs) {
             logs.value.push(text)
-            await autoScrollAndDelay(true) 
+            await autoScrollAndDelay(true) // Fast mode
         }
     
+        // Finish up
         logs.value.push("Starting Graphical User Interface (X11)...")
         await autoScrollAndDelay()
         logs.value.push("Welcome, User.")
         
+        // Wait a bit then tell parent we're done
         await new Promise(r => setTimeout(r, 800))
         emit('complete')
     }
     
+    // Helper to scroll and wait between messages
     const autoScrollAndDelay = async (isFast = false) => {
+        // Auto-scroll to bottom
         setTimeout(() => {
             if (containerRef.value) {
                 containerRef.value.scrollTop = containerRef.value.scrollHeight
             }
         }, 10)
         
+        // Wait a bit (faster if loading files)
         const delay = isFast ? Math.random() * 20 + 5 : Math.random() * 100 + 50
         await new Promise(r => setTimeout(r, delay))
     }
     
+    // Start boot sequence when component loads
     onMounted(() => {
         runBootSequence()
     })

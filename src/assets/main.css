@@ -1,7 +1,13 @@
+/* Load Tailwind's default styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ===================================
+   BASE STYLES
+   =================================== */
+
+/* Make the page fill the entire screen */
 html, body {
     margin: 0;
     padding: 0;
@@ -16,15 +22,22 @@ html, body {
     cursor: default;
 }
 
+/* Vue mounts here */
 #app {
     height: 100%;
     width: 100%;
 }
 
+/* ===================================
+   VISUAL EFFECTS
+   =================================== */
+
+/* Add a shadow to text for better readability */
 .text-shadow {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+/* Old CRT monitor scanline effect */
 .scanline {
   position: fixed;
   top: 0;
@@ -45,6 +58,7 @@ html, body {
   animation: scanline 10s linear infinite;
 }
 
+/* Animate the scanlines moving down */
 @keyframes scanline {
   0% {
     background-position: 0 0;
@@ -54,24 +68,33 @@ html, body {
   }
 }
 
+/* ===================================
+   CUSTOM SCROLLBARS
+   =================================== */
+
+/* Make scrollbars thin and stylish */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
+/* Scrollbar track background */
 ::-webkit-scrollbar-track {
     background: #0d1117;
 }
 
+/* The draggable scrollbar thumb */
 ::-webkit-scrollbar-thumb {
     background: #30363d;
     border-radius: 4px;
 }
 
+/* Thumb color when hovering */
 ::-webkit-scrollbar-thumb:hover {
     background: #58a6ff;
 }
 
+/* Hide scrollbar for certain elements */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -81,6 +104,11 @@ html, body {
     scrollbar-width: none;
 }
 
+/* ===================================
+   TEXT SELECTION
+   =================================== */
+
+/* Make selected text look cool with green highlight */
 ::selection {
     background: #00ff41;
     color: #000;

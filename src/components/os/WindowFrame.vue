@@ -10,8 +10,10 @@
   const { isMobile } = useBreakpoints()
   const windowRef = ref(null)
   
+  // Get the state for this specific window
   const winState = computed(() => store.windows[props.windowId])
   
+  // Animation when window opens
   const onEnter = (el, done) => {
     gsap.fromTo(el, 
       { scale: 0.8, opacity: 0, y: 30 },
@@ -19,40 +21,48 @@
     )
   }
   
+  // Animation when window closes
   const onLeave = (el, done) => {
     gsap.to(el, 
       { scale: 0.9, opacity: 0, y: 30, duration: 0.2, ease: "power2.in", onComplete: done }
     )
   }
   
+  // Set up dragging and resizing for the window
   const initInteract = (el) => {
+    // Make window draggable
     interact(el).draggable({
-      allowFrom: '.window-header',
+      allowFrom: '.window-header', // Only drag from the title bar
       modifiers: [
         interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })
       ],
       listeners: {
         move(event) {
+          // Don't allow dragging on mobile or when maximized
           if (isMobile.value || winState.value.isMaximized) return
   
+          // Calculate new position
           const currentX = winState.value.position.x
           const currentY = winState.value.position.y
           
           const newX = currentX + event.dx
           const newY = currentY + event.dy
   
+          // Update the window position
           store.updatePosition(props.windowId, { x: newX, y: newY })
         }
       }
     }).resizable({
+      // Make window resizable from left, right, and bottom edges
       edges: { left: true, right: true, bottom: true, top: false },
       modifiers: [
           interact.modifiers.restrictSize({
-              min: { width: 300, height: 200 }
+              min: { width: 300, height: 200 } // Minimum size
           })
       ],
       listeners: {
           move(event) {
+              // Don't allow resizing on mobile or when maximized
               if (isMobile.value || winState.value.isMaximized) return
   
               const newWidth = event.rect.width
@@ -64,6 +74,7 @@
               const newX = currentX + event.deltaRect.left
               const newY = currentY + event.deltaRect.top
   
+              // Update the window size and position
               store.updateSize(props.windowId, { width: newWidth, height: newHeight })
               store.updatePosition(props.windowId, { x: newX, y: newY })
           }
@@ -71,7 +82,9 @@
     })
   }
   
+  // Calculate the window's style based on its state
   const windowStyle = computed(() => {
+      // On mobile, windows are always fullscreen
       if (isMobile.value) {
           return {
               top: '0px', left: '0px', width: '100%', height: 'calc(100% - 3rem)',
@@ -79,6 +92,7 @@
           }
       }
   
+      // When maximized, fill the entire screen
       if (winState.value.isMaximized) {
           return {
               top: '0px', left: '0px', width: '100%', height: '100%',
@@ -86,6 +100,7 @@
           }
       }
   
+      // Normal windowed mode - use stored position and size
       return {
           width: `${winState.value.size.width}px`,
           height: `${winState.value.size.height}px`,
@@ -96,6 +111,7 @@
       }
   })
   
+  // Initialize interact.js when window opens
   onMounted(() => {
     watch(
       () => winState.value.isOpen,

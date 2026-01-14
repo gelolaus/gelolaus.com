@@ -1,7 +1,9 @@
+// Virtual file system - mimics a real computer's folders and files
 export const fileSystem = {
     "root": {
         type: "directory",
         children: {
+            // Desktop folder - contains shortcuts to apps
             "desktop": {
                 type: "directory",
                 children: {
@@ -11,6 +13,7 @@ export const fileSystem = {
                     "README.md.lnk": { type: "shortcut", windowId: "readme", icon: "fa-brands fa-markdown" }
                 }
             },
+            // Documents folder - contains PDFs
             "documents": {
                 type: "directory",
                 children: {
@@ -20,6 +23,7 @@ export const fileSystem = {
                     "cert_crtom.pdf": { type: "pdf", path: "assets/certs/cert_crtom.pdf" }
                 }
             },
+            // Pictures folder - contains images
             "pictures": {
                 type: "directory",
                 children: {
