@@ -1,23 +1,18 @@
-/* =========================================
-   Contains the command line logic for the terminal.
-   ========================================= */
-
 let currentPath = ["root"]; 
 let commandHistory = [];
 let historyIndex = -1;
 
 const inputField = document.getElementById('terminal-input');
 const terminalBody = document.getElementById('terminal-body');
-const promptLabel = document.querySelector('.text-hacker-green.mr-2'); 
+const promptLabel = document.querySelector('.text-hacker-green.mr-2');
 
-// Resolver function to handle paths like "cd documents/projects"
 function resolvePath(inputPath) {
     let pathStack = inputPath.startsWith('/') ? [] : [...currentPath];
     const segments = inputPath.split('/').filter(seg => seg !== '' && seg !== '.');
 
     for (let segment of segments) {
         if (segment === '..') {
-            if (pathStack.length > 1) { 
+            if (pathStack.length > 1) {
                 pathStack.pop();
             }
         } else {
@@ -38,7 +33,7 @@ function resolvePath(inputPath) {
             } else if (currentNode[folderName]) {
                 currentNode = currentNode[folderName];
             } else {
-                return null; 
+                return null;
             }
         }
     }
@@ -205,7 +200,7 @@ if (inputField && terminalBody) {
                 const lastSlashIndex = currentWord.lastIndexOf('/');
                 
                 if (lastSlashIndex !== -1) {
-                    prefix = currentWord.substring(0, lastSlashIndex + 1); 
+                    prefix = currentWord.substring(0, lastSlashIndex + 1);
                     const search = currentWord.substring(lastSlashIndex + 1); 
                     
                     const parentDir = resolvePath(prefix);
@@ -217,7 +212,7 @@ if (inputField && terminalBody) {
                     }
                 } else {
                     const currentDirObj = getCurrentDir();
-                    const items = currentDirObj.children || currentDirObj; 
+                    const items = currentDirObj.children || currentDirObj;
                     const files = Object.keys(items);
                     candidates = files.filter(f => f.startsWith(currentWord));
                 }

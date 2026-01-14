@@ -34,14 +34,12 @@
         
         window.addEventListener('click', (e) => {
             const taskbar = document.querySelector('footer')
-            // Since StartMenu is teleported, we look for it by ID
             const startMenu = document.getElementById('start-menu-root') 
             
             if (isStartOpen.value) {
                 const clickedTaskbar = taskbar && taskbar.contains(e.target)
                 const clickedMenu = startMenu && startMenu.contains(e.target)
                 
-                // Close if we didn't click the taskbar AND didn't click the menu
                 if (!clickedTaskbar && !clickedMenu) {
                     isStartOpen.value = false
                 }

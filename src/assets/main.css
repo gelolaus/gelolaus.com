@@ -2,18 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global OS Styles */
 html, body {
     margin: 0;
     padding: 0;
     background-color: #0d0d0d;
     color: #e5e7eb;
-    font-family: 'Courier New', monospace; 
-    
-    height: 100svh; 
+    font-family: 'Courier New', monospace;
+    height: 100svh;
     width: 100vw;
-    
-    overflow: hidden; 
+    overflow: hidden;
     position: fixed;
     inset: 0;
     cursor: default;
@@ -63,7 +60,7 @@ html, body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #0d1117; 
+    background: #0d1117;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -85,6 +82,6 @@ html, body {
 }
 
 ::selection {
-    background: #00ff41; 
+    background: #00ff41;
     color: #000;
 }

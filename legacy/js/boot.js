@@ -1,8 +1,3 @@
-/* =========================================
-   Contains the startup and effects for the OS.
-   ========================================= */
-
-/* --- MATRIX EFFECT --- */
 const canvas = document.getElementById('matrix-canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 
@@ -51,7 +46,6 @@ function startMatrix() {
     });
 }
 
-/* --- BOOT SEQUENCE --- */
 const bootTexts = [
     "Initializing GELO-KERNEL v1.0.4...",
     "Loading BIOS settings... [OK]",

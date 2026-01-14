@@ -27,7 +27,7 @@
   
   const initInteract = (el) => {
     interact(el).draggable({
-      allowFrom: '.window-header', 
+      allowFrom: '.window-header',
       modifiers: [
         interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })
       ],

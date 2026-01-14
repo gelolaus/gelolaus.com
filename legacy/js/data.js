@@ -1,11 +1,5 @@
-/* =========================================
-   Contains the file system and command content for the terminal.
-   ========================================= */
-
-/* --- VIRTUAL FILE SYSTEM --- */
 const fileSystem = {
     "root": {
-        // "about.txt": { type: "text", content: "I am Gelo, a CS student specializing in Cybersecurity." },
         "desktop": {
             type: "dir",
             children: {
@@ -21,7 +15,6 @@ const fileSystem = {
                 "cert_ccep.pdf": { type: "pdf", path: "assets/certs/cert_ccep.pdf" },
                 "cert_cpps.pdf": { type: "pdf", path: "assets/certs/cert_cpps.pdf" },
                 "cert_crtom.pdf": { type: "pdf", path: "assets/certs/cert_crtom.pdf" }
-                // "resume.pdf": { type: "pdf", path: "assets/docs/resume.pdf" } 
             }
         },
         "pictures": {
@@ -50,7 +43,6 @@ const fileSystem = {
     }
 };
 
-/* --- TERMINAL COMMAND TEXTS --- */
 const commands = {
     help: `
         <span class="text-hacker-green">Available commands:</span><br>

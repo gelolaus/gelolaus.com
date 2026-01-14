@@ -1,12 +1,7 @@
-/* =========================================
-   Contains the core utilties, audio, and drag & drop functionality.
-   ========================================= */
-
-/* --- AUDIO SETTINGS --- */
 const clickSound = new Audio('assets/sounds/click.mp3');
 clickSound.volume = 0.4;
 
-const keySound = new Audio('assets/sounds/keypress.wav'); 
+const keySound = new Audio('assets/sounds/keypress.wav');
 keySound.volume = 0.2; 
 
 function playClick() {
@@ -28,7 +23,6 @@ document.addEventListener('keydown', function(e) {
     playKey();
 });
 
-/* --- CLOCK --- */
 function updateClock() {
     const now = new Date();
     const clockEl = document.getElementById('clock');
@@ -39,7 +33,6 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-/* --- Z-INDEX MANAGEMENT --- */
 let highestZ = 10;
 
 function bringToFront(element) {
@@ -47,11 +40,10 @@ function bringToFront(element) {
     element.style.zIndex = highestZ;
 }
 
-/* --- INTERACT.JS CONFIG (Drag & Drop) --- */
 if (typeof interact !== 'undefined') {
     interact('.draggable')
       .draggable({
-        allowFrom: '.window-header', 
+        allowFrom: '.window-header',
         inertia: true,
         modifiers: [
           interact.modifiers.restrictRect({
@@ -60,9 +52,9 @@ if (typeof interact !== 'undefined') {
           })
         ],
         autoScroll: true,
-        listeners: { 
+        listeners: {
           move: function(event) {
-            if (window.innerWidth < 768) return; 
+            if (window.innerWidth < 768) return;
             dragMoveListener(event);
           }
         }
@@ -99,7 +91,6 @@ function dragMoveListener (event) {
   target.setAttribute('data-y', y);
 }
 
-// Add event listener for Z-Index
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.draggable').forEach(win => {
         win.addEventListener('mousedown', () => bringToFront(win));

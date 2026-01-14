@@ -4,16 +4,13 @@
     
     const store = useWindowStore()
     
-    // State
     const urlInput = ref(store.windows.browser.url) 
     const iframeSrc = ref('')
     const isLoading = ref(false)
     
-    // Logic
     const navigate = () => {
         let target = urlInput.value.trim()
         
-        // Auto-add https if missing
         if (!target.startsWith('http') && !target.startsWith('file')) {
             target = 'https://' + target
         }
@@ -22,14 +19,13 @@
         isLoading.value = true
         iframeSrc.value = target
         
-        // Simulated load delay
         setTimeout(() => {
             isLoading.value = false
         }, 1500)
     }
     
     onMounted(() => {
-        navigate() 
+        navigate()
     })
     </script>
     

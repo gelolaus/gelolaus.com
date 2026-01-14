@@ -1,7 +1,3 @@
-/* =========================================
-   Contains the GUI and applications for the OS.
-   ========================================= */
-
 let readmeLoaded = false;
 
 const managedWindows = ['window-terminal', 'window-files', 'window-pdf', 'window-image', 'window-readme', 'window-browser'];
@@ -149,14 +145,12 @@ async function loadReadme() {
         
         const markdownText = await response.text();
         
-        // 1. Convert Markdown to HTML
         container.innerHTML = marked.parse(markdownText);
         
-        // 2. FORCE EXTERNAL LINKS TO OPEN IN NEW TAB (The Fix)
         container.querySelectorAll('a').forEach(link => {
             link.setAttribute('target', '_blank');
-            link.setAttribute('rel', 'noopener noreferrer'); // Security best practice
-            link.classList.add('text-blue-400', 'hover:text-blue-300'); // Add styling if missing
+            link.setAttribute('rel', 'noopener noreferrer');
+            link.classList.add('text-blue-400', 'hover:text-blue-300');
         });
 
         readmeLoaded = true;

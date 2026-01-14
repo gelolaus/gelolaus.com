@@ -6,11 +6,9 @@
     const logs = ref([])
     const containerRef = ref(null)
     
-    // Helper: Safely get files without crashing
     const getAssetLogs = () => {
         const assets = []
         try {
-            // Safe access using optional chaining (?.)
             const docs = fileSystem?.root?.children?.documents?.children || {}
             const pics = fileSystem?.root?.children?.pictures?.children || {}
     
@@ -23,7 +21,6 @@
     }
     
     const runBootSequence = async () => {
-        // Basic logs always work
         const initialLogs = [
             "Initializing GELOS-KERNEL v2.0...",
             "Loading BIOS settings... [OK]",
@@ -44,21 +41,17 @@
             "Loading Portfolio Assets..."
         ]
     
-        // 1. Run Initial Logs
         for (let text of initialLogs) {
             logs.value.push(text)
             await autoScrollAndDelay()
         }
     
-        // 2. Run Asset Logs (Fast Scroll)
         const assetLogs = getAssetLogs()
         for (let text of assetLogs) {
             logs.value.push(text)
-            // Scroll fast for assets
             await autoScrollAndDelay(true) 
         }
     
-        // 3. Finish
         logs.value.push("Starting Graphical User Interface (X11)...")
         await autoScrollAndDelay()
         logs.value.push("Welcome, User.")
@@ -67,16 +60,13 @@
         emit('complete')
     }
     
-    // Helper to handle scrolling and delay
     const autoScrollAndDelay = async (isFast = false) => {
-        // Scroll
         setTimeout(() => {
             if (containerRef.value) {
                 containerRef.value.scrollTop = containerRef.value.scrollHeight
             }
         }, 10)
         
-        // Delay
         const delay = isFast ? Math.random() * 20 + 5 : Math.random() * 100 + 50
         await new Promise(r => setTimeout(r, delay))
     }
