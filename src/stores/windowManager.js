@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 // Store for managing all the windows in our fake OS
 export const useWindowStore = defineStore('windows', () => {
@@ -35,6 +35,34 @@ export const useWindowStore = defineStore('windows', () => {
     readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown')
   })
   
+  // Check if we have any saved window settings in the browser's storage
+  // This is so the user doesn't lose their work when they refresh the page
+  const savedState = localStorage.getItem('gelos-windows')
+  
+  if (savedState) {
+    try {
+      // If we found saved data, turn it back into a JavaScript object
+      const parsed = JSON.parse(savedState)
+      
+      // Loop through each window we found and update our current list
+      // We do it this way to make sure we don't break anything if we added new apps later
+      for (const key in parsed) {
+        if (windows.value[key]) {
+          windows.value[key] = parsed[key]
+        }
+      }
+    } catch (e) {
+      // If something goes wrong loading the data, just ignore it and start fresh
+      console.error('Failed to load window state', e)
+    }
+  }
+
+  // Watch for any changes to our windows (like moving or resizing)
+  // When something changes, save it immediately to the browser
+  watch(windows, (newVal) => {
+    localStorage.setItem('gelos-windows', JSON.stringify(newVal))
+  }, { deep: true }) // "deep: true" means we watch nested properties like position.x
+
   // Turn Matrix effect on/off
   function toggleMatrix() {
     isMatrixActive.value = !isMatrixActive.value
