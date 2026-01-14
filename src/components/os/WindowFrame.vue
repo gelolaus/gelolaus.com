@@ -13,27 +13,19 @@
   const winState = computed(() => store.windows[props.windowId])
   
   const onEnter = (el, done) => {
-    const { x, y } = winState.value.position
-    
     gsap.fromTo(el, 
-      { x: x, y: y + 20, scale: 0.8, opacity: 0 },
-      { x: x, y: y, scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)", onComplete: done }
+      { scale: 0.8, opacity: 0, y: 30 },
+      { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.7)", onComplete: done }
     )
   }
   
   const onLeave = (el, done) => {
-    const { x, y } = winState.value.position
-    
-    gsap.fromTo(el,
-      { x: x, y: y, scale: 1, opacity: 1 }, 
-      { x: x, y: y + 20, scale: 0.9, opacity: 0, duration: 0.2, ease: "power2.in", onComplete: done }
+    gsap.to(el, 
+      { scale: 0.9, opacity: 0, y: 30, duration: 0.2, ease: "power2.in", onComplete: done }
     )
   }
   
   const initInteract = (el) => {
-    el.setAttribute('data-x', winState.value.position.x)
-    el.setAttribute('data-y', winState.value.position.y)
-  
     interact(el).draggable({
       allowFrom: '.window-header', 
       modifiers: [
@@ -41,18 +33,15 @@
       ],
       listeners: {
         move(event) {
-          if (isMobile.value || winState.value.isMaximized) return; 
-          
-          const target = event.target
-          const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
-          const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+          if (isMobile.value || winState.value.isMaximized) return
   
-          target.style.transform = `translate(${x}px, ${y}px)`
+          const currentX = winState.value.position.x
+          const currentY = winState.value.position.y
           
-          target.setAttribute('data-x', x)
-          target.setAttribute('data-y', y)
+          const newX = currentX + event.dx
+          const newY = currentY + event.dy
   
-          store.updatePosition(props.windowId, { x, y })
+          store.updatePosition(props.windowId, { x: newX, y: newY })
         }
       }
     }).resizable({
@@ -64,21 +53,19 @@
       ],
       listeners: {
           move(event) {
-              if (isMobile.value || winState.value.isMaximized) return;
+              if (isMobile.value || winState.value.isMaximized) return
   
-              let { x, y } = event.target.dataset
-              x = (parseFloat(x) || 0) + event.deltaRect.left
-              y = (parseFloat(y) || 0) + event.deltaRect.top
+              const newWidth = event.rect.width
+              const newHeight = event.rect.height
               
-              Object.assign(event.target.style, {
-                  width: `${event.rect.width}px`,
-                  height: `${event.rect.height}px`,
-                  transform: `translate(${x}px, ${y}px)`
-              })
-              Object.assign(event.target.dataset, { x, y })
+              const currentX = winState.value.position.x
+              const currentY = winState.value.position.y
+              
+              const newX = currentX + event.deltaRect.left
+              const newY = currentY + event.deltaRect.top
   
-              store.updateSize(props.windowId, { width: event.rect.width, height: event.rect.height })
-              store.updatePosition(props.windowId, { x, y })
+              store.updateSize(props.windowId, { width: newWidth, height: newHeight })
+              store.updatePosition(props.windowId, { x: newX, y: newY })
           }
       }
     })
@@ -102,7 +89,8 @@
       return {
           width: `${winState.value.size.width}px`,
           height: `${winState.value.size.height}px`,
-          transform: `translate(${winState.value.position.x}px, ${winState.value.position.y}px)`,
+          left: `${winState.value.position.x}px`,
+          top: `${winState.value.position.y}px`,
           zIndex: winState.value.zIndex,
           position: 'absolute'
       }
@@ -119,22 +107,6 @@
         }
       },
       { immediate: true }
-    )
-  
-    watch(
-      () => winState.value.isMaximized,
-      (maximized) => {
-          const el = windowRef.value
-          if (!el) return
-  
-          if (maximized) {
-              el.style.transform = 'none' 
-          } else {
-              const x = el.getAttribute('data-x') || winState.value.position.x
-              const y = el.getAttribute('data-y') || winState.value.position.y
-              el.style.transform = `translate(${x}px, ${y}px)`
-          }
-      }
     )
   })
   </script>
