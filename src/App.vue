@@ -17,6 +17,7 @@
     const ImageViewer = defineAsyncComponent(() => import('@/components/apps/ImageViewer.vue'))
     const Browser = defineAsyncComponent(() => import('@/components/apps/Browser.vue'))
     const FileExplorer = defineAsyncComponent(() => import('@/components/apps/FileExplorer.vue'))
+    const Settings = defineAsyncComponent(() => import('@/components/apps/Settings.vue'))
 
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -120,7 +121,7 @@
              :class="store.isMatrixActive ? 'opacity-0' : 'opacity-20'">
         </div>
         
-        <div class="scanline"></div>
+        <div v-if="store.isCRTActive" class="scanline"></div>
 
         <div class="absolute top-4 left-4 grid gap-4 z-10">
             <div 
@@ -135,6 +136,7 @@
                     name.includes('readme') ? 'text-blue-400' : 
                     name.includes('files') ? 'text-yellow-500' : 
                     name.includes('browser') ? 'text-blue-400' : 
+                    name.includes('settings') ? 'text-gray-200' :
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -211,6 +213,10 @@
             </template>
             
             <Browser />
+        </WindowFrame>
+
+        <WindowFrame windowId="settings" :title="store.windows.settings.title" :icon="store.windows.settings.icon">
+            <Settings />
         </WindowFrame>
 
         <Taskbar />

@@ -3,8 +3,18 @@ import { ref, watch } from 'vue'
 
 // Store for managing all the windows in our fake OS
 export const useWindowStore = defineStore('windows', () => {
+  // --- SYSTEM SETTINGS ---
+  
   // Track if the Matrix effect is active
   const isMatrixActive = ref(false)
+  
+  // Track if the CRT scanline effect is on (retro monitor look)
+  const isCRTActive = ref(true)
+
+  // Track if sound effects are enabled (clicks, beeps)
+  const soundEnabled = ref(true)
+  
+  // --- WINDOW STATE ---
   
   // Keep track of which window is on top
   const activeZIndex = ref(100)
@@ -32,9 +42,12 @@ export const useWindowStore = defineStore('windows', () => {
     browser: defaultState('browser', 'Browser', 'fa-solid fa-globe', 'https://gelolaus.com'),
     pdf: defaultState('pdf', 'PDF Viewer', 'fa-solid fa-file-pdf'),
     image: defaultState('image', 'Image Viewer', 'fa-solid fa-image'),
-    readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown')
+    readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown'),
+    settings: defaultState('settings', 'Settings', 'fa-solid fa-gears') // The new Settings app
   })
   
+  // --- SAVED DATA LOADING ---
+
   // Check if we have any saved window settings in the browser's storage
   // This is so the user doesn't lose their work when they refresh the page
   const savedState = localStorage.getItem('gelos-windows')
@@ -57,15 +70,55 @@ export const useWindowStore = defineStore('windows', () => {
     }
   }
 
+  // Check if we have any saved system settings (sound, theme, etc.)
+  const savedSettings = localStorage.getItem('gelos-settings')
+
+  if (savedSettings) {
+    try {
+      const parsed = JSON.parse(savedSettings)
+      
+      // If we found saved settings, apply them
+      // We use '??' to allow 'false' values to be accepted (because false is a valid setting)
+      isMatrixActive.value = parsed.matrix ?? false
+      isCRTActive.value = parsed.crt ?? true
+      soundEnabled.value = parsed.sound ?? true
+    } catch (e) {
+      console.error('Failed to load settings', e)
+    }
+  }
+
+  // --- AUTO-SAVE WATCHERS ---
+
   // Watch for any changes to our windows (like moving or resizing)
   // When something changes, save it immediately to the browser
   watch(windows, (newVal) => {
     localStorage.setItem('gelos-windows', JSON.stringify(newVal))
   }, { deep: true }) // "deep: true" means we watch nested properties like position.x
 
+  // Watch for system setting changes and save them
+  watch([isMatrixActive, isCRTActive, soundEnabled], () => {
+    localStorage.setItem('gelos-settings', JSON.stringify({
+      matrix: isMatrixActive.value,
+      crt: isCRTActive.value,
+      sound: soundEnabled.value
+    }))
+  })
+
+  // --- ACTIONS ---
+
   // Turn Matrix effect on/off
   function toggleMatrix() {
     isMatrixActive.value = !isMatrixActive.value
+  }
+
+  // Toggle CRT Scanlines
+  function toggleCRT() {
+    isCRTActive.value = !isCRTActive.value
+  }
+
+  // Toggle System Sounds
+  function toggleSound() {
+    soundEnabled.value = !soundEnabled.value
   }
 
   // Open a window (and set it up if it's the first time)
@@ -180,7 +233,11 @@ export const useWindowStore = defineStore('windows', () => {
   return { 
     windows, 
     isMatrixActive, 
+    isCRTActive,       // Exported so we can use it in App.vue
+    soundEnabled,      // Exported so sound.js can check it
     toggleMatrix, 
+    toggleCRT, 
+    toggleSound,
     openWindow, 
     closeWindow, 
     minimizeWindow,

@@ -10,7 +10,8 @@ export const fileSystem = {
                     "terminal.lnk": { type: "shortcut", windowId: "terminal", icon: "fa-solid fa-terminal" },
                     "files.lnk": { type: "shortcut", windowId: "files", icon: "fa-solid fa-folder-open" },
                     "browser.lnk": { type: "shortcut", windowId: "browser", icon: "fa-solid fa-globe" },
-                    "README.md.lnk": { type: "shortcut", windowId: "readme", icon: "fa-brands fa-markdown" }
+                    "readme.lnk": { type: "shortcut", windowId: "readme", icon: "fa-brands fa-markdown" },
+                    "settings.lnk": { type: "shortcut", windowId: "settings", icon: "fa-solid fa-gears" }
                 }
             },
             // Documents folder - contains PDFs
