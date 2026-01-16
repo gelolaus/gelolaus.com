@@ -14,6 +14,25 @@ export const useWindowStore = defineStore('windows', () => {
   // Track if sound effects are enabled (clicks, beeps)
   const soundEnabled = ref(true)
   
+  // --- NOTIFICATIONS ---
+
+  // A list to hold our active alerts (toasts)
+  const notifications = ref([])
+
+  // Function to show a pop-up message
+  // We can call this from anywhere: store.notify('Title', 'Message', 'success')
+  function notify(title, message, type = 'info') {
+    const id = Date.now() // Simple unique ID based on time
+    
+    // Add the new notification to our list
+    notifications.value.push({ id, title, message, type })
+    
+    // Automatically remove it after 3 seconds so they don't stack up
+    setTimeout(() => {
+        notifications.value = notifications.value.filter(n => n.id !== id)
+    }, 3000)
+  }
+
   // --- WINDOW STATE ---
   
   // Keep track of which window is on top
@@ -43,7 +62,7 @@ export const useWindowStore = defineStore('windows', () => {
     pdf: defaultState('pdf', 'PDF Viewer', 'fa-solid fa-file-pdf'),
     image: defaultState('image', 'Image Viewer', 'fa-solid fa-image'),
     readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown'),
-    settings: defaultState('settings', 'Settings', 'fa-solid fa-gears') // The new Settings app
+    settings: defaultState('settings', 'Settings', 'fa-solid fa-gears')
   })
   
   // --- SAVED DATA LOADING ---
@@ -235,6 +254,8 @@ export const useWindowStore = defineStore('windows', () => {
     isMatrixActive, 
     isCRTActive,       // Exported so we can use it in App.vue
     soundEnabled,      // Exported so sound.js can check it
+    notifications,     // The list of active notifications
+    notify,            // The function to trigger a new notification
     toggleMatrix, 
     toggleCRT, 
     toggleSound,

@@ -9,6 +9,7 @@
     import Taskbar from '@/components/os/Taskbar.vue'
     import BootScreen from '@/components/effects/BootScreen.vue'
     import MatrixRain from '@/components/effects/MatrixRain.vue'
+    import NotificationToast from '@/components/os/NotificationToast.vue'
     import { readmeContent } from '@/utils/projectReadme'
     
     // Load app components lazily (only when needed) to speed up initial load
@@ -40,6 +41,10 @@
     const finishBoot = () => {
       isBooting.value = false
       store.openWindow('readme') // Open README by default
+      // Test notification on boot
+      setTimeout(() => {
+        store.notify('System Online', 'Welcome back, Administrator.', 'success')
+      }, 1000)
     }
 
     // Track browser URL (for the custom address bar in header)
@@ -220,6 +225,5 @@
         </WindowFrame>
 
         <Taskbar />
-        
-      </div>
+        <NotificationToast /> </div>
 </template>
