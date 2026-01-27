@@ -62,7 +62,8 @@ export const useWindowStore = defineStore('windows', () => {
     pdf: defaultState('pdf', 'PDF Viewer', 'fa-solid fa-file-pdf'),
     image: defaultState('image', 'Image Viewer', 'fa-solid fa-image'),
     readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown'),
-    settings: defaultState('settings', 'Settings', 'fa-solid fa-gears')
+    settings: defaultState('settings', 'Settings', 'fa-solid fa-gears'),
+    mail: defaultState('mail', 'Mail', 'fa-solid fa-envelope')
   })
   
   // --- SAVED DATA LOADING ---
