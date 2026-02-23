@@ -30,7 +30,7 @@
     
     // Show boot screen initially
     const isBooting = ref(true)
-    const isLoggingIn = ref(false) // <-- NEW STATE
+    const isLoggingIn = ref(false) 
     
     // Track which desktop icon is selected
     const selectedIcon = ref(null)
@@ -42,6 +42,119 @@
     const desktopIcons = computed(() => {
         return fileSystem.root.children.desktop.children
     })
+
+    // --- ICON DRAG & GRID LOGIC ---
+    const CELL_W = 100 // Grid cell width
+    const CELL_H = 110 // Grid cell height
+    const OFFSET_X = 16 // Left padding
+    const OFFSET_Y = 16 // Top padding
+
+    const dragState = ref({
+        isDragging: false,
+        iconName: null,
+        startX: 0, startY: 0,
+        initialX: 0, initialY: 0,
+        currentX: 0, currentY: 0,
+        hasMoved: false
+    })
+
+    // Calculate dynamic default layout (top-to-bottom, left-to-right) for unpositioned icons
+    const getIconPos = (name) => {
+        if (dragState.value.isDragging && dragState.value.iconName === name) {
+            return { x: dragState.value.currentX, y: dragState.value.currentY }
+        }
+        if (store.iconPositions[name]) {
+            return store.iconPositions[name]
+        }
+        
+        const keys = Object.keys(desktopIcons.value)
+        const index = keys.indexOf(name)
+        
+        // Ensure we calculate rows based on screen height
+        const maxRows = Math.max(1, Math.floor((window.innerHeight - 100) / CELL_H))
+        
+        const col = Math.floor(index / maxRows)
+        const row = index % maxRows
+        
+        return { x: col * CELL_W + OFFSET_X, y: row * CELL_H + OFFSET_Y }
+    }
+
+    const startDrag = (name, e) => {
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY
+
+        const currentPos = getIconPos(name)
+
+        dragState.value = {
+            isDragging: true,
+            iconName: name,
+            startX: clientX, startY: clientY,
+            initialX: currentPos.x, initialY: currentPos.y,
+            currentX: currentPos.x, currentY: currentPos.y,
+            hasMoved: false
+        }
+
+        if (!isMobile.value) {
+            selectedIcon.value = name
+        }
+
+        window.addEventListener('mousemove', onDrag)
+        window.addEventListener('touchmove', onDrag, { passive: false })
+        window.addEventListener('mouseup', stopDrag)
+        window.addEventListener('touchend', stopDrag)
+    }
+
+    const onDrag = (e) => {
+        if (!dragState.value.isDragging) return
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY
+
+        const dx = clientX - dragState.value.startX
+        const dy = clientY - dragState.value.startY
+
+        // Only register as a "drag" if we moved more than 3 pixels
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+            dragState.value.hasMoved = true
+        }
+
+        if (dragState.value.hasMoved) {
+            if (e.cancelable) e.preventDefault() // prevent page scroll on mobile
+            dragState.value.currentX = dragState.value.initialX + dx
+            dragState.value.currentY = dragState.value.initialY + dy
+        }
+    }
+
+    const stopDrag = () => {
+        if (!dragState.value.isDragging) return
+
+        if (dragState.value.hasMoved) {
+            // SNAP TO GRID
+            let snappedX = Math.round((dragState.value.currentX - OFFSET_X) / CELL_W) * CELL_W + OFFSET_X
+            let snappedY = Math.round((dragState.value.currentY - OFFSET_Y) / CELL_H) * CELL_H + OFFSET_Y
+
+            // Prevent dragging off top/left edges
+            snappedX = Math.max(OFFSET_X, snappedX)
+            snappedY = Math.max(OFFSET_Y, snappedY)
+
+            store.updateIconPosition(dragState.value.iconName, { x: snappedX, y: snappedY })
+        } else {
+            // WAS JUST A CLICK (No dragging occurred)
+            if (isMobile.value) {
+                const winId = desktopIcons.value[dragState.value.iconName].windowId
+                store.openWindow(winId)
+                selectedIcon.value = null
+            }
+        }
+
+        dragState.value.isDragging = false
+        dragState.value.iconName = null
+
+        window.removeEventListener('mousemove', onDrag)
+        window.removeEventListener('touchmove', onDrag)
+        window.removeEventListener('mouseup', stopDrag)
+        window.removeEventListener('touchend', stopDrag)
+    }
   
     // Boot finishes -> Show Login
     const finishBoot = () => {
@@ -64,7 +177,6 @@
     // Navigate browser to a URL
     const navigateBrowser = () => {
         let target = browserInput.value.trim()
-        // Add https:// if missing
         if (!target.startsWith('http') && !target.startsWith('file')) {
             target = 'https://' + target
         }
@@ -86,18 +198,6 @@
     // Deselect icon when clicking background
     const handleBackgroundClick = () => {
         selectedIcon.value = null
-    }
-
-    // Handle clicking a desktop icon
-    const handleIconClick = (name, windowId) => {
-        if (isMobile.value) {
-            // On mobile, single click opens the app
-            store.openWindow(windowId)
-            selectedIcon.value = null
-        } else {
-            // On desktop, single click selects it
-            selectedIcon.value = name
-        }
     }
 
     // Handle double-clicking a desktop icon (opens the app)
@@ -141,14 +241,20 @@
         
         <div v-if="store.isCRTActive" class="scanline"></div>
 
-        <div class="absolute top-4 left-4 grid gap-4 z-10">
+        <div class="absolute inset-0 z-10 pointer-events-none">
             <div 
                 v-for="(item, name) in desktopIcons" 
                 :key="name"
-                @click.stop="handleIconClick(name, item.windowId)"
-                @dblclick="handleIconDblClick(item.windowId)"
-                class="w-20 md:w-24 p-2 rounded cursor-pointer flex flex-col items-center transition-colors group border border-transparent"
+                @mousedown.stop="startDrag(name, $event)"
+                @touchstart.stop="startDrag(name, $event)"
+                @dblclick.stop="handleIconDblClick(item.windowId)"
+                class="absolute w-20 md:w-24 p-2 rounded cursor-pointer flex flex-col items-center transition-colors group border border-transparent pointer-events-auto"
                 :class="selectedIcon === name ? 'bg-white/20 border-white/30' : 'hover:bg-white/10'"
+                :style="{
+                    transform: `translate(${getIconPos(name).x}px, ${getIconPos(name).y}px)`,
+                    transition: (dragState.isDragging && dragState.iconName === name) ? 'none' : 'transform 0.2s',
+                    zIndex: (dragState.isDragging && dragState.iconName === name) ? 50 : 'auto'
+                }"
             >
                 <i :class="[item.icon, 'text-3xl md:text-4xl mb-2 transition-transform duration-200', 
                     name.includes('readme') ? 'text-blue-400' : 
