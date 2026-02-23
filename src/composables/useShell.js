@@ -10,7 +10,7 @@ export function useShell() {
     
     // Terminal output history (what you see in the terminal)
     const history = ref([
-        { text: "Welcome to GelOS v2.0. Type 'help'.", color: "text-gray-400" }
+        { text: "Welcome to GelOS v3.0. Type 'help'.", color: "text-gray-400" }
     ])
     
     // Where we are in the file system
@@ -30,6 +30,100 @@ export function useShell() {
     const formatPath = () => {
         return currentPath.value.length === 1 ? '~' : '~/' + currentPath.value.slice(1).join('/')
     }
+
+    // --- TAB AUTOCOMPLETE LOGIC ---
+    
+    // Helper to find the longest common prefix among autocomplete matches
+    const getCommonPrefix = (words) => {
+        if (!words || words.length === 0) return ''
+        let prefix = words[0]
+        for (let i = 1; i < words.length; i++) {
+            while (words[i].toLowerCase().indexOf(prefix.toLowerCase()) !== 0) {
+                prefix = prefix.substring(0, prefix.length - 1)
+                if (prefix === '') return ''
+            }
+        }
+        // Return correctly cased prefix based on the actual file system
+        return words[0].substring(0, prefix.length)
+    }
+
+    const handleTab = (currentInput) => {
+        if (!currentInput) return currentInput
+
+        // Get the last word they are typing (e.g., "cd doc" -> "doc", "cd ../p" -> "../p")
+        const args = currentInput.split(' ')
+        const lastToken = args[args.length - 1]
+
+        // Separate the path part from the partial word
+        const lastSlashIndex = lastToken.lastIndexOf('/')
+        let dirPath = '.'
+        let partialName = lastToken
+
+        if (lastSlashIndex !== -1) {
+            dirPath = lastToken.substring(0, lastSlashIndex)
+            if (dirPath === '') dirPath = '/' // Handle absolute root correctly
+            partialName = lastToken.substring(lastSlashIndex + 1)
+        }
+
+        // Resolve the directory they are trying to autocomplete inside
+        const result = resolvePath(currentPath.value, dirPath)
+        
+        // If directory doesn't exist, just return what they typed
+        if (result.error || !result.node || result.node.type !== 'directory' || !result.node.children) {
+            return currentInput
+        }
+
+        // Find matches in that directory
+        const matches = Object.keys(result.node.children).filter(name => 
+            name.toLowerCase().startsWith(partialName.toLowerCase())
+        )
+
+        if (matches.length === 1) {
+            // Exactly one match! Auto-complete it fully.
+            const match = matches[0]
+            const isDir = result.node.children[match].type === 'directory'
+            
+            // Slice off what they already typed and append the correct match
+            const baseInput = currentInput.substring(0, currentInput.length - partialName.length)
+            return baseInput + match + (isDir ? '/' : '')
+            
+        } else if (matches.length > 1) {
+            // Multiple matches! Find how much we can safely autocomplete for them
+            const commonPrefix = getCommonPrefix(matches)
+            let newInput = currentInput
+            
+            if (commonPrefix.length > partialName.length) {
+                const baseInput = currentInput.substring(0, currentInput.length - partialName.length)
+                newInput = baseInput + commonPrefix
+            }
+
+            // Print the input line and the available options, mimicking real bash
+            history.value.push({ 
+                text: `root@gelo:${formatPath()}$ ${currentInput}`, 
+                color: "text-white font-bold" 
+            })
+            
+            let output = '<div class="grid grid-cols-2 md:grid-cols-4 gap-2">'
+            for (const match of matches) {
+                const item = result.node.children[match]
+                let color = 'text-gray-300'
+                let icon = ''
+                if (item.type === 'directory') { color = 'text-blue-400 font-bold'; icon = '/' }
+                else if (item.type === 'shortcut') { color = 'text-hacker-green'; icon = '*' }
+                else if (item.type === 'pdf') { color = 'text-red-400'; icon = '' }
+                else if (item.type === 'img') { color = 'text-purple-400'; icon = '' }
+                output += `<span class="${color}">${match}${icon}</span>`
+            }
+            output += '</div>'
+            history.value.push({ text: output, isHtml: true })
+            
+            return newInput
+        }
+
+        return currentInput
+    }
+
+    // --- COMMAND EXECUTION ---
 
     // Run a command the user typed
     const execute = (rawCmd) => {
@@ -69,6 +163,17 @@ export function useShell() {
                     text: `Matrix Protocol ${status}`, 
                     color: "text-hacker-green font-bold" 
                 })
+                break
+
+            case 'sudo':
+                if (target === 'su') {
+                    history.value.push({ text: "[sudo] password for root: ********", color: "text-gray-400" })
+                    history.value.push({ text: "ACCESS GRANTED. GOD MODE INITIATED.", color: "text-red-500 font-bold animate-pulse" })
+                    store.notify('SECURITY OVERRIDE', 'Root Access Granted', 'error')
+                    if (!store.isMatrixActive) store.toggleMatrix()
+                } else {
+                    history.value.push({ text: `gelo is not in the sudoers file. This incident will be reported.`, color: "text-red-500" })
+                }
                 break
 
             case 'ls':
@@ -178,6 +283,7 @@ export function useShell() {
         currentPath,
         commandHistory,
         execute,
-        formatPath
+        formatPath,
+        handleTab // Export the new tab function
     }
 }

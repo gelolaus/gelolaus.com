@@ -4,7 +4,7 @@
     import { useShell } from '@/composables/useShell'
     
     // Get all the terminal logic from the useShell composable
-    const { history, currentPath, commandHistory, execute, formatPath } = useShell()
+    const { history, currentPath, commandHistory, execute, formatPath, handleTab } = useShell()
     
     // Track what user is typing
     const input = ref('')
@@ -20,6 +20,12 @@
         await nextTick()
         const container = document.getElementById('terminal-container')
         if(container) container.scrollTop = container.scrollHeight
+    }
+
+    // Handles the Tab Autocomplete event
+    const onTab = () => {
+        input.value = handleTab(input.value)
+        scrollToBottom()
     }
 
     // When user presses Enter, run the command
@@ -78,11 +84,13 @@
                 ref="inputRef"
                 v-model="input"
                 @keydown.enter="handleEnter"
-                @keydown.up="handleKey"
-                @keydown.down="handleKey"
+                @keydown.tab.prevent="onTab"
+                @keydown.up.prevent="handleKey"
+                @keydown.down.prevent="handleKey"
                 type="text" 
                 class="bg-transparent border-none outline-none text-white flex-1 font-mono"
                 autocomplete="off"
+                spellcheck="false"
             />
         </div>
     </div>
