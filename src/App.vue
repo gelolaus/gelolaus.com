@@ -20,7 +20,8 @@
     const FileExplorer = defineAsyncComponent(() => import('@/components/apps/FileExplorer.vue'))
     const Settings = defineAsyncComponent(() => import('@/components/apps/Settings.vue'))
     const Mail = defineAsyncComponent(() => import('@/components/apps/Mail.vue'))
-    const Notepad = defineAsyncComponent(() => import('@/components/apps/Notepad.vue')) // NEW
+    const Notepad = defineAsyncComponent(() => import('@/components/apps/Notepad.vue'))
+    const MusicPlayer = defineAsyncComponent(() => import('@/components/apps/MusicPlayer.vue'))
 
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -146,6 +147,7 @@
                     name.includes('settings') ? 'text-gray-200' :
                     name.includes('mail') ? 'text-blue-500' :
                     name.includes('notepad') ? 'text-yellow-400' :
+                    name.includes('music') ? 'text-purple-400' :
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -234,6 +236,10 @@
 
         <WindowFrame windowId="notepad" :title="store.windows.notepad.title" :icon="store.windows.notepad.icon">
             <Notepad />
+        </WindowFrame>
+
+        <WindowFrame windowId="music" :title="store.windows.music.title" :icon="store.windows.music.icon">
+            <MusicPlayer />
         </WindowFrame>
 
         <Taskbar />

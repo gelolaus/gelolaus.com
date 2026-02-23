@@ -13,7 +13,8 @@ export const fileSystem = {
                     "readme.lnk": { type: "shortcut", windowId: "readme", icon: "fa-brands fa-markdown" },
                     "settings.lnk": { type: "shortcut", windowId: "settings", icon: "fa-solid fa-gears" },
                     "mail.lnk": { type: "shortcut", windowId: "mail", icon: "fa-solid fa-envelope" },
-                    "notepad.lnk": { type: "shortcut", windowId: "notepad", icon: "fa-solid fa-file-lines" }
+                    "notepad.lnk": { type: "shortcut", windowId: "notepad", icon: "fa-solid fa-file-lines" },
+                    "music.lnk": { type: "shortcut", windowId: "music", icon: "fa-solid fa-music" }
                 }
             },
             // Documents folder - contains PDFs
