@@ -73,7 +73,8 @@ export const useWindowStore = defineStore('windows', () => {
     mail: defaultState('mail', 'Mail', 'fa-solid fa-envelope'),
     notepad: defaultState('notepad', 'Notepad', 'fa-solid fa-file-lines'),
     music: defaultState('music', 'Music Player', 'fa-solid fa-music'),
-    code: defaultState('code', 'Code Editor', 'fa-solid fa-code')
+    code: defaultState('code', 'Code Editor', 'fa-solid fa-code'),
+    about: defaultState('about', 'About Me', 'fa-solid fa-address-card')
   })
   
   // --- SAVED DATA LOADING ---

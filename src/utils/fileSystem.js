@@ -15,7 +15,8 @@ export const fileSystem = {
                     "mail.lnk": { type: "shortcut", windowId: "mail", icon: "fa-solid fa-envelope" },
                     "notepad.lnk": { type: "shortcut", windowId: "notepad", icon: "fa-solid fa-file-lines" },
                     "music.lnk": { type: "shortcut", windowId: "music", icon: "fa-solid fa-music" },
-                    "code.lnk": { type: "shortcut", windowId: "code", icon: "fa-solid fa-code" }
+                    "code.lnk": { type: "shortcut", windowId: "code", icon: "fa-solid fa-code" },
+                    "about.lnk": { type: "shortcut", windowId: "about", icon: "fa-solid fa-address-card" }
                 }
             },
             // Scripts folder - contains code files for our Code Viewer

@@ -24,6 +24,7 @@
     const Notepad = defineAsyncComponent(() => import('@/components/apps/Notepad.vue'))
     const MusicPlayer = defineAsyncComponent(() => import('@/components/apps/MusicPlayer.vue'))
     const CodeViewer = defineAsyncComponent(() => import('@/components/apps/CodeViewer.vue'))
+    const AboutMe = defineAsyncComponent(() => import('@/components/apps/AboutMe.vue'))
 
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -265,6 +266,7 @@
                     name.includes('notepad') ? 'text-yellow-400' :
                     name.includes('music') ? 'text-purple-400' :
                     name.includes('code') ? 'text-blue-300' :
+                    name.includes('about') ? 'text-green-400' :
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -362,6 +364,10 @@
         <WindowFrame windowId="music" :title="store.windows.music.title" :icon="store.windows.music.icon">
             <MusicPlayer />
         </WindowFrame>
+
+        <WindowFrame windowId="about" :title="store.windows.about.title" :icon="store.windows.about.icon">
+          <AboutMe />
+      </WindowFrame>
 
         <Taskbar />
         
