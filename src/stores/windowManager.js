@@ -14,6 +14,10 @@ export const useWindowStore = defineStore('windows', () => {
   // Track if sound effects are enabled (clicks, beeps)
   const soundEnabled = ref(true)
   
+  // --- GLOBAL AUTH STATE ---
+  // Holds the currently logged-in user: { email, name, pin }
+  const currentUser = ref(null) 
+
   // --- NOTIFICATIONS ---
 
   // A list to hold our active alerts (toasts)
@@ -257,6 +261,7 @@ export const useWindowStore = defineStore('windows', () => {
     isMatrixActive, 
     isCRTActive,       // Exported so we can use it in App.vue
     soundEnabled,      // Exported so sound.js can check it
+    currentUser,       // EXPORT GLOBAL USER
     notifications,     // The list of active notifications
     notify,            // The function to trigger a new notification
     toggleMatrix, 

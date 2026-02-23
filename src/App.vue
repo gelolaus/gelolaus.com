@@ -10,6 +10,7 @@
     import BootScreen from '@/components/effects/BootScreen.vue'
     import MatrixRain from '@/components/effects/MatrixRain.vue'
     import NotificationToast from '@/components/os/NotificationToast.vue'
+    import LoginScreen from '@/components/os/LoginScreen.vue'
     import { readmeContent } from '@/utils/projectReadme'
     
     // Load app components lazily (only when needed) to speed up initial load
@@ -28,6 +29,7 @@
     
     // Show boot screen initially
     const isBooting = ref(true)
+    const isLoggingIn = ref(false) // <-- NEW STATE
     
     // Track which desktop icon is selected
     const selectedIcon = ref(null)
@@ -40,13 +42,18 @@
         return fileSystem.root.children.desktop.children
     })
   
-    // Called when boot sequence finishes
+    // Boot finishes -> Show Login
     const finishBoot = () => {
       isBooting.value = false
+      isLoggingIn.value = true 
+    }
+
+    // Login finishes -> Show Desktop
+    const finishLogin = () => {
+      isLoggingIn.value = false
       store.openWindow('readme') // Open README by default
-      // Test notification on boot
       setTimeout(() => {
-        store.notify('System Online', 'Welcome back, Administrator.', 'success')
+        store.notify('System Online', `Welcome back, ${store.currentUser.name}.`, 'success')
       }, 1000)
     }
 
@@ -113,9 +120,11 @@
     
 <template>
       <BootScreen v-if="isBooting" @complete="finishBoot" />
+      
+      <LoginScreen v-else-if="isLoggingIn" @success="finishLogin" />
     
       <div 
-        v-show="!isBooting" 
+        v-else 
         @click="handleBackgroundClick"
         class="bg-hacker-black h-full w-full overflow-hidden font-mono text-gray-300 relative select-none touch-none"
       >

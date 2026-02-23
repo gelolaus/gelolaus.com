@@ -1,99 +1,23 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { supabase } from '@/utils/supabase'
 import { useWindowStore } from '@/stores/windowManager'
 
 const store = useWindowStore()
 
 // --- STATE MANAGEMENT ---
-// Views: 'login' | 'register' | 'inbox' | 'compose' | 'read'
-const currentView = ref('login')
+const currentView = ref('inbox')
 const isLoading = ref(false)
-
-// --- DATA ---
-const currentUser = ref({ email: '', name: '', pin: '', storedPin: '' })
-const inputPin = ref('')
 const messages = ref([])
 const selectedMessage = ref(null)
-
-// Form for composing
 const composeForm = ref({ message: '' })
 
-// --- ACTIONS: AUTH ---
-
-const checkEmail = async () => {
-  if (!currentUser.value.email.includes('@')) {
-    store.notify('Error', 'Invalid Email Address', 'error')
-    return
-  }
-  
-  isLoading.value = true
-  
-  // Check if user exists in Supabase
-  const { data, error } = await supabase
-    .from('mail_users')
-    .select('*')
-    .eq('email', currentUser.value.email)
-    .single()
-
-  isLoading.value = false
-
-  if (data) {
-    // User found, ask for PIN
-    currentUser.value.name = data.name
-    // Store the real PIN temporarily to check against input
-    currentUser.value.storedPin = data.pin 
-    store.notify('Identity Found', 'Please enter your access code.', 'info')
-  } else {
-    // User not found, go to register
-    currentView.value = 'register'
-    store.notify('New User', 'Setup your secure access code.', 'info')
-  }
-}
-
-const login = () => {
-  if (inputPin.value === currentUser.value.storedPin) {
-    store.notify('Access Granted', `Welcome back, ${currentUser.value.name}`, 'success')
-    fetchMessages()
-  } else {
-    store.notify('Access Denied', 'Incorrect PIN code.', 'error')
-    inputPin.value = ''
-  }
-}
-
-const register = async () => {
-  if (currentUser.value.pin.length !== 4) {
-    store.notify('Error', 'PIN must be 4 digits.', 'error')
-    return
-  }
-  if (!currentUser.value.name) {
-    store.notify('Error', 'Please enter a display name.', 'error')
-    return
-  }
-
-  isLoading.value = true
-
-  // Create user in DB
-  const { error } = await supabase
-    .from('mail_users')
-    .insert([{
-      email: currentUser.value.email,
-      name: currentUser.value.name,
-      pin: currentUser.value.pin
-    }])
-
-  isLoading.value = false
-
-  if (error) {
-    console.error(error)
-    store.notify('Error', 'Could not create account.', 'error')
-  } else {
-    store.notify('Success', 'Account established.', 'success')
+// Automatically fetch messages on mount since we are already logged in
+onMounted(() => {
+  if (store.currentUser) {
     fetchMessages()
   }
-}
-
-// --- ACTIONS: MESSAGING ---
+})
 
 const fetchMessages = async () => {
   isLoading.value = true
@@ -102,7 +26,7 @@ const fetchMessages = async () => {
   const { data, error } = await supabase
     .from('messages')
     .select('*')
-    .eq('email', currentUser.value.email)
+    .eq('email', store.currentUser.email) // Pulling from Global OS State
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -126,8 +50,8 @@ const sendMessage = async () => {
   const { error } = await supabase
     .from('messages')
     .insert([{
-      email: currentUser.value.email,
-      name: currentUser.value.name,
+      email: store.currentUser.email,
+      name: store.currentUser.name,
       message: composeForm.value.message
     }])
 
@@ -138,21 +62,13 @@ const sendMessage = async () => {
   } else {
     store.notify('Sent', 'Message uploaded to server.', 'success')
     composeForm.value = { message: '' }
-    fetchMessages() // Go back to inbox
+    fetchMessages() 
   }
 }
 
-// --- HELPERS ---
 const formatDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-
-const logout = () => {
-  currentUser.value = { email: '', name: '', pin: '', storedPin: '' }
-  inputPin.value = ''
-  messages.value = []
-  currentView.value = 'login'
 }
 </script>
 
@@ -164,81 +80,7 @@ const logout = () => {
         <i class="fa-solid fa-envelope text-blue-400"></i>
         <span class="font-bold tracking-wider">Gelo's Secure-ish Mail Client</span>
       </div>
-      <button v-if="currentView !== 'login' && currentView !== 'register'" @click="logout" class="text-red-400 hover:text-white transition-colors">
-        <i class="fa-solid fa-power-off"></i> LOGOUT
-      </button>
-    </div>
-
-    <div v-if="currentView === 'login'" class="flex-1 flex flex-col items-center justify-center p-8 space-y-6">
-      <div class="text-center">
-        <i class="fa-solid fa-user-shield text-5xl text-gray-600 mb-4"></i>
-        <h2 class="text-xl font-bold text-hacker-green">IDENTITY VERIFICATION</h2>
-        <p class="text-gray-500 text-xs mt-2">Enter credentials to access encrypted network.</p>
       </div>
-
-      <div class="w-full max-w-xs space-y-4">
-        <div v-if="!currentUser.name" class="space-y-2">
-          <label class="text-xs text-blue-400">USER_ID (EMAIL)</label>
-          <div class="flex gap-2">
-            <input 
-              v-model="currentUser.email" 
-              @keydown.enter="checkEmail"
-              type="email" 
-              class="flex-1 bg-black/50 border border-gray-600 rounded px-3 py-2 text-white focus:border-hacker-green outline-none"
-              placeholder="e.g. hello@gelolaus.com"
-            >
-            <button @click="checkEmail" :disabled="isLoading" class="bg-blue-600 hover:bg-blue-500 px-3 rounded text-white transition-colors">
-              <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <div v-else class="space-y-2 animate-fade-in">
-          <div class="text-xs text-gray-400 mb-2 text-center border-b border-gray-700 pb-2">ID: {{ currentUser.email }}</div>
-          <label class="text-xs text-blue-400">ACCESS CODE (PIN)</label>
-          <div class="flex gap-2">
-            <input 
-              v-model="inputPin" 
-              @keydown.enter="login"
-              type="password" 
-              maxlength="4"
-              class="flex-1 bg-black/50 border border-gray-600 rounded px-3 py-2 text-white focus:border-hacker-green outline-none tracking-widest text-center"
-              placeholder="••••"
-            >
-            <button @click="login" class="bg-hacker-green text-black font-bold px-3 rounded hover:bg-green-400 transition-colors">
-              UNLOCK
-            </button>
-          </div>
-          <button @click="currentUser.name = ''" class="text-xs text-gray-500 hover:text-white underline w-full text-center mt-2">Change User</button>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="currentView === 'register'" class="flex-1 flex flex-col items-center justify-center p-8 space-y-6">
-       <div class="text-center">
-        <i class="fa-solid fa-user-plus text-5xl text-gray-600 mb-4"></i>
-        <h2 class="text-xl font-bold text-blue-400">NEW USER REGISTRATION</h2>
-      </div>
-
-      <div class="w-full max-w-xs space-y-4">
-        <div class="text-xs text-gray-500 text-center border-b border-gray-700 pb-2">{{ currentUser.email }}</div>
-        
-        <div class="space-y-1">
-          <label class="text-xs text-gray-400">DISPLAY NAME</label>
-          <input v-model="currentUser.name" type="text" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 outline-none focus:border-blue-400 text-white">
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-xs text-gray-400">SET 4-DIGIT PIN</label>
-          <input v-model="currentUser.pin" type="text" maxlength="4" class="w-full bg-black/50 border border-gray-600 rounded px-3 py-2 outline-none focus:border-blue-400 tracking-widest text-center text-white">
-        </div>
-
-        <button @click="register" :disabled="isLoading" class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded text-white font-bold mt-2 transition-colors">
-          CREATE IDENTITY
-        </button>
-         <button @click="currentView = 'login'; currentUser.name = ''" class="w-full text-xs text-gray-500 mt-2 hover:text-white">Cancel</button>
-      </div>
-    </div>
 
     <div v-if="currentView === 'inbox'" class="flex-1 flex flex-col">
       <div class="p-2 bg-gray-800/50 flex justify-between items-center border-b border-gray-700">
