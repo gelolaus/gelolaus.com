@@ -12,7 +12,8 @@ export const fileSystem = {
                     "browser.lnk": { type: "shortcut", windowId: "browser", icon: "fa-solid fa-globe" },
                     "readme.lnk": { type: "shortcut", windowId: "readme", icon: "fa-brands fa-markdown" },
                     "settings.lnk": { type: "shortcut", windowId: "settings", icon: "fa-solid fa-gears" },
-                    "mail.lnk": { type: "shortcut", windowId: "mail", icon: "fa-solid fa-envelope" }
+                    "mail.lnk": { type: "shortcut", windowId: "mail", icon: "fa-solid fa-envelope" },
+                    "notepad.lnk": { type: "shortcut", windowId: "notepad", icon: "fa-solid fa-file-lines" }
                 }
             },
             // Documents folder - contains PDFs

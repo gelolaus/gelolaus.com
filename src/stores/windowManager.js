@@ -63,7 +63,8 @@ export const useWindowStore = defineStore('windows', () => {
     image: defaultState('image', 'Image Viewer', 'fa-solid fa-image'),
     readme: defaultState('readme', 'README.md', 'fa-brands fa-markdown'),
     settings: defaultState('settings', 'Settings', 'fa-solid fa-gears'),
-    mail: defaultState('mail', 'Mail', 'fa-solid fa-envelope')
+    mail: defaultState('mail', 'Mail', 'fa-solid fa-envelope'),
+    notepad: defaultState('notepad', 'Notepad', 'fa-solid fa-file-lines')
   })
   
   // --- SAVED DATA LOADING ---

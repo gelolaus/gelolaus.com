@@ -20,6 +20,7 @@
     const FileExplorer = defineAsyncComponent(() => import('@/components/apps/FileExplorer.vue'))
     const Settings = defineAsyncComponent(() => import('@/components/apps/Settings.vue'))
     const Mail = defineAsyncComponent(() => import('@/components/apps/Mail.vue'))
+    const Notepad = defineAsyncComponent(() => import('@/components/apps/Notepad.vue')) // NEW
 
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -144,6 +145,7 @@
                     name.includes('browser') ? 'text-blue-400' : 
                     name.includes('settings') ? 'text-gray-200' :
                     name.includes('mail') ? 'text-blue-500' :
+                    name.includes('notepad') ? 'text-yellow-400' :
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -228,6 +230,10 @@
 
         <WindowFrame windowId="mail" :title="store.windows.mail.title" :icon="store.windows.mail.icon">
             <Mail />
+        </WindowFrame>
+
+        <WindowFrame windowId="notepad" :title="store.windows.notepad.title" :icon="store.windows.notepad.icon">
+            <Notepad />
         </WindowFrame>
 
         <Taskbar />
