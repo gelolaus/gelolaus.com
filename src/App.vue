@@ -252,7 +252,9 @@
         </WindowFrame>
 
         <Taskbar />
-        <NotificationToast />
         
       </div>
+
+      <NotificationToast />
+
 </template>
