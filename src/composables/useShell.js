@@ -213,6 +213,7 @@ export function useShell() {
                 else if (item.type === 'shortcut') { color = 'text-hacker-green'; icon = '*' }
                 else if (item.type === 'pdf') { color = 'text-red-400'; icon = '' }
                 else if (item.type === 'img') { color = 'text-purple-400'; icon = '' }
+                else if (item.type === 'code') { color = 'text-yellow-400'; icon = '' }
                 
                 output += `<span class="${color}">${name}${icon}</span>`
             }
@@ -271,6 +272,10 @@ export function useShell() {
         else if (file.type === 'img') {
             history.value.push({ text: `Opening Image: ${target}...`, color: 'text-gray-400' })
             store.openWindow('image', { title: target, filePath: file.path })
+        }
+        else if (file.type === 'code') {
+            history.value.push({ text: `Opening Script: ${target}...`, color: 'text-gray-400' })
+            store.openWindow('code', { title: target, filePath: file.path })
         }
         else {
             history.value.push({ text: `Cannot open file type: ${file.type}`, color: 'text-red-500' })

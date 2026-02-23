@@ -23,6 +23,7 @@
     const Mail = defineAsyncComponent(() => import('@/components/apps/Mail.vue'))
     const Notepad = defineAsyncComponent(() => import('@/components/apps/Notepad.vue'))
     const MusicPlayer = defineAsyncComponent(() => import('@/components/apps/MusicPlayer.vue'))
+    const CodeViewer = defineAsyncComponent(() => import('@/components/apps/CodeViewer.vue'))
 
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -157,6 +158,7 @@
                     name.includes('mail') ? 'text-blue-500' :
                     name.includes('notepad') ? 'text-yellow-400' :
                     name.includes('music') ? 'text-purple-400' :
+                    name.includes('code') ? 'text-blue-300' :
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -176,6 +178,10 @@
     
         <WindowFrame windowId="files" :title="store.windows.files.title" :icon="store.windows.files.icon">
             <FileExplorer />
+        </WindowFrame>
+
+        <WindowFrame windowId="code" :title="store.windows.code.title" :icon="store.windows.code.icon">
+            <CodeViewer :filePath="store.windows.code.filePath" />
         </WindowFrame>
         
         <WindowFrame windowId="pdf" :title="store.windows.pdf.title" :icon="store.windows.pdf.icon">

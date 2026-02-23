@@ -14,7 +14,24 @@ export const fileSystem = {
                     "settings.lnk": { type: "shortcut", windowId: "settings", icon: "fa-solid fa-gears" },
                     "mail.lnk": { type: "shortcut", windowId: "mail", icon: "fa-solid fa-envelope" },
                     "notepad.lnk": { type: "shortcut", windowId: "notepad", icon: "fa-solid fa-file-lines" },
-                    "music.lnk": { type: "shortcut", windowId: "music", icon: "fa-solid fa-music" }
+                    "music.lnk": { type: "shortcut", windowId: "music", icon: "fa-solid fa-music" },
+                    "code.lnk": { type: "shortcut", windowId: "code", icon: "fa-solid fa-code" }
+                }
+            },
+            // Scripts folder - contains code files for our Code Viewer
+            "scripts": {
+                type: "directory",
+                children: {
+                    "init.js": { 
+                        type: "code", 
+                        path: "scripts/init.js",
+                        content: "/**\n * GelOS v3.0 Core Init\n */\n\nfunction bootSystem() {\n  console.log('Mounting virtual drives...');\n  console.log('Establishing secure connection...');\n  \n  const isAuthorized = checkAdmin('gelo');\n  if (isAuthorized) {\n    return 'Access Granted';\n  }\n}\n\nbootSystem();"
+                    },
+                    "hack.py": {
+                        type: "code",
+                        path: "scripts/hack.py",
+                        content: "import time\nimport sys\n\ndef bypass_mainframe():\n    print('Initiating bypass...')\n    time.sleep(1)\n    for i in range(101):\n        sys.stdout.write(f'\\r[OVERRIDE] {i}%')\n        sys.stdout.flush()\n        time.sleep(0.02)\n    print('\\nSecurity disabled.')\n    return True\n\nif __name__ == '__main__':\n    bypass_mainframe()"
+                    }
                 }
             },
             // Documents folder - contains PDFs
