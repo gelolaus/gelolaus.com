@@ -1,63 +1,6 @@
-// =========================================
-// VIRTUAL FILE SYSTEM
-// =========================================
-
-// This is like a fake file system - it mimics a real computer's folders
-const fileSystem = {
-    "root": {
-        // Desktop folder - has shortcuts to open apps
-        "desktop": {
-            type: "dir",
-            children: {
-                "terminal.lnk": { type: "exec", action: () => toggleWindow('window-terminal') },
-                "files.lnk": { type: "exec", action: () => toggleWindow('window-files') },
-                "browser.lnk": { type: "exec", action: () => openBrowser('https://gelolaus.com') }
-            }
-        },
-        // Documents folder - has PDF files
-        "documents": {
-            type: "dir",
-            children: {
-                "cert_c3sa.pdf": { type: "pdf", path: "assets/certs/cert_c3sa.pdf" },
-                "cert_ccep.pdf": { type: "pdf", path: "assets/certs/cert_ccep.pdf" },
-                "cert_cpps.pdf": { type: "pdf", path: "assets/certs/cert_cpps.pdf" },
-                "cert_crtom.pdf": { type: "pdf", path: "assets/certs/cert_crtom.pdf" }
-            }
-        },
-        // Pictures folder - has image files
-        "pictures": {
-            type: "dir",
-            children: {
-                "01_PyConAPAC.jpg": { type: "img", path: "assets/pics/01_PyConAPAC.jpg" },
-                "02_HWMUN.jpg": { type: "img", path: "assets/pics/02_HWMUN.jpg" },
-                "03_ArduinoDayPH.jpg": { type: "img", path: "assets/pics/03_ArduinoDayPH.jpg" },
-                "04_YSESIdeathon.jpg": { type: "img", path: "assets/pics/04_YSESIdeathon.jpg" },
-                "05_AWSPartyRockHackathon.jpg": { type: "img", path: "assets/pics/05_AWSPartyRockHackathon.jpg" },
-                "06_BitcoinPizzaDay.jpg": { type: "img", path: "assets/pics/06_BitcoinPizzaDay.jpg" },
-                "07_APCFest2025.jpg": { type: "img", path: "assets/pics/07_APCFest2025.jpg" },
-                "08_GDGMNLBuildWithAI.jpg": { type: "img", path: "assets/pics/08_GDGMNLBuildWithAI.jpg" },
-                "09_Innoverse.jpg": { type: "img", path: "assets/pics/09_Innoverse.jpg" },
-                "10_CyberPHMeetup1.JPG": { type: "img", path: "assets/pics/10_CyberPHMeetup1.JPG" },
-                "11_WhoscallRelaunch.jpg": { type: "img", path: "assets/pics/11_WhoscallRelaunch.jpg" },
-                "12_NotionWorkshop.jpg": { type: "img", path: "assets/pics/12_NotionWorkshop.jpg" },
-                "13_RecognitionDay.jpg": { type: "img", path: "assets/pics/13_RecognitionDay.jpg" },
-                "14_CursorMeetup2.jpeg": { type: "img", path: "assets/pics/14_CursorMeetup2.jpeg" },
-                "15_EngagedtoCharl.jpg": { type: "img", path: "assets/pics/15_EngagedtoCharl.jpg" },
-                "16_HackForGov2025NCR.jpg": { type: "img", path: "assets/pics/16_HackForGov2025NCR.jpg" },
-                "17_GDGMNLDevFest.jpg": { type: "img", path: "assets/pics/17_GDGMNLDevFest.jpg" },
-                "18_HackForGov2025Finals.jpg": { type: "img", path: "assets/pics/18_HackForGov2025Finals.jpg" }
-            }
-        }
-    }
-};
-
-// =========================================
-// TERMINAL COMMANDS
-// =========================================
-
-// What each command shows when you type it in the terminal
-const commands = {
-    // The 'help' command shows all available commands
+// Terminal command outputs (what each command shows when you type it)
+export const commands = {
+    // The 'help' command - shows all available commands
     help: `
         <span class="text-hacker-green">Available commands:</span><br>
         <span class="ml-4">whoami</span> - About Me<br>
@@ -65,18 +8,21 @@ const commands = {
         <span class="ml-4">ac</span> - Achievements, Awards, and Recognitions<br>
         <span class="ml-4">xp</span> - Experience<br>
         <span class="ml-4">go</span> - Short-Term and Long-Term Goals<br>
+        <span class="ml-4">curl [url]</span> - Fetch JSON from a REST API<br> <span class="ml-4">ls</span> - List files<br>
         <span class="ml-4">ls</span> - List files<br>
         <span class="ml-4">cd [dir]</span> - Change directory<br>
         <span class="ml-4">open [file]</span> - Open a file<br>
         <span class="ml-4">clear</span> - Clear terminal<br>
         <span class="ml-4">exit</span> - Close terminal<br>
     `,
-    // About me section
+    
+    // About me info
     whoami: `
         <span class="font-bold text-yellow-500">>> ABOUT ME</span><br>
         I am Angelo Laus, but you can call me "Gelo". I graduated from the Science, Technology, Engineering, and Mathematics with a Specialization in Information Technology (STEM-IT) strand at Asia Pacific College, Makati City.<br><br>
         I am a Notion Campus Leader (one out of eight Cohort 4 Campus Leaders in the Philippines) and the Director of External Relations at JPCS-APC, a role I've been doing inside and outside college for different organizations for the past four years.<br>
     `,
+    
     // Education background
     ed: `
         <span class="font-bold text-blue-400">>> EDUCATION</span><br>
@@ -89,6 +35,7 @@ const commands = {
         55% Scholarship<br>
         Asia Pacific College, Makati City<br>
     `,
+    
     // Achievements and awards
     ac: `
         <span class="font-bold text-blue-400">>> ACHIEVEMENTS</span><br>
@@ -103,7 +50,8 @@ const commands = {
         - HackForGov 2025 Capture the Flag NCR Champion (Team Akira: Requiem)<br>
         - HackForGov 2024 Capture the Flag NCR 2nd Runner-Up (Team Akira)<br>
     `,
-    // Work and leadership experience
+    
+    // Experience
     xp: `
         <span class="font-bold text-blue-400">>> LEADERSHIP EXPERIENCE</span><br>
         <span class="font-bold text-green-400">Notion Campus Leader</span><br>
@@ -121,7 +69,8 @@ const commands = {
         - Rangya E-Commerce System (Web Application)<br>
         - Doon Ride-Hailing Comparison System (Web Application)<br>
     `,
-    // Future goals
+    
+    // Goals
     go: `
         <span class="font-bold text-blue-400">>> SHORT-TERM AND LONG-TERM GOALS</span><br>
         <span class="font-bold text-green-400">Short-Term Goals</span><br>

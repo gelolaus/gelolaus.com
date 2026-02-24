@@ -1,6 +1,9 @@
+// README content in markdown format
+// This gets converted to HTML and displayed in the README window
+export const readmeContent = `
 # Welcome to GelOS
-![Version](https://img.shields.io/badge/version-3.0.0-green?style=flat-square)
-![Status](https://img.shields.io/badge/status-experimental-orange?style=flat-square)
+![Version](https://img.shields.io/badge/version-2.0.0-green?style=flat-square)
+![Status](https://img.shields.io/badge/status-stable-blue?style=flat-square)
 
 Gelo + OS = GelOS. A fully interactive web-based operating system simulation designed to showcase my skills, certifications, and projects in Computer Science, Cyber Security, and Forensics.
 
@@ -57,3 +60,4 @@ The OS features a simulated recursive file system. You can navigate paths just l
 ---
 
 *© 2026 Angelo Laus. Bachelor of Science in Computer Science specialized in Cybersecurity & Forensics at Asia Pacific College, Philippines.*
+`;
