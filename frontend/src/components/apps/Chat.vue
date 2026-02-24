@@ -155,7 +155,7 @@ onUnmounted(() => {
         <input 
           v-model="newMessage" 
           type="text" 
-          placeholder="Send via REST POST..." 
+          placeholder="Send a message..." 
           class="flex-1 bg-black/50 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-teal-400 outline-none transition-colors"
           :disabled="isLoading || !store.currentUser"
         >
