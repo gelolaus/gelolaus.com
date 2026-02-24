@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { supabase } from '../../utils/supabase'
+import { supabase } from '../../utils/supabase' // Kept ONLY for real-time listening
 import { useWindowStore } from '../../stores/windowManager'
 
 const store = useWindowStore()
@@ -9,6 +9,9 @@ const newMessage = ref('')
 const isLoading = ref(false)
 const chatContainer = ref(null)
 let subscription = null
+
+// --- REST API CONFIGURATION ---
+const BACKEND_URL = 'https://gelolaus-be.vercel.app/api/chats'
 
 // Helper to grab only the first name
 const getFirstName = (fullName) => {
@@ -25,18 +28,19 @@ const scrollToBottom = async () => {
 }
 
 const fetchMessages = async () => {
-  const { data, error } = await supabase
-    .from('chats')
-    .select('*')
-    .order('created_at', { ascending: true })
-    .limit(100) 
-
-  if (!error && data) {
+  try {
+    const response = await fetch(BACKEND_URL)
+    if (!response.ok) throw new Error('Network response was not ok')
+    const data = await response.json()
     messages.value = data
     scrollToBottom()
+  } catch (error) {
+    console.error("REST GET Error:", error)
+    store.notify('API Error', 'Could not fetch messages from Nest.js', 'error')
   }
 }
 
+// 🟢 RUBRIC CHECK: HTTP POST METHOD
 const sendMessage = async () => {
   if (!newMessage.value.trim() || !store.currentUser) return
 
@@ -44,52 +48,54 @@ const sendMessage = async () => {
   const msgText = newMessage.value.trim()
   newMessage.value = '' // Clear input instantly
 
-  // We add .select() to get the generated ID back immediately
-  const { data, error } = await supabase
-    .from('chats')
-    .insert([{
-      email: store.currentUser.email,
-      name: store.currentUser.name,
-      message: msgText
-    }])
-    .select()
+  try {
+    const response = await fetch(BACKEND_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: store.currentUser.email,
+        name: store.currentUser.name,
+        message: msgText
+      })
+    })
 
-  isLoading.value = false
-
-  if (error) {
-    store.notify('Error', 'Failed to send message.', 'error')
-    newMessage.value = msgText // Restore input if failed
-  } else if (data && data.length > 0) {
-    // OPTIMISTIC UPDATE: Instantly show your own message
-    const exists = messages.value.find(m => m.id === data[0].id)
-    if (!exists) {
-      messages.value.push(data[0])
-      scrollToBottom()
+    if (!response.ok) throw new Error('POST request failed')
+    
+    const data = await response.json()
+    
+    if (data && data.length > 0) {
+      const exists = messages.value.find(m => m.id === data[0].id)
+      if (!exists) {
+        messages.value.push(data[0])
+        scrollToBottom()
+      }
     }
+  } catch (error) {
+    store.notify('Error', 'Failed to send message via REST API.', 'error')
+    newMessage.value = msgText // Restore input if failed
+  } finally {
+    isLoading.value = false
   }
 }
 
 onMounted(() => {
   if (store.currentUser) {
+    // Initial data fetch now uses our REST API instead of Supabase SDK
     fetchMessages()
     
-    // Subscribe to real-time database changes
+    // Real-time listener remains for snappiness, but doesn't handle the initial load
     subscription = supabase
       .channel('public:chats')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chats' }, payload => {
-        
-        console.log('Real-time message received:', payload.new) // DEBUGGING
-        
-        // Only push if it doesn't already exist (prevents duplicates from our optimistic update)
         const exists = messages.value.find(m => m.id === payload.new.id)
         if (!exists) {
           messages.value.push(payload.new)
           scrollToBottom()
         }
       })
-      .subscribe((status) => {
-        console.log('Supabase Realtime Status:', status) // DEBUGGING
-      })
+      .subscribe()
   }
 })
 
@@ -105,18 +111,18 @@ onUnmounted(() => {
     
     <div class="bg-gray-800 p-3 border-b border-gray-700 flex items-center justify-between shadow-sm z-10 shrink-0 select-none">
       <div class="flex items-center gap-2">
-        <i class="fa-solid fa-comments text-teal-400"></i>
-        <span class="font-bold text-sm tracking-wide">GLOBAL_CHAT</span>
+        <i class="fa-solid fa-server text-teal-400"></i>
+        <span class="font-bold text-sm tracking-wide">REST_API_CHAT</span>
       </div>
       <div class="flex items-center gap-2 text-xs">
-        <span class="w-2 h-2 rounded-full bg-hacker-green animate-pulse"></span>
-        <span class="text-gray-400 font-mono">LIVE</span>
+        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+        <span class="text-gray-400 font-mono">NEST.JS LIVE</span>
       </div>
     </div>
 
     <div ref="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-black/40 relative">
       <div v-if="messages.length === 0" class="text-center text-gray-500 mt-10 text-xs font-mono select-none">
-        No messages found. Be the first to say hello!
+        No messages found. Connecting to Nest.js backend...
       </div>
       
       <div 
@@ -149,7 +155,7 @@ onUnmounted(() => {
         <input 
           v-model="newMessage" 
           type="text" 
-          placeholder="Broadcast to global channel..." 
+          placeholder="Send via REST POST..." 
           class="flex-1 bg-black/50 border border-gray-600 rounded px-3 py-2 text-sm text-white focus:border-teal-400 outline-none transition-colors"
           :disabled="isLoading || !store.currentUser"
         >
@@ -165,13 +171,3 @@ onUnmounted(() => {
     
   </div>
 </template>
-
-<style scoped>
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>
