@@ -1,32 +1,34 @@
 <script setup>
-    import { ref, computed, onMounted, onUnmounted, defineAsyncComponent, watch } from 'vue'
+    import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
     import { marked } from 'marked'
     import { useWindowStore } from './stores/windowManager'
     import { fileSystem } from './utils/fileSystem'
     import { playKey, playClick } from './utils/sound' 
     import { useBreakpoints } from './composables/useBreakpoints'
+    
+    // --- STANDARD IMPORTS (NO MORE LAZY LOADING) ---
     import WindowFrame from '@/components/os/WindowFrame.vue'
     import Taskbar from '@/components/os/Taskbar.vue'
     import BootScreen from '@/components/effects/BootScreen.vue'
     import MatrixRain from '@/components/effects/MatrixRain.vue'
     import NotificationToast from '@/components/os/NotificationToast.vue'
     import LoginScreen from '@/components/os/LoginScreen.vue'
-    import { readmeContent } from './utils/projectReadme'
     
-    // Load app components lazily
-    const Terminal = defineAsyncComponent(() => import('@/components/apps/Terminal.vue'))
-    const PDFViewer = defineAsyncComponent(() => import('@/components/apps/PDFViewer.vue'))
-    const ImageViewer = defineAsyncComponent(() => import('@/components/apps/ImageViewer.vue'))
-    const Browser = defineAsyncComponent(() => import('@/components/apps/Browser.vue'))
-    const FileExplorer = defineAsyncComponent(() => import('@/components/apps/FileExplorer.vue'))
-    const Settings = defineAsyncComponent(() => import('@/components/apps/Settings.vue'))
-    const Mail = defineAsyncComponent(() => import('@/components/apps/Mail.vue'))
-    const Notepad = defineAsyncComponent(() => import('@/components/apps/Notepad.vue'))
-    const MusicPlayer = defineAsyncComponent(() => import('@/components/apps/MusicPlayer.vue'))
-    const CodeViewer = defineAsyncComponent(() => import('@/components/apps/CodeViewer.vue'))
-    const AboutMe = defineAsyncComponent(() => import('@/components/apps/AboutMe.vue'))
-    const Chat = defineAsyncComponent(() => import('@/components/apps/Chat.vue'))
-    const NetTool = defineAsyncComponent(() => import('@/components/apps/NetTool.vue'))
+    import Terminal from '@/components/apps/Terminal.vue'
+    import PDFViewer from '@/components/apps/PDFViewer.vue'
+    import ImageViewer from '@/components/apps/ImageViewer.vue'
+    import Browser from '@/components/apps/Browser.vue'
+    import FileExplorer from '@/components/apps/FileExplorer.vue'
+    import Settings from '@/components/apps/Settings.vue'
+    import Mail from '@/components/apps/Mail.vue'
+    import Notepad from '@/components/apps/Notepad.vue'
+    import MusicPlayer from '@/components/apps/MusicPlayer.vue'
+    import CodeViewer from '@/components/apps/CodeViewer.vue'
+    import AboutMe from '@/components/apps/AboutMe.vue'
+    import Chat from '@/components/apps/Chat.vue'
+    import NetTool from '@/components/apps/NetTool.vue'
+    
+    import { readmeContent } from './utils/projectReadme'
     
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -49,8 +51,7 @@
         currentTime.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
-    // --- FILE OPENING FIX FOR MOBILE ---
-    // This watches for new windows (like images/PDFs) opening and auto-focuses them on mobile
+    // --- FILE OPENING WATCHER (FIXED) ---
     watch(() => store.activeWindows.length, (newCount, oldCount) => {
         if (isMobile.value && newCount > oldCount) {
             const latestWin = store.activeWindows[store.activeWindows.length - 1]
@@ -201,21 +202,25 @@
             
             <div class="h-7 px-4 flex justify-between items-center text-[10px] bg-black/40 backdrop-blur-md font-sans font-bold shrink-0">
                 <span>{{ currentTime }}</span>
-                <div class="flex gap-2 items-center text-[11px]">
-                    <i class="fa-solid fa-wifi"></i>
-                    <i class="fa-solid fa-battery-three-quarters text-hacker-green"></i>
-                </div>
+                <div class="flex gap-2 items-center text-[11px]"><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-three-quarters text-hacker-green"></i></div>
             </div>
 
             <div class="flex-1 relative overflow-hidden bg-black">
-                <div class="h-full w-full p-6 grid grid-cols-3 gap-y-8 gap-x-4 content-start overflow-y-auto absolute inset-0" :class="{ 'pointer-events-none opacity-50': activeMobileApp || isSwitcherOpen }">
+                <div 
+                    class="h-full w-full p-6 grid grid-cols-3 gap-y-8 gap-x-4 content-start overflow-y-auto absolute inset-0"
+                    :class="{ 'pointer-events-none opacity-50': activeMobileApp || isSwitcherOpen }"
+                >
                     <div v-for="(item, name) in desktopIcons" :key="name" @click="handleIconClick(item.windowId)" class="flex flex-col items-center gap-2 active:scale-90 transition-transform">
                         <div class="w-16 h-16 rounded-2xl bg-gray-800/50 border border-white/5 flex items-center justify-center text-3xl shadow-xl" :class="getIconColor(name)"><i :class="item.icon"></i></div>
                         <span class="text-[10px] text-center font-bold text-gray-300 uppercase tracking-tighter">{{ name.replace('.lnk', '') }}</span>
                     </div>
                 </div>
 
-                <div v-if="activeMobileApp" class="absolute inset-0 bg-[#121212] z-50 animate-mobile-app" :class="{ 'pointer-events-none': isSwitcherOpen }">
+                <div 
+                    v-if="activeMobileApp" 
+                    class="absolute inset-0 bg-[#121212] z-50 animate-mobile-app"
+                    :class="{ 'pointer-events-none': isSwitcherOpen }"
+                >
                     <component :is="{
                         terminal: Terminal, files: FileExplorer, code: CodeViewer, pdf: PDFViewer,
                         image: ImageViewer, readme: 'div', browser: Browser, settings: Settings,
@@ -240,9 +245,7 @@
                                 <i :class="[win.icon, getIconColor(win.title)]" class="text-xs"></i>
                                 <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">{{ win.title }}</span>
                             </div>
-                            <div class="flex-1 bg-[#121212] flex items-center justify-center p-8">
-                                <i :class="win.icon" class="text-6xl opacity-10"></i>
-                            </div>
+                            <div class="flex-1 bg-[#121212] flex items-center justify-center p-8"><i :class="win.icon" class="text-6xl opacity-10"></i></div>
                         </div>
                     </div>
                     <div v-if="store.activeWindows.length > 0" class="p-8 flex justify-center">
@@ -252,9 +255,9 @@
             </div>
 
             <div class="h-14 bg-black/90 border-t border-white/5 flex justify-around items-center px-12 shrink-0 relative z-[1000]">
-                <button @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white transition-colors min-h-[44px] min-w-[44px]"><i class="fa-solid fa-chevron-left text-lg"></i></button>
-                <button @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white transition-colors min-h-[44px] min-w-[44px]"><i class="fa-solid fa-circle text-xl"></i></button>
-                <button @click.stop="onSwitcherTap" class="text-gray-500 transition-colors min-h-[44px] min-w-[44px]" :class="isSwitcherOpen ? 'text-teal-400' : 'active:text-white'"><i class="fa-solid fa-square text-lg"></i></button>
+                <button @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white min-h-[44px] min-w-[44px]"><i class="fa-solid fa-chevron-left text-lg"></i></button>
+                <button @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white min-h-[44px] min-w-[44px]"><i class="fa-solid fa-circle text-xl"></i></button>
+                <button @click.stop="onSwitcherTap" class="text-gray-500 min-h-[44px] min-w-[44px]" :class="isSwitcherOpen ? 'text-teal-400' : 'active:text-white'"><i class="fa-solid fa-square text-lg"></i></button>
             </div>
         </div>
 
@@ -266,6 +269,7 @@
                     <span class="text-xs font-bold text-shadow">{{ name.replace('.lnk', '') }}</span>
                 </div>
             </div>
+            
             <WindowFrame v-for="win in store.activeWindows" :key="win.id" :windowId="win.id" :title="win.title" :icon="win.icon">
                 <component :is="{terminal: Terminal, files: FileExplorer, code: CodeViewer, pdf: PDFViewer, image: ImageViewer, readme: 'div', browser: Browser, settings: Settings, mail: Mail, notepad: Notepad, music: MusicPlayer, about: AboutMe, chat: Chat, nettool: NetTool}[win.id]" :filePath="win.filePath" />
                 <div v-if="win.id === 'readme'" class="h-full overflow-y-auto p-6 prose prose-invert" v-html="readmeHtml"></div>
