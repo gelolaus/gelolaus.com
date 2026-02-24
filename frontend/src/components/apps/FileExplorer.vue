@@ -7,13 +7,10 @@
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
     
-    // Keep track of what folder we're currently viewing
     const currentPath = ref(['root', 'desktop'])
     
-    // Get the folder object we're currently in
     const currentFolderNode = computed(() => {
         let node = fileSystem.root
-        // Walk through the path to find the current folder
         for (let i = 1; i < currentPath.value.length; i++) {
             if (node.children && node.children[currentPath.value[i]]) {
                 node = node.children[currentPath.value[i]]
@@ -24,160 +21,151 @@
         return node
     })
     
-    // Get list of files to show (with some filtering)
     const currentFiles = computed(() => {
         const rawFiles = currentFolderNode.value.children || {}
         const processedFiles = {}
-        
-        // On desktop, hide some shortcuts that are already on the main desktop
         const isDesktop = currentPath.value.length === 2 && currentPath.value[1] === 'desktop'
     
         for (const [key, value] of Object.entries(rawFiles)) {
             if (isDesktop) {
-                // Skip these shortcuts on desktop view
-                if (['terminal.lnk', 'files.lnk', 'browser.lnk'].includes(key)) {
-                    continue
-                }
-                // Remove .lnk extension from shortcut names
+                if (['terminal.lnk', 'files.lnk', 'browser.lnk'].includes(key)) continue
                 const newKey = key.replace('.lnk', '')
                 processedFiles[newKey] = value
             } else {
                 processedFiles[key] = value
             }
         }
-        
         return processedFiles
     })
     
-    // Format path for display (like "~/documents")
     const pathDisplay = computed(() => {
         if (currentPath.value.length === 1) return '/'
         return '~/' + currentPath.value.slice(1).join('/')
     })
     
-    // Jump directly to a folder (from sidebar)
     const navigateTo = (location) => {
         currentPath.value = ['root', location]
     }
+
+    const navigateToSegment = (index) => {
+        currentPath.value = currentPath.value.slice(0, index + 1)
+    }
     
-    // Go up one folder
     const goUp = () => {
         if (currentPath.value.length > 1) {
             currentPath.value.pop()
         }
     }
     
-    // Open a file or folder when user clicks it
     const openItem = (name, item) => {
         if (item.type === 'directory') {
-            // Go into the folder
             currentPath.value.push(name)
         } 
         else if (item.type === 'shortcut') {
-            // Launch the app
             store.openWindow(item.windowId)
         } 
         else if (item.type === 'pdf') {
-            // Open PDF viewer
             store.openWindow('pdf', { title: name, filePath: item.path })
         }
         else if (item.type === 'img') {
-            // Open image viewer
             store.openWindow('image', { title: name, filePath: item.path })
         }
     }
-    </script>
+</script>
     
-    <template>
-        <div class="flex-1 flex overflow-hidden h-full font-mono select-none">
-            
-            <div class="w-16 md:w-48 bg-gray-800 border-r border-gray-700 flex flex-col py-2">
-                
-                <div 
-                    @click="navigateTo('desktop')"
-                    class="sidebar-item px-4 py-2 cursor-pointer flex items-center gap-3 border-l-2 transition-colors"
-                    :class="currentPath.includes('desktop') && currentPath.length === 2 ? 'bg-white/10 text-gray-100 border-hacker-green' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200 border-transparent'"
-                >
-                    <i class="fa-solid fa-desktop text-blue-400 w-4"></i>
-                    <span class="hidden md:inline text-sm">Desktop</span>
-                </div>
-    
-                <div 
-                    @click="navigateTo('documents')"
-                    class="sidebar-item px-4 py-2 cursor-pointer flex items-center gap-3 border-l-2 transition-colors"
-                    :class="currentPath.includes('documents') ? 'bg-white/10 text-gray-100 border-hacker-green' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200 border-transparent'"
-                >
-                    <i class="fa-solid fa-file-lines text-yellow-500 w-4"></i>
-                    <span class="hidden md:inline text-sm">Documents</span>
-                </div>
-    
-                <div 
-                    @click="navigateTo('pictures')"
-                    class="sidebar-item px-4 py-2 cursor-pointer flex items-center gap-3 border-l-2 transition-colors"
-                    :class="currentPath.includes('pictures') ? 'bg-white/10 text-gray-100 border-hacker-green' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200 border-transparent'"
-                >
-                    <i class="fa-solid fa-images text-purple-400 w-4"></i>
-                    <span class="hidden md:inline text-sm">Pictures</span>
-                </div>
-                
-                <div class="flex-1"></div>
-                
-                 <div 
-                    @click="currentPath = ['root']"
-                    class="sidebar-item px-4 py-2 cursor-pointer flex items-center gap-3 border-l-2 transition-colors"
-                    :class="currentPath.length === 1 ? 'bg-white/10 text-gray-100 border-hacker-green' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200 border-transparent'"
-                >
-                    <i class="fa-solid fa-hard-drive text-gray-500 w-4"></i>
-                    <span class="hidden md:inline text-sm">Local Disk (C:)</span>
-                </div>
+<template>
+    <div class="flex-1 flex overflow-hidden h-full font-mono select-none bg-hacker-black">
+        
+        <div class="w-14 md:w-48 bg-gray-900 border-r border-gray-800 flex flex-col py-2 shrink-0">
+            <div 
+                v-for="folder in [
+                    { id: 'desktop', icon: 'fa-desktop', color: 'text-blue-400', label: 'Desktop' },
+                    { id: 'documents', icon: 'fa-file-lines', color: 'text-yellow-500', label: 'Documents' },
+                    { id: 'pictures', icon: 'fa-images', color: 'text-purple-400', label: 'Pictures' }
+                ]"
+                :key="folder.id"
+                @click="navigateTo(folder.id)"
+                class="px-4 py-3 cursor-pointer flex items-center justify-center md:justify-start gap-3 border-l-2 transition-all active:bg-white/10"
+                :class="currentPath.includes(folder.id) && currentPath.length === 2 ? 'bg-white/10 text-gray-100 border-hacker-green' : 'text-gray-500 border-transparent'"
+            >
+                <i :class="['fa-solid w-4 text-lg md:text-base', folder.icon, folder.color]"></i>
+                <span class="hidden md:inline text-sm">{{ folder.label }}</span>
             </div>
-    
-            <div class="flex-1 bg-hacker-black/50 flex flex-col relative overflow-hidden">
-                
-                <div class="h-10 border-b border-gray-700 flex items-center px-4 gap-2 bg-gray-800/50">
-                    <button 
-                        @click="goUp" 
-                        class="w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 transition-colors"
-                        :class="currentPath.length > 1 ? 'text-gray-200' : 'text-gray-600 cursor-not-allowed'"
-                        :disabled="currentPath.length <= 1"
-                    >
-                        <i class="fa-solid fa-arrow-up"></i>
-                    </button>
-                    
-                    <div class="h-4 w-[1px] bg-gray-600 mx-2"></div>
-                    
-                    <div class="text-sm text-gray-300 font-mono flex-1 truncate">
-                       {{ pathDisplay }}
-                    </div>
-                </div>
-    
-                <div class="flex-1 p-4 overflow-y-auto">
-                    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        <div 
-                            v-for="(item, name) in currentFiles" 
-                            :key="name"
-                            class="group flex flex-col items-center p-2 hover:bg-white/10 rounded cursor-pointer transition-colors"
-                            @dblclick="openItem(name, item)"
-                            @click="isMobile && openItem(name, item)" 
-                        >
-                            <i v-if="item.type === 'directory'" class="fa-solid fa-folder text-4xl text-yellow-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                            <i v-else-if="item.type === 'pdf'" class="fa-solid fa-file-pdf text-4xl text-red-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                            <i v-else-if="item.type === 'img'" class="fa-solid fa-image text-4xl text-purple-400 mb-2 group-hover:scale-110 transition-transform"></i>
-                            <i v-else-if="item.windowId === 'readme'" class="fa-brands fa-markdown text-4xl text-blue-400 mb-2 group-hover:scale-110 transition-transform"></i>
-                            <i v-else-if="item.windowId === 'browser'" class="fa-solid fa-globe text-4xl text-blue-400 mb-2 group-hover:scale-110 transition-transform"></i>
-                            <i v-else-if="item.windowId === 'terminal'" class="fa-solid fa-terminal text-4xl text-gray-400 mb-2 group-hover:scale-110 transition-transform"></i>
-                            <i v-else class="fa-solid fa-file text-4xl text-gray-400 mb-2"></i>
-    
-                            <span class="text-xs text-center text-gray-300 break-words w-full line-clamp-2 leading-tight">{{ name }}</span>
-                        </div>
-                        
-                        <div v-if="Object.keys(currentFiles).length === 0" class="col-span-full flex flex-col items-center justify-center text-gray-500 mt-10">
-                            <i class="fa-regular fa-folder-open text-4xl mb-2 opacity-50"></i>
-                            <span class="text-sm">This folder is empty.</span>
-                        </div>
-                    </div>
-                </div>
-    
+
+            <div class="flex-1"></div>
+            
+            <div 
+                @click="currentPath = ['root']"
+                class="px-4 py-3 cursor-pointer flex items-center justify-center md:justify-start gap-3 border-l-2 border-transparent text-gray-500 active:bg-white/10"
+                :class="{ 'bg-white/10 text-gray-100 border-hacker-green': currentPath.length === 1 }"
+            >
+                <i class="fa-solid fa-hard-drive w-4 text-lg md:text-base"></i>
+                <span class="hidden md:inline text-sm">System (C:)</span>
             </div>
         </div>
-    </template>
+
+        <div class="flex-1 flex flex-col min-w-0">
+            <div class="h-12 border-b border-gray-800 flex items-center px-4 gap-2 bg-gray-900/50">
+                <button 
+                    @click="goUp" 
+                    class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 active:bg-hacker-green active:text-black transition-colors"
+                    :class="currentPath.length > 1 ? 'text-gray-200' : 'text-gray-600 cursor-not-allowed'"
+                    :disabled="currentPath.length <= 1"
+                >
+                    <i class="fa-solid fa-arrow-up text-xs"></i>
+                </button>
+                
+                <div class="h-4 w-[1px] bg-gray-700 mx-1"></div>
+                
+                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <template v-for="(segment, index) in currentPath" :key="index">
+                        <button 
+                            @click="navigateToSegment(index)"
+                            class="text-[10px] md:text-xs px-2 py-1 rounded hover:bg-white/10 active:text-hacker-green transition-colors"
+                            :class="index === currentPath.length - 1 ? 'text-white font-bold' : 'text-gray-500'"
+                        >
+                            {{ segment === 'root' ? 'System' : segment }}
+                        </button>
+                        <i v-if="index < currentPath.length - 1" class="fa-solid fa-chevron-right text-[8px] text-gray-700"></i>
+                    </template>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800">
+                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-4">
+                    <div 
+                        v-for="(item, name) in currentFiles" 
+                        :key="name"
+                        class="group flex flex-col items-center p-3 rounded-xl hover:bg-white/5 active:bg-hacker-green/20 cursor-pointer transition-all border border-transparent active:border-hacker-green/30"
+                        @dblclick="!isMobile && openItem(name, item)"
+                        @click="isMobile && openItem(name, item)" 
+                    >
+                        <div class="relative mb-2 group-hover:scale-110 transition-transform duration-200">
+                            <i v-if="item.type === 'directory'" class="fa-solid fa-folder text-4xl text-yellow-500"></i>
+                            <i v-else-if="item.type === 'pdf'" class="fa-solid fa-file-pdf text-4xl text-red-500"></i>
+                            <i v-else-if="item.type === 'img'" class="fa-solid fa-image text-4xl text-purple-400"></i>
+                            <i v-else-if="item.windowId === 'readme'" class="fa-brands fa-markdown text-4xl text-blue-400"></i>
+                            <i v-else-if="item.windowId === 'browser'" class="fa-solid fa-globe text-4xl text-blue-400"></i>
+                            <i v-else-if="item.windowId === 'terminal'" class="fa-solid fa-terminal text-4xl text-gray-400"></i>
+                            <i v-else class="fa-solid fa-file text-4xl text-gray-400"></i>
+                        </div>
+
+                        <span class="text-[10px] md:text-xs text-center text-gray-300 break-all w-full line-clamp-2 leading-tight px-1">
+                            {{ name }}
+                        </span>
+                    </div>
+
+                    <div v-if="Object.keys(currentFiles).length === 0" class="col-span-full flex flex-col items-center justify-center text-gray-600 mt-12">
+                        <i class="fa-regular fa-folder-open text-5xl mb-4 opacity-20"></i>
+                        <span class="text-xs uppercase tracking-widest opacity-40">Directory Empty</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

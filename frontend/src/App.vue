@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
+    import { ref, computed, onMounted, onUnmounted, defineAsyncComponent, watch } from 'vue'
     import { marked } from 'marked'
     import { useWindowStore } from './stores/windowManager'
     import { fileSystem } from './utils/fileSystem'
@@ -49,6 +49,18 @@
         currentTime.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
+    // --- FILE OPENING FIX FOR MOBILE ---
+    // This watches for new windows (like images/PDFs) opening and auto-focuses them on mobile
+    watch(() => store.activeWindows.length, (newCount, oldCount) => {
+        if (isMobile.value && newCount > oldCount) {
+            const latestWin = store.activeWindows[store.activeWindows.length - 1]
+            if (latestWin) {
+                store.focusedWindow = latestWin.id
+                isSwitcherOpen.value = false
+            }
+        }
+    })
+
     // --- ICON DRAG & GRID LOGIC (DESKTOP ONLY) ---
     const CELL_W = 100 
     const CELL_H = 110 
@@ -56,12 +68,8 @@
     const OFFSET_Y = 16 
 
     const dragState = ref({
-        isDragging: false,
-        iconName: null,
-        startX: 0, startY: 0,
-        initialX: 0, initialY: 0,
-        currentX: 0, currentY: 0,
-        hasMoved: false
+        isDragging: false, iconName: null, startX: 0, startY: 0,
+        initialX: 0, initialY: 0, currentX: 0, currentY: 0, hasMoved: false
     })
 
     const getIconPos = (name) => {
@@ -144,17 +152,14 @@
         return 'text-gray-400'
     }
 
-    // --- MOBILE SWITCHER LOGIC ---
+    // --- MOBILE SWITCHER & SWIPE-TO-CLOSE ---
     const touchY = ref(0)
     const cardOffsets = ref({})
-
     const onCardTouchStart = (e) => { touchY.value = e.touches[0].clientY }
-    
     const onCardTouchMove = (id, e) => {
         const deltaY = e.touches[0].clientY - touchY.value
         if (deltaY < 0) cardOffsets.value[id] = deltaY
     }
-
     const onCardTouchEnd = (id) => {
         if (cardOffsets.value[id] < -120) {
             store.closeWindow(id)
@@ -169,11 +174,6 @@
         isSwitcherOpen.value = false
     }
 
-    const toggleSwitcher = () => {
-        isSwitcherOpen.value = !isSwitcherOpen.value
-    }
-
-    /* Guard so touch devices don't double-fire (touchend + click) */
     let _switcherTapAt = 0
     const onSwitcherTap = () => {
         const now = Date.now()
@@ -208,45 +208,33 @@
             </div>
 
             <div class="flex-1 relative overflow-hidden bg-black">
-                <!-- 1) Desktop grid (no app focused) - stays rendered, pointer-events disabled when switcher open -->
-                <div
-                    v-if="!activeMobileApp"
-                    class="h-full w-full p-6 grid grid-cols-3 gap-y-8 gap-x-4 content-start overflow-y-auto absolute inset-0"
-                    :class="{ 'pointer-events-none': isSwitcherOpen }"
-                >
+                <div class="h-full w-full p-6 grid grid-cols-3 gap-y-8 gap-x-4 content-start overflow-y-auto absolute inset-0" :class="{ 'pointer-events-none opacity-50': activeMobileApp || isSwitcherOpen }">
                     <div v-for="(item, name) in desktopIcons" :key="name" @click="handleIconClick(item.windowId)" class="flex flex-col items-center gap-2 active:scale-90 transition-transform">
                         <div class="w-16 h-16 rounded-2xl bg-gray-800/50 border border-white/5 flex items-center justify-center text-3xl shadow-xl" :class="getIconColor(name)"><i :class="item.icon"></i></div>
                         <span class="text-[10px] text-center font-bold text-gray-300 uppercase tracking-tighter">{{ name.replace('.lnk', '') }}</span>
                     </div>
                 </div>
 
-                <!-- 2) Active app layer - always rendered when activeMobileApp is set (never unmount when switcher open) -->
-                <div
-                    v-if="activeMobileApp"
-                    class="absolute inset-0 bg-[#121212] z-50 animate-mobile-app"
-                    :class="{ 'pointer-events-none': isSwitcherOpen }"
-                >
+                <div v-if="activeMobileApp" class="absolute inset-0 bg-[#121212] z-50 animate-mobile-app" :class="{ 'pointer-events-none': isSwitcherOpen }">
                     <component :is="{
                         terminal: Terminal, files: FileExplorer, code: CodeViewer, pdf: PDFViewer,
                         image: ImageViewer, readme: 'div', browser: Browser, settings: Settings,
                         mail: Mail, notepad: Notepad, music: MusicPlayer, about: AboutMe,
                         chat: Chat, nettool: NetTool
-                    }[activeMobileApp]" :filePath="store.windows[activeMobileApp]?.filePath" class="h-full" />
+                    }[activeMobileApp]" 
+                    :key="activeMobileApp"
+                    :filePath="store.windows[activeMobileApp]?.filePath" class="h-full" />
                     <div v-if="activeMobileApp === 'readme'" class="h-full overflow-y-auto p-6 prose prose-invert prose-sm bg-[#0a0a0a] max-w-none" v-html="readmeHtml"></div>
                 </div>
 
-                <!-- 3) App Switcher overlay - last in DOM so it stacks on top -->
                 <div v-if="isSwitcherOpen" class="absolute inset-0 z-[999] bg-black/80 backdrop-blur-xl flex flex-col animate-fade-in">
                     <div class="flex-1 overflow-x-auto flex items-center gap-6 px-12 snap-x">
                         <div v-if="store.activeWindows.length === 0" class="text-gray-500 text-sm w-full text-center font-sans">No apps running</div>
-                        <div
+                        <div 
                             v-for="win in store.activeWindows" :key="win.id"
                             class="relative shrink-0 w-64 h-[60vh] bg-gray-900 rounded-2xl border border-white/10 overflow-hidden snap-center transition-transform duration-200"
                             :style="{ transform: `translateY(${cardOffsets[win.id] || 0}px)` }"
-                            @touchstart="onCardTouchStart"
-                            @touchmove="onCardTouchMove(win.id, $event)"
-                            @touchend="onCardTouchEnd(win.id)"
-                            @click="handleIconClick(win.id)"
+                            @touchstart="onCardTouchStart" @touchmove="onCardTouchMove(win.id, $event)" @touchend="onCardTouchEnd(win.id)" @click="handleIconClick(win.id)"
                         >
                             <div class="h-10 bg-gray-800 flex items-center px-4 gap-2 border-b border-white/5">
                                 <i :class="[win.icon, getIconColor(win.title)]" class="text-xs"></i>
@@ -257,19 +245,16 @@
                             </div>
                         </div>
                     </div>
-
                     <div v-if="store.activeWindows.length > 0" class="p-8 flex justify-center">
-                        <button @click="clearAllApps" class="px-6 py-2 bg-white/10 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] text-white active:bg-red-500/20 active:border-red-500/40 transition-all">
-                            Clear All
-                        </button>
+                        <button @click="clearAllApps" class="px-6 py-2 bg-white/10 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] text-white active:bg-red-500/20 transition-all">Clear All</button>
                     </div>
                 </div>
             </div>
 
-            <div class="h-14 bg-black/90 border-t border-white/5 flex justify-around items-center px-12 shrink-0 relative z-[1000] touch-manipulation pointer-events-auto">
-                <button type="button" @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center -m-2"><i class="fa-solid fa-chevron-left text-lg"></i></button>
-                <button type="button" @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center -m-2"><i class="fa-solid fa-circle text-xl"></i></button>
-                <button type="button" @click.stop="onSwitcherTap" @touchend.prevent.stop="onSwitcherTap" class="text-gray-500 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center -m-2" :class="isSwitcherOpen ? 'text-teal-400' : 'active:text-white'"><i class="fa-solid fa-square text-lg pointer-events-none"></i></button>
+            <div class="h-14 bg-black/90 border-t border-white/5 flex justify-around items-center px-12 shrink-0 relative z-[1000]">
+                <button @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white transition-colors min-h-[44px] min-w-[44px]"><i class="fa-solid fa-chevron-left text-lg"></i></button>
+                <button @click.stop="store.focusedWindow = null; isSwitcherOpen = false" class="text-gray-500 active:text-white transition-colors min-h-[44px] min-w-[44px]"><i class="fa-solid fa-circle text-xl"></i></button>
+                <button @click.stop="onSwitcherTap" class="text-gray-500 transition-colors min-h-[44px] min-w-[44px]" :class="isSwitcherOpen ? 'text-teal-400' : 'active:text-white'"><i class="fa-solid fa-square text-lg"></i></button>
             </div>
         </div>
 
@@ -281,12 +266,10 @@
                     <span class="text-xs font-bold text-shadow">{{ name.replace('.lnk', '') }}</span>
                 </div>
             </div>
-            
             <WindowFrame v-for="win in store.activeWindows" :key="win.id" :windowId="win.id" :title="win.title" :icon="win.icon">
                 <component :is="{terminal: Terminal, files: FileExplorer, code: CodeViewer, pdf: PDFViewer, image: ImageViewer, readme: 'div', browser: Browser, settings: Settings, mail: Mail, notepad: Notepad, music: MusicPlayer, about: AboutMe, chat: Chat, nettool: NetTool}[win.id]" :filePath="win.filePath" />
                 <div v-if="win.id === 'readme'" class="h-full overflow-y-auto p-6 prose prose-invert" v-html="readmeHtml"></div>
             </WindowFrame>
-
             <Taskbar />
         </div>
         <NotificationToast />
