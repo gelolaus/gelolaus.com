@@ -25,7 +25,8 @@
     const MusicPlayer = defineAsyncComponent(() => import('@/components/apps/MusicPlayer.vue'))
     const CodeViewer = defineAsyncComponent(() => import('@/components/apps/CodeViewer.vue'))
     const AboutMe = defineAsyncComponent(() => import('@/components/apps/AboutMe.vue'))
-
+    const Chat = defineAsyncComponent(() => import('@/components/apps/Chat.vue'))
+    
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
     
@@ -229,6 +230,7 @@
         v-else 
         @click="handleBackgroundClick"
         class="bg-hacker-black h-full w-full overflow-hidden font-mono text-gray-300 relative select-none touch-none"
+        :style="store.wallpaper ? { backgroundImage: `url(${store.wallpaper})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
       >
         
         <div class="absolute inset-0 z-0 transition-opacity duration-700"
@@ -267,6 +269,7 @@
                     name.includes('music') ? 'text-purple-400' :
                     name.includes('code') ? 'text-blue-300' :
                     name.includes('about') ? 'text-green-400' :
+                    name.includes('chat') ? 'text-teal-400' : // <-- NEW COLOR FOR CHAT ICON
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -367,7 +370,11 @@
 
         <WindowFrame windowId="about" :title="store.windows.about.title" :icon="store.windows.about.icon">
           <AboutMe />
-      </WindowFrame>
+        </WindowFrame>
+
+        <WindowFrame windowId="chat" :title="store.windows.chat.title" :icon="store.windows.chat.icon">
+            <Chat />
+        </WindowFrame>
 
         <Taskbar />
         

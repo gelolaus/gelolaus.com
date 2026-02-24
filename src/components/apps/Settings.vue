@@ -1,17 +1,32 @@
 <script setup>
     import { useWindowStore } from '@/stores/windowManager'
     
-    // We grab the store so we can change the global settings
     const store = useWindowStore()
     
-    // This function handles the toggle clicks
-    // It's a bit cleaner than writing the logic inside the template
     const toggleSetting = (setting) => {
       if (setting === 'crt') {
         store.toggleCRT()
       } else if (setting === 'sound') {
         store.toggleSound()
       }
+    }
+
+    const handleFileUpload = (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+
+      // Limit to 2MB to keep localStorage safe
+      if (file.size > 2 * 1024 * 1024) {
+        store.notify('Error', 'Image too large. Keep it under 2MB.', 'error')
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        store.setWallpaper(event.target.result)
+        store.notify('Success', 'Wallpaper updated.', 'success')
+      }
+      reader.readAsDataURL(file)
     }
 </script>
     
@@ -21,6 +36,38 @@
     <h1 class="text-2xl font-bold text-hacker-green mb-6 border-b border-gray-700 pb-2">
       <i class="fa-solid fa-gears mr-2"></i>System Settings
     </h1>
+
+    <div class="mb-8">
+      <h2 class="text-xl text-purple-400 mb-4 font-bold flex items-center gap-2">
+        <i class="fa-solid fa-palette"></i> Personalization
+      </h2>
+      
+      <div class="bg-white/5 p-4 rounded border border-gray-800">
+        <div class="flex flex-col gap-4">
+          <div>
+            <div class="font-bold text-gray-300 text-sm mb-1">Desktop Wallpaper</div>
+            <div class="text-[10px] text-gray-500 mb-3">Upload a custom background (Max 2MB)</div>
+          </div>
+
+          <div class="flex gap-2">
+            <label class="flex-1">
+              <div class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2 px-4 rounded cursor-pointer text-center transition-colors">
+                <i class="fa-solid fa-upload mr-2"></i> UPLOAD IMAGE
+              </div>
+              <input type="file" class="hidden" accept="image/*" @change="handleFileUpload">
+            </label>
+
+            <button 
+              v-if="store.wallpaper"
+              @click="store.removeWallpaper"
+              class="bg-red-900/40 hover:bg-red-900/60 text-red-400 text-xs font-bold py-2 px-4 rounded border border-red-500/30 transition-colors"
+            >
+              <i class="fa-solid fa-trash-can mr-2"></i> REMOVE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="mb-8">
       <h2 class="text-xl text-blue-400 mb-4 font-bold flex items-center gap-2">

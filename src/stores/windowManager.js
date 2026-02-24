@@ -14,6 +14,9 @@ export const useWindowStore = defineStore('windows', () => {
   // Track if sound effects are enabled (clicks, beeps)
   const soundEnabled = ref(true)
   
+  // Track custom desktop wallpaper
+  const wallpaper = ref(null)
+
   // --- GLOBAL AUTH STATE ---
   // Holds the currently logged-in user: { email, name, pin }
   const currentUser = ref(null) 
@@ -27,7 +30,6 @@ export const useWindowStore = defineStore('windows', () => {
   const notifications = ref([])
 
   // Function to show a pop-up message
-  // We can call this from anywhere: store.notify('Title', 'Message', 'success')
   function notify(title, message, type = 'info') {
     const id = Date.now() // Simple unique ID based on time
     
@@ -74,7 +76,8 @@ export const useWindowStore = defineStore('windows', () => {
     notepad: defaultState('notepad', 'Notepad', 'fa-solid fa-file-lines'),
     music: defaultState('music', 'Music Player', 'fa-solid fa-music'),
     code: defaultState('code', 'Code Editor', 'fa-solid fa-code'),
-    about: defaultState('about', 'About Me', 'fa-solid fa-address-card')
+    about: defaultState('about', 'About Me', 'fa-solid fa-address-card'),
+    chat: defaultState('chat', 'Global Chat', 'fa-solid fa-comments')
   })
   
   // --- SAVED DATA LOADING ---
@@ -95,7 +98,7 @@ export const useWindowStore = defineStore('windows', () => {
     }
   }
 
-  // Check if we have any saved system settings (sound, theme, etc.)
+  // Check if we have any saved system settings (sound, theme, wallpaper, etc.)
   const savedSettings = localStorage.getItem('gelos-settings')
 
   if (savedSettings) {
@@ -104,6 +107,7 @@ export const useWindowStore = defineStore('windows', () => {
       isMatrixActive.value = parsed.matrix ?? false
       isCRTActive.value = parsed.crt ?? true
       soundEnabled.value = parsed.sound ?? true
+      wallpaper.value = parsed.wallpaper ?? null
     } catch (e) {
       console.error('Failed to load settings', e)
     }
@@ -126,11 +130,12 @@ export const useWindowStore = defineStore('windows', () => {
     localStorage.setItem('gelos-windows', JSON.stringify(newVal))
   }, { deep: true }) 
 
-  watch([isMatrixActive, isCRTActive, soundEnabled], () => {
+  watch([isMatrixActive, isCRTActive, soundEnabled, wallpaper], () => {
     localStorage.setItem('gelos-settings', JSON.stringify({
       matrix: isMatrixActive.value,
       crt: isCRTActive.value,
-      sound: soundEnabled.value
+      sound: soundEnabled.value,
+      wallpaper: wallpaper.value
     }))
   })
 
@@ -150,6 +155,14 @@ export const useWindowStore = defineStore('windows', () => {
 
   function toggleSound() {
     soundEnabled.value = !soundEnabled.value
+  }
+
+  function setWallpaper(base64) {
+    wallpaper.value = base64
+  }
+
+  function removeWallpaper() {
+    wallpaper.value = null
   }
 
   // Update a single icon's position
@@ -253,6 +266,7 @@ export const useWindowStore = defineStore('windows', () => {
     isMatrixActive, 
     isCRTActive, 
     soundEnabled, 
+    wallpaper,
     currentUser, 
     notifications,
     iconPositions,
@@ -260,6 +274,8 @@ export const useWindowStore = defineStore('windows', () => {
     toggleMatrix, 
     toggleCRT, 
     toggleSound,
+    setWallpaper,
+    removeWallpaper,
     updateIconPosition,
     openWindow, 
     closeWindow, 
