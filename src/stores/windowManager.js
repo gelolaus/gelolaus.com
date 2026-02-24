@@ -77,7 +77,8 @@ export const useWindowStore = defineStore('windows', () => {
     music: defaultState('music', 'Music Player', 'fa-solid fa-music'),
     code: defaultState('code', 'Code Editor', 'fa-solid fa-code'),
     about: defaultState('about', 'About Me', 'fa-solid fa-address-card'),
-    chat: defaultState('chat', 'Global Chat', 'fa-solid fa-comments')
+    chat: defaultState('chat', 'Global Chat', 'fa-solid fa-comments'),
+    nettool: defaultState('nettool', 'Network Utility', 'fa-solid fa-network-wired')
   })
   
   // --- SAVED DATA LOADING ---

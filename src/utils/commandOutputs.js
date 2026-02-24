@@ -8,6 +8,7 @@ export const commands = {
         <span class="ml-4">ac</span> - Achievements, Awards, and Recognitions<br>
         <span class="ml-4">xp</span> - Experience<br>
         <span class="ml-4">go</span> - Short-Term and Long-Term Goals<br>
+        <span class="ml-4">curl [url]</span> - Fetch JSON from a REST API<br> <span class="ml-4">ls</span> - List files<br>
         <span class="ml-4">ls</span> - List files<br>
         <span class="ml-4">cd [dir]</span> - Change directory<br>
         <span class="ml-4">open [file]</span> - Open a file<br>

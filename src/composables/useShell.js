@@ -191,6 +191,38 @@ export function useShell() {
                 handleOpen(target)
                 break
 
+            case 'curl':
+                if (!target) {
+                    history.value.push({ text: "usage: curl [url]", color: 'text-yellow-500' })
+                    break
+                }
+                
+                // Add an initial loading message
+                history.value.push({ text: `Resolving ${target}...`, color: 'text-gray-400' })
+                
+                // Perform the asynchronous fetch
+                fetch(target)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+                        return res.json()
+                    })
+                    .then(data => {
+                        // Format the JSON nicely with HTML breaks and spaces
+                        const formatted = JSON.stringify(data, null, 2)
+                            .replace(/\n/g, '<br>')
+                            .replace(/ /g, '&nbsp;')
+                            
+                        history.value.push({ 
+                            text: `<div class="text-blue-300 font-mono text-xs">${formatted}</div>`, 
+                            isHtml: true 
+                        })
+                    })
+                    .catch(err => {
+                        // If it's not JSON, or the fetch failed, catch it here
+                        history.value.push({ text: `curl: request failed - ${err.message}`, color: 'text-red-500' })
+                    })
+                break
+
             default:
                 // Command not found
                 history.value.push({ text: `Command not found: ${cmd}`, color: 'text-red-500' })

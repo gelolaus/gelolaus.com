@@ -26,6 +26,7 @@
     const CodeViewer = defineAsyncComponent(() => import('@/components/apps/CodeViewer.vue'))
     const AboutMe = defineAsyncComponent(() => import('@/components/apps/AboutMe.vue'))
     const Chat = defineAsyncComponent(() => import('@/components/apps/Chat.vue'))
+    const NetTool = defineAsyncComponent(() => import('@/components/apps/NetTool.vue'))
     
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()
@@ -269,7 +270,8 @@
                     name.includes('music') ? 'text-purple-400' :
                     name.includes('code') ? 'text-blue-300' :
                     name.includes('about') ? 'text-green-400' :
-                    name.includes('chat') ? 'text-teal-400' : // <-- NEW COLOR FOR CHAT ICON
+                    name.includes('chat') ? 'text-teal-400' :
+                    name.includes('nettool') ? 'text-orange-400' :
                     'text-gray-400',
                     selectedIcon === name ? 'scale-110' : 'group-hover:scale-110']">
                 </i>
@@ -374,6 +376,10 @@
 
         <WindowFrame windowId="chat" :title="store.windows.chat.title" :icon="store.windows.chat.icon">
             <Chat />
+        </WindowFrame>
+
+        <WindowFrame windowId="nettool" :title="store.windows.nettool.title" :icon="store.windows.nettool.icon">
+            <NetTool />
         </WindowFrame>
 
         <Taskbar />
