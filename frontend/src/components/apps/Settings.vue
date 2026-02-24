@@ -1,5 +1,5 @@
 <script setup>
-    import { useWindowStore } from '@/stores/windowManager'
+    import { useWindowStore } from '../../stores/windowManager'
     
     const store = useWindowStore()
     

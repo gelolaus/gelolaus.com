@@ -1,8 +1,8 @@
 <script setup>
     import { ref, computed } from 'vue'
-    import { useWindowStore } from '@/stores/windowManager'
-    import { fileSystem } from '@/utils/fileSystem'
-    import { useBreakpoints } from '@/composables/useBreakpoints'
+    import { useWindowStore } from '../../stores/windowManager'
+    import { fileSystem } from '../../utils/fileSystem'
+    import { useBreakpoints } from '../../composables/useBreakpoints'
     
     const store = useWindowStore()
     const { isMobile } = useBreakpoints()

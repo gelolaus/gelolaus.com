@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '@/utils/supabase'
-import { useWindowStore } from '@/stores/windowManager'
+import { supabase } from '../../utils/supabase'
+import { useWindowStore } from '../../stores/windowManager'
 
 const emit = defineEmits(['success'])
 const store = useWindowStore()

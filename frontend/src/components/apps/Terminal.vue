@@ -1,7 +1,7 @@
 <script setup>
     import { ref, onMounted, nextTick } from 'vue'
     import DOMPurify from 'dompurify'
-    import { useShell } from '@/composables/useShell'
+    import { useShell } from '../../composables/useShell'
     
     // Get all the terminal logic from the useShell composable
     const { history, currentPath, commandHistory, execute, formatPath, handleTab } = useShell()

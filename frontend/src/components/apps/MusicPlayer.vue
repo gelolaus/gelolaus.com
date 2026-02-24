@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useWindowStore } from '@/stores/windowManager'
+import { useWindowStore } from '../../stores/windowManager'
 
 const store = useWindowStore()
 

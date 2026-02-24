@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
-import { fileSystem } from '@/utils/fileSystem'
+import { fileSystem } from '../../utils/fileSystem'
 import { Editor } from '@guolao/vue-monaco-editor'
-import { useWindowStore } from '@/stores/windowManager'
+import { useWindowStore } from '../../stores/windowManager'
 
 const props = defineProps({
   filePath: {

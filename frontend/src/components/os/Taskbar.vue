@@ -1,7 +1,7 @@
 <script setup>
     import { ref, onMounted, onUnmounted, computed } from 'vue'
-    import { useWindowStore } from '@/stores/windowManager'
-    import { useBreakpoints } from '@/composables/useBreakpoints'
+    import { useWindowStore } from '../../stores/windowManager'
+    import { useBreakpoints } from '../../composables/useBreakpoints'
     import StartMenu from './StartMenu.vue'
     
     const store = useWindowStore()

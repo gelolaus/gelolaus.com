@@ -1,7 +1,7 @@
 <script setup>
     import { computed } from 'vue'
-    import { useWindowStore } from '@/stores/windowManager'
-    import { useBreakpoints } from '@/composables/useBreakpoints'
+    import { useWindowStore } from '../../stores/windowManager'
+    import { useBreakpoints } from '../../composables/useBreakpoints'
     
     // Tell parent to close the menu
     const emit = defineEmits(['close'])

@@ -1,17 +1,17 @@
 <script setup>
     import { ref, computed, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
     import { marked } from 'marked'
-    import { useWindowStore } from '@/stores/windowManager'
-    import { fileSystem } from '@/utils/fileSystem'
-    import { playKey, playClick } from '@/utils/sound' 
-    import { useBreakpoints } from '@/composables/useBreakpoints'
+    import { useWindowStore } from './stores/windowManager'
+    import { fileSystem } from './utils/fileSystem'
+    import { playKey, playClick } from './utils/sound' 
+    import { useBreakpoints } from './composables/useBreakpoints'
     import WindowFrame from '@/components/os/WindowFrame.vue'
     import Taskbar from '@/components/os/Taskbar.vue'
     import BootScreen from '@/components/effects/BootScreen.vue'
     import MatrixRain from '@/components/effects/MatrixRain.vue'
     import NotificationToast from '@/components/os/NotificationToast.vue'
     import LoginScreen from '@/components/os/LoginScreen.vue'
-    import { readmeContent } from '@/utils/projectReadme'
+    import { readmeContent } from './utils/projectReadme'
     
     // Load app components lazily (only when needed) to speed up initial load
     const Terminal = defineAsyncComponent(() => import('@/components/apps/Terminal.vue'))

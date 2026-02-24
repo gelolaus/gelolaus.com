@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { supabase } from '@/utils/supabase'
-import { useWindowStore } from '@/stores/windowManager'
+import { supabase } from '../../utils/supabase'
+import { useWindowStore } from '../../stores/windowManager'
 
 const store = useWindowStore()
 const messages = ref([])

@@ -1,8 +1,8 @@
 import { ref } from 'vue'
-import { fileSystem } from '@/utils/fileSystem'
-import { commands } from '@/utils/commandOutputs'
-import { resolvePath } from '@/utils/pathResolver'
-import { useWindowStore } from '@/stores/windowManager'
+import { fileSystem } from '../utils/fileSystem'
+import { commands } from '../utils/commandOutputs'
+import { resolvePath } from '../utils/pathResolver'
+import { useWindowStore } from '../stores/windowManager'
 
 // Composable for handling terminal commands
 export function useShell() {

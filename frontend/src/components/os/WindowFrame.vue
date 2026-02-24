@@ -2,8 +2,8 @@
   import { ref, onMounted, computed, nextTick, watch } from 'vue'
   import interact from 'interactjs'
   import gsap from 'gsap'
-  import { useWindowStore } from '@/stores/windowManager'
-  import { useBreakpoints } from '@/composables/useBreakpoints'
+  import { useWindowStore } from '../../stores/windowManager'
+  import { useBreakpoints } from '../../composables/useBreakpoints'
   
   const props = defineProps(['windowId', 'title', 'icon'])
   const store = useWindowStore()

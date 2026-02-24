@@ -1,4 +1,4 @@
-import { useWindowStore } from '@/stores/windowManager'
+import { useWindowStore } from '../stores/windowManager'
 
 // Load sound effects
 const clickAudio = new Audio('/assets/sounds/click.mp3')

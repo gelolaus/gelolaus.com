@@ -1,5 +1,5 @@
 <script setup>
-    import { useWindowStore } from '@/stores/windowManager'
+    import { useWindowStore } from '../../stores/windowManager'
     
     // Get the store so we can see the list of notifications
     const store = useWindowStore()

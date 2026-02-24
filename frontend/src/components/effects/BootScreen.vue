@@ -1,6 +1,6 @@
 <script setup>
     import { ref, onMounted } from 'vue'
-    import { fileSystem } from '@/utils/fileSystem' 
+    import { fileSystem } from '../../utils/fileSystem' 
     
     // Tell parent when boot is complete
     const emit = defineEmits(['complete'])
