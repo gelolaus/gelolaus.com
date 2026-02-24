@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 // Store for managing all the windows in our fake OS
 export const useWindowStore = defineStore('windows', () => {
@@ -46,6 +46,16 @@ export const useWindowStore = defineStore('windows', () => {
   
   // Keep track of which window is on top
   const activeZIndex = ref(100)
+
+  // Mobile: which single window is "focused" (fullscreen). null = desktop.
+  const focusedWindow = ref(null)
+
+  // Derived: list of open windows for taskbar / app switcher (id, title, icon, filePath, etc.)
+  const activeWindows = computed(() => {
+    return Object.entries(windows.value)
+      .filter(([, w]) => w.isOpen)
+      .map(([id, w]) => ({ id, title: w.title, icon: w.icon, filePath: w.filePath, url: w.url }))
+  })
 
   // Helper function to create default window settings
   const defaultState = (id, title, icon, url = '', filePath = '') => ({
@@ -264,6 +274,8 @@ export const useWindowStore = defineStore('windows', () => {
 
   return { 
     windows, 
+    activeWindows,
+    focusedWindow,
     isMatrixActive, 
     isCRTActive, 
     soundEnabled, 

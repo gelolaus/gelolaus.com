@@ -20,7 +20,7 @@
     </script>
     
     <template>
-      <div class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none">
+      <div class="fixed right-4 z-[9999] flex flex-col gap-2 pointer-events-none toast-container">
         
         <TransitionGroup name="toast">
           <div 
@@ -42,6 +42,15 @@
     </template>
     
     <style scoped>
+    /* On mobile, sit above the nav bar (h-14 = 3.5rem) so toasts don't block the app switcher button */
+    .toast-container {
+      bottom: 1rem;
+    }
+    @media (max-width: 767px) {
+      .toast-container {
+        bottom: 5rem;
+      }
+    }
     /* Animations for the toasts sliding in/out */
     .toast-enter-active,
     .toast-leave-active {
