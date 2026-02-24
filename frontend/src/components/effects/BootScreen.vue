@@ -31,7 +31,7 @@
     const runBootSequence = async () => {
         // All the boot messages to show
         const initialLogs = [
-            "Initializing GELOS-KERNEL v2.0...",
+            "Initializing GELOS-KERNEL v3.0...",
             "Loading BIOS settings... [OK]",
             "Verifying CPU microcode... [OK]",
             "[OK] CPU: Intel Core i9-14900K detected (24 Cores).",

@@ -20,7 +20,7 @@
     </script>
     
     <template>
-      <div class="fixed right-4 z-[9999] flex flex-col gap-2 pointer-events-none toast-container">
+      <div class="fixed right-4 z-[10000] flex flex-col gap-2 pointer-events-none toast-container">
         
         <TransitionGroup name="toast">
           <div 

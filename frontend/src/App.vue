@@ -194,7 +194,7 @@
 <template>
     <BootScreen v-if="isBooting" @complete="finishBoot" />
     <LoginScreen v-else-if="isLoggingIn" @success="finishLogin" />
-    
+
     <div v-else class="h-full w-full overflow-hidden bg-black relative select-none touch-none font-mono">
         <div class="absolute inset-0 z-0 transition-opacity duration-700" :class="store.isMatrixActive ? 'opacity-100' : 'opacity-0'"><MatrixRain /></div>
 
@@ -271,13 +271,17 @@
             </div>
             
             <WindowFrame v-for="win in store.activeWindows" :key="win.id" :windowId="win.id" :title="win.title" :icon="win.icon">
-                <component :is="{terminal: Terminal, files: FileExplorer, code: CodeViewer, pdf: PDFViewer, image: ImageViewer, readme: 'div', browser: Browser, settings: Settings, mail: Mail, notepad: Notepad, music: MusicPlayer, about: AboutMe, chat: Chat, nettool: NetTool}[win.id]" :filePath="win.filePath" />
-                <div v-if="win.id === 'readme'" class="h-full overflow-y-auto p-6 prose prose-invert" v-html="readmeHtml"></div>
+                <template v-if="win.id !== 'readme'">
+                    <div class="flex-1 min-h-0 overflow-hidden flex flex-col">
+                        <component :is="{terminal: Terminal, files: FileExplorer, code: CodeViewer, pdf: PDFViewer, image: ImageViewer, readme: 'div', browser: Browser, settings: Settings, mail: Mail, notepad: Notepad, music: MusicPlayer, about: AboutMe, chat: Chat, nettool: NetTool}[win.id]" :filePath="win.filePath" />
+                    </div>
+                </template>
+                <div v-if="win.id === 'readme'" class="flex-1 min-h-0 overflow-y-auto p-6 prose prose-invert" v-html="readmeHtml"></div>
             </WindowFrame>
             <Taskbar />
         </div>
-        <NotificationToast />
     </div>
+    <NotificationToast />
 </template>
 
 <style scoped>

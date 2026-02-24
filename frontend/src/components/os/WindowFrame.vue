@@ -53,27 +53,26 @@
         }
       }
     }).resizable({
-      // Make window resizable from left, right, and bottom edges
+      // Make window resizable from left, right, and bottom edges (no size modifier = no max cap)
       edges: { left: true, right: true, bottom: true, top: false },
-      modifiers: [
-          interact.modifiers.restrictSize({
-              min: { width: 300, height: 200 } // Minimum size
-          })
-      ],
       listeners: {
           move(event) {
               // Don't allow resizing on mobile or when maximized
               if (isMobile.value || winState.value.isMaximized) return
-  
-              const newWidth = event.rect.width
-              const newHeight = event.rect.height
-              
+
+              const MIN_W = 300
+              const MIN_H = 200
+              let newWidth = event.rect.width
+              let newHeight = event.rect.height
+              if (newWidth < MIN_W) newWidth = MIN_W
+              if (newHeight < MIN_H) newHeight = MIN_H
+
               const currentX = winState.value.position.x
               const currentY = winState.value.position.y
-              
+
               const newX = currentX + event.deltaRect.left
               const newY = currentY + event.deltaRect.top
-  
+
               // Update the window size and position
               store.updateSize(props.windowId, { width: newWidth, height: newHeight })
               store.updatePosition(props.windowId, { x: newX, y: newY })
@@ -119,7 +118,10 @@
         if (isOpen) {
           await nextTick()
           const el = windowRef.value
-          if (el) initInteract(el)
+          if (el) {
+            // Delay so layout is complete and resize has no hidden cap
+            requestAnimationFrame(() => initInteract(el))
+          }
         }
       },
       { immediate: true }
@@ -155,7 +157,7 @@
             </div>
         </div>
     
-        <div class="flex-1 overflow-hidden bg-hacker-black relative">
+        <div class="flex-1 flex flex-col min-h-0 overflow-hidden bg-hacker-black relative">
             <slot></slot>
         </div>
         </div>

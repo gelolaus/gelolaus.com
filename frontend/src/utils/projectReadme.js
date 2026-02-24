@@ -2,12 +2,25 @@
 // This gets converted to HTML and displayed in the README window
 export const readmeContent = `
 # Welcome to GelOS
-![Version](https://img.shields.io/badge/version-2.0.0-green?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.0.0-green?style=flat-square)
 ![Status](https://img.shields.io/badge/status-stable-blue?style=flat-square)
 
 Gelo + OS = GelOS. A fully interactive web-based operating system simulation designed to showcase my skills, certifications, and projects in Computer Science, Cyber Security, and Forensics.
 
 This project runs entirely in the browser using **Vue.js 3**, **Pinia**, and **Tailwind CSS**. No backend required.
+
+---
+
+## ✨ What's New in V3.0
+* **Settings App** — Customize themes and preferences.
+* **Persistent Storage** — Your data survives browser refresh.
+* **Notification Toasts** — Stay updated with system notifications.
+* **Mail Client** — Send and read mail in-app.
+* **Chat Client** — Chat with AI or contacts.
+* **Music Player** — Play music from your files.
+* **Code Editor** — Edit code with syntax highlighting.
+* **Login System** — Sign in for a personalized experience.
+* **Better Mobile UI** — GelOS works great on phones and tablets.
 
 ---
 
@@ -56,6 +69,7 @@ The OS features a simulated recursive file system. You can navigate paths just l
 * **[Marked.js](https://marked.js.org/):** Markdown parsing to render this README dynamically.
 * **[Fira Code](https://github.com/tonsky/FiraCode):** Monospace font for the coding aesthetic.
 * **[Google Gemini](https://gemini.google.com/share/4c25460691ad):** Check link for AI use.
+* **[Cursor](.cursor/plans):** Check link for AI use.
 
 ---
 

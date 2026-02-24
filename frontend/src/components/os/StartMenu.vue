@@ -32,7 +32,7 @@
             : 'absolute bottom-12 left-0 w-64 border rounded-t-lg'"
     >
         <div class="bg-hacker-green text-black px-4 py-2 font-bold text-sm tracking-wider flex items-center justify-between shrink-0">
-            <span>GelOS v2.0</span>
+            <span>GelOS v3.0</span>
             <i class="fa-solid fa-user-astronaut"></i>
         </div>
 
