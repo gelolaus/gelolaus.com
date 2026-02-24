@@ -89,6 +89,7 @@ const register = async () => {
           <i class="fa-solid fa-user-shield text-5xl text-gray-600 mb-4"></i>
           <h2 class="text-2xl font-bold text-hacker-green">GelOS LOGIN</h2>
           <p class="text-gray-500 text-xs mt-2">Enter credentials to access desktop.</p>
+          <p class="text-gray-500 text-[10px] mt-1">New users: there&apos;s no separate registration screen — just enter your email to get started.</p>
         </div>
 
         <div class="w-full space-y-4">
